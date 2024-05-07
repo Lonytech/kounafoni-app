@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "kounafoni-app"
+version = "0.1.0"
+description = "The idea is to provide a web interface to enable easy access to Malian news on a daily basis. It highlights the work of the local press and official media through high-quality summary reports"
+authors = ["Lonytech"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+langchain = "^0.1.17"
+jupyter = "^1.0.0"
+dateparser = "^1.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
