@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel, Field, field_validator, ValidationInfo
+from pydantic import BaseModel, field_validator
 
 
 class ScrapDate(BaseModel):
