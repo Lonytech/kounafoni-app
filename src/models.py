@@ -1,0 +1,22 @@
+from datetime import date
+
+from pydantic import BaseModel, field_validator
+
+
+class ScrapDate(BaseModel):
+    end_date: date
+    begin_date: date
+
+    @field_validator("begin_date")
+    def validate_begin_date(cls, value: date, values: dict):
+        end_date = values.data.get("end_date")
+        if value > end_date:
+            raise ValueError("End date must be greater or equal than the begin date.")
+        return value
+
+    # TODO : Add field validator to check if end_date is greater than today
+    # @field_validator("end_date")
+    # def validate_end_date(cls, value: date):
+    #     if value > date.today():
+    #         raise ValueError("End date must not be greater than today.")
+    #     return value
