@@ -18,6 +18,10 @@ Using various data sources (ORTM, Malijet, etc.) :
 ## Technologies Used
 Essentially built with python.
 
+### External tools required
+- Poetry -> See : https://python-poetry.org/docs/
+- Ollama -> See : https://ollama.com/download
+
 (Schema of underlying technologies used for the app)
 
 ## Contribute
