@@ -20,6 +20,9 @@ Essentially built with python.
 
 ### 🛠️ External tools required
 - Poetry -> See : https://python-poetry.org/docs/
+- Install ffmpeg for audio processing : 
+  - On Linux :
+    - `sudo apt update && sudo apt install ffmpeg`
 - Ollama -> See : https://ollama.com/download
   - For linux users :
     - curl -fsSL https://ollama.com/install.sh | sh
