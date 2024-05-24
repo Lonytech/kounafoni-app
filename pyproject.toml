@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-langchain = "^0.1.17"
+langchain = "^0.2.1"
 jupyter = "^1.0.0"
 dateparser = "^1.2.0"
 pandas = "^2.2.2"
@@ -16,6 +16,7 @@ tqdm = "^4.66.4"
 beautifulsoup4 = "^4.12.3"
 black = "^24.4.2"
 isort = "^5.13.2"
+gtts = "^2.5.1"
 
 
 [build-system]

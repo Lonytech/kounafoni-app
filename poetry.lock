@@ -608,21 +608,6 @@ traitlets = ">=4"
 test = ["pytest"]
 
 [[package]]
-name = "dataclasses-json"
-version = "0.6.5"
-description = "Easily serialize dataclasses to and from JSON."
-optional = false
-python-versions = "<4.0,>=3.7"
-files = [
-    {file = "dataclasses_json-0.6.5-py3-none-any.whl", hash = "sha256:f49c77aa3a85cac5bf5b7f65f4790ca0d2be8ef4d92c75e91ba0103072788a39"},
-    {file = "dataclasses_json-0.6.5.tar.gz", hash = "sha256:1c287594d9fcea72dc42d6d3836cf14848c2dc5ce88f65ed61b36b57f515fe26"},
-]
-
-[package.dependencies]
-marshmallow = ">=3.18.0,<4.0.0"
-typing-inspect = ">=0.4.0,<1"
-
-[[package]]
 name = "dateparser"
 version = "1.2.0"
 description = "Date parsing library designed to parse dates from HTML pages"
@@ -906,6 +891,25 @@ files = [
 [package.extras]
 docs = ["Sphinx", "furo"]
 test = ["objgraph", "psutil"]
+
+[[package]]
+name = "gtts"
+version = "2.5.1"
+description = "gTTS (Google Text-to-Speech), a Python library and CLI tool to interface with Google Translate text-to-speech API"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "gTTS-2.5.1-py3-none-any.whl", hash = "sha256:273ec8a5077b25e60ca5a266ed254b54d1f14032b0af3ba00092d14966148664"},
+    {file = "gTTS-2.5.1.tar.gz", hash = "sha256:02d0a9874f945dee9cd5092991c60bc88d4b7767b8cd81144b6fb49dc3de6897"},
+]
+
+[package.dependencies]
+click = ">=7.1,<8.2"
+requests = ">=2.27,<3"
+
+[package.extras]
+docs = ["sphinx", "sphinx-autobuild", "sphinx-click", "sphinx-mdinclude", "sphinx-rtd-theme"]
+tests = ["pytest (>=7.1.3,<8.1.0)", "pytest-cov", "testfixtures"]
 
 [[package]]
 name = "h11"
@@ -1471,23 +1475,20 @@ files = [
 
 [[package]]
 name = "langchain"
-version = "0.1.17"
+version = "0.2.1"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain-0.1.17-py3-none-any.whl", hash = "sha256:f6c5b5fdb529545e6cafbb4ba099031508e621ba1ed7985cf078a597ade3458b"},
-    {file = "langchain-0.1.17.tar.gz", hash = "sha256:709b80afa00ae634dfc7042f3e4c20309267b21ffeacc7d7494d58bcae1862f7"},
+    {file = "langchain-0.2.1-py3-none-any.whl", hash = "sha256:3e13bf97c5717bce2c281f5117e8778823e8ccf62d949e73d3869448962b1c97"},
+    {file = "langchain-0.2.1.tar.gz", hash = "sha256:5758a315e1ac92eb26dafec5ad0fafa03cafa686aba197d5bb0b1dd28cc03ebe"},
 ]
 
 [package.dependencies]
 aiohttp = ">=3.8.3,<4.0.0"
 async-timeout = {version = ">=4.0.0,<5.0.0", markers = "python_version < \"3.11\""}
-dataclasses-json = ">=0.5.7,<0.7"
-jsonpatch = ">=1.33,<2.0"
-langchain-community = ">=0.0.36,<0.1"
-langchain-core = ">=0.1.48,<0.2.0"
-langchain-text-splitters = ">=0.0.1,<0.1"
+langchain-core = ">=0.2.0,<0.3.0"
+langchain-text-splitters = ">=0.2.0,<0.3.0"
 langsmith = ">=0.1.17,<0.2.0"
 numpy = ">=1,<2"
 pydantic = ">=1,<3"
@@ -1503,48 +1504,22 @@ cli = ["typer (>=0.9.0,<0.10.0)"]
 cohere = ["cohere (>=4,<6)"]
 docarray = ["docarray[hnswlib] (>=0.32.0,<0.33.0)"]
 embeddings = ["sentence-transformers (>=2,<3)"]
-extended-testing = ["aiosqlite (>=0.19.0,<0.20.0)", "aleph-alpha-client (>=2.15.0,<3.0.0)", "anthropic (>=0.3.11,<0.4.0)", "arxiv (>=1.4,<2.0)", "assemblyai (>=0.17.0,<0.18.0)", "atlassian-python-api (>=3.36.0,<4.0.0)", "beautifulsoup4 (>=4,<5)", "bibtexparser (>=1.4.0,<2.0.0)", "cassio (>=0.1.0,<0.2.0)", "chardet (>=5.1.0,<6.0.0)", "cohere (>=4,<6)", "couchbase (>=4.1.9,<5.0.0)", "dashvector (>=1.0.1,<2.0.0)", "databricks-vectorsearch (>=0.21,<0.22)", "datasets (>=2.15.0,<3.0.0)", "dgml-utils (>=0.3.0,<0.4.0)", "esprima (>=4.0.1,<5.0.0)", "faiss-cpu (>=1,<2)", "feedparser (>=6.0.10,<7.0.0)", "fireworks-ai (>=0.9.0,<0.10.0)", "geopandas (>=0.13.1,<0.14.0)", "gitpython (>=3.1.32,<4.0.0)", "google-cloud-documentai (>=2.20.1,<3.0.0)", "gql (>=3.4.1,<4.0.0)", "hologres-vector (>=0.0.6,<0.0.7)", "html2text (>=2020.1.16,<2021.0.0)", "javelin-sdk (>=0.1.8,<0.2.0)", "jinja2 (>=3,<4)", "jq (>=1.4.1,<2.0.0)", "jsonschema (>1)", "langchain-openai (>=0.0.2,<0.1)", "lxml (>=4.9.3,<6.0)", "markdownify (>=0.11.6,<0.12.0)", "motor (>=3.3.1,<4.0.0)", "msal (>=1.25.0,<2.0.0)", "mwparserfromhell (>=0.6.4,<0.7.0)", "mwxml (>=0.3.3,<0.4.0)", "newspaper3k (>=0.2.8,<0.3.0)", "numexpr (>=2.8.6,<3.0.0)", "openai (<2)", "openapi-pydantic (>=0.3.2,<0.4.0)", "pandas (>=2.0.1,<3.0.0)", "pdfminer-six (>=20221105,<20221106)", "pgvector (>=0.1.6,<0.2.0)", "praw (>=7.7.1,<8.0.0)", "psychicapi (>=0.8.0,<0.9.0)", "py-trello (>=0.19.0,<0.20.0)", "pymupdf (>=1.22.3,<2.0.0)", "pypdf (>=3.4.0,<4.0.0)", "pypdfium2 (>=4.10.0,<5.0.0)", "pyspark (>=3.4.0,<4.0.0)", "rank-bm25 (>=0.2.2,<0.3.0)", "rapidfuzz (>=3.1.1,<4.0.0)", "rapidocr-onnxruntime (>=1.3.2,<2.0.0)", "rdflib (==7.0.0)", "requests-toolbelt (>=1.0.0,<2.0.0)", "rspace_client (>=2.5.0,<3.0.0)", "scikit-learn (>=1.2.2,<2.0.0)", "sqlite-vss (>=0.1.2,<0.2.0)", "streamlit (>=1.18.0,<2.0.0)", "sympy (>=1.12,<2.0)", "telethon (>=1.28.5,<2.0.0)", "timescale-vector (>=0.0.1,<0.0.2)", "tqdm (>=4.48.0)", "upstash-redis (>=0.15.0,<0.16.0)", "xata (>=1.0.0a7,<2.0.0)", "xmltodict (>=0.13.0,<0.14.0)"]
+extended-testing = ["aiosqlite (>=0.19.0,<0.20.0)", "aleph-alpha-client (>=2.15.0,<3.0.0)", "anthropic (>=0.3.11,<0.4.0)", "arxiv (>=1.4,<2.0)", "assemblyai (>=0.17.0,<0.18.0)", "atlassian-python-api (>=3.36.0,<4.0.0)", "beautifulsoup4 (>=4,<5)", "bibtexparser (>=1.4.0,<2.0.0)", "cassio (>=0.1.0,<0.2.0)", "chardet (>=5.1.0,<6.0.0)", "cohere (>=4,<6)", "couchbase (>=4.1.9,<5.0.0)", "dashvector (>=1.0.1,<2.0.0)", "databricks-vectorsearch (>=0.21,<0.22)", "datasets (>=2.15.0,<3.0.0)", "dgml-utils (>=0.3.0,<0.4.0)", "esprima (>=4.0.1,<5.0.0)", "faiss-cpu (>=1,<2)", "feedparser (>=6.0.10,<7.0.0)", "fireworks-ai (>=0.9.0,<0.10.0)", "geopandas (>=0.13.1,<0.14.0)", "gitpython (>=3.1.32,<4.0.0)", "google-cloud-documentai (>=2.20.1,<3.0.0)", "gql (>=3.4.1,<4.0.0)", "hologres-vector (>=0.0.6,<0.0.7)", "html2text (>=2020.1.16,<2021.0.0)", "javelin-sdk (>=0.1.8,<0.2.0)", "jinja2 (>=3,<4)", "jq (>=1.4.1,<2.0.0)", "jsonschema (>1)", "langchain-openai (>=0.1,<0.2)", "lxml (>=4.9.3,<6.0)", "markdownify (>=0.11.6,<0.12.0)", "motor (>=3.3.1,<4.0.0)", "msal (>=1.25.0,<2.0.0)", "mwparserfromhell (>=0.6.4,<0.7.0)", "mwxml (>=0.3.3,<0.4.0)", "newspaper3k (>=0.2.8,<0.3.0)", "numexpr (>=2.8.6,<3.0.0)", "openai (<2)", "openapi-pydantic (>=0.3.2,<0.4.0)", "pandas (>=2.0.1,<3.0.0)", "pdfminer-six (>=20221105,<20221106)", "pgvector (>=0.1.6,<0.2.0)", "praw (>=7.7.1,<8.0.0)", "psychicapi (>=0.8.0,<0.9.0)", "py-trello (>=0.19.0,<0.20.0)", "pymupdf (>=1.22.3,<2.0.0)", "pypdf (>=3.4.0,<4.0.0)", "pypdfium2 (>=4.10.0,<5.0.0)", "pyspark (>=3.4.0,<4.0.0)", "rank-bm25 (>=0.2.2,<0.3.0)", "rapidfuzz (>=3.1.1,<4.0.0)", "rapidocr-onnxruntime (>=1.3.2,<2.0.0)", "rdflib (==7.0.0)", "requests-toolbelt (>=1.0.0,<2.0.0)", "rspace_client (>=2.5.0,<3.0.0)", "scikit-learn (>=1.2.2,<2.0.0)", "sqlite-vss (>=0.1.2,<0.2.0)", "streamlit (>=1.18.0,<2.0.0)", "sympy (>=1.12,<2.0)", "telethon (>=1.28.5,<2.0.0)", "timescale-vector (>=0.0.1,<0.0.2)", "tqdm (>=4.48.0)", "upstash-redis (>=0.15.0,<0.16.0)", "xata (>=1.0.0a7,<2.0.0)", "xmltodict (>=0.13.0,<0.14.0)"]
 javascript = ["esprima (>=4.0.1,<5.0.0)"]
 llms = ["clarifai (>=9.1.0)", "cohere (>=4,<6)", "huggingface_hub (>=0,<1)", "manifest-ml (>=0.0.1,<0.0.2)", "nlpcloud (>=1,<2)", "openai (<2)", "openlm (>=0.0.5,<0.0.6)", "torch (>=1,<3)", "transformers (>=4,<5)"]
-openai = ["openai (<2)", "tiktoken (>=0.3.2,<0.6.0)"]
+openai = ["openai (<2)", "tiktoken (>=0.7,<1.0)"]
 qdrant = ["qdrant-client (>=1.3.1,<2.0.0)"]
 text-helpers = ["chardet (>=5.1.0,<6.0.0)"]
 
 [[package]]
-name = "langchain-community"
-version = "0.0.37"
-description = "Community contributed LangChain integrations."
-optional = false
-python-versions = "<4.0,>=3.8.1"
-files = [
-    {file = "langchain_community-0.0.37-py3-none-any.whl", hash = "sha256:52e8557602dc099c2e236ec8a0599a956e2f08cfeb61e501815f5ec2d8545747"},
-    {file = "langchain_community-0.0.37.tar.gz", hash = "sha256:db2b5829bb20bc5b04c126b69143dbc31a880e949e94110c236b2c176906889f"},
-]
-
-[package.dependencies]
-aiohttp = ">=3.8.3,<4.0.0"
-dataclasses-json = ">=0.5.7,<0.7"
-langchain-core = ">=0.1.51,<0.2.0"
-langsmith = ">=0.1.0,<0.2.0"
-numpy = ">=1,<2"
-PyYAML = ">=5.3"
-requests = ">=2,<3"
-SQLAlchemy = ">=1.4,<3"
-tenacity = ">=8.1.0,<9.0.0"
-
-[package.extras]
-cli = ["typer (>=0.9.0,<0.10.0)"]
-extended-testing = ["aiosqlite (>=0.19.0,<0.20.0)", "aleph-alpha-client (>=2.15.0,<3.0.0)", "anthropic (>=0.3.11,<0.4.0)", "arxiv (>=1.4,<2.0)", "assemblyai (>=0.17.0,<0.18.0)", "atlassian-python-api (>=3.36.0,<4.0.0)", "azure-ai-documentintelligence (>=1.0.0b1,<2.0.0)", "azure-identity (>=1.15.0,<2.0.0)", "azure-search-documents (==11.4.0)", "beautifulsoup4 (>=4,<5)", "bibtexparser (>=1.4.0,<2.0.0)", "cassio (>=0.1.6,<0.2.0)", "chardet (>=5.1.0,<6.0.0)", "cloudpickle (>=2.0.0)", "cohere (>=4,<5)", "databricks-vectorsearch (>=0.21,<0.22)", "datasets (>=2.15.0,<3.0.0)", "dgml-utils (>=0.3.0,<0.4.0)", "elasticsearch (>=8.12.0,<9.0.0)", "esprima (>=4.0.1,<5.0.0)", "faiss-cpu (>=1,<2)", "feedparser (>=6.0.10,<7.0.0)", "fireworks-ai (>=0.9.0,<0.10.0)", "friendli-client (>=1.2.4,<2.0.0)", "geopandas (>=0.13.1,<0.14.0)", "gitpython (>=3.1.32,<4.0.0)", "google-cloud-documentai (>=2.20.1,<3.0.0)", "gql (>=3.4.1,<4.0.0)", "gradientai (>=1.4.0,<2.0.0)", "hdbcli (>=2.19.21,<3.0.0)", "hologres-vector (>=0.0.6,<0.0.7)", "html2text (>=2020.1.16,<2021.0.0)", "httpx (>=0.24.1,<0.25.0)", "httpx-sse (>=0.4.0,<0.5.0)", "javelin-sdk (>=0.1.8,<0.2.0)", "jinja2 (>=3,<4)", "jq (>=1.4.1,<2.0.0)", "jsonschema (>1)", "lxml (>=4.9.3,<6.0)", "markdownify (>=0.11.6,<0.12.0)", "motor (>=3.3.1,<4.0.0)", "msal (>=1.25.0,<2.0.0)", "mwparserfromhell (>=0.6.4,<0.7.0)", "mwxml (>=0.3.3,<0.4.0)", "newspaper3k (>=0.2.8,<0.3.0)", "numexpr (>=2.8.6,<3.0.0)", "nvidia-riva-client (>=2.14.0,<3.0.0)", "oci (>=2.119.1,<3.0.0)", "openai (<2)", "openapi-pydantic (>=0.3.2,<0.4.0)", "oracle-ads (>=2.9.1,<3.0.0)", "oracledb (>=2.2.0,<3.0.0)", "pandas (>=2.0.1,<3.0.0)", "pdfminer-six (>=20221105,<20221106)", "pgvector (>=0.1.6,<0.2.0)", "praw (>=7.7.1,<8.0.0)", "premai (>=0.3.25,<0.4.0)", "psychicapi (>=0.8.0,<0.9.0)", "py-trello (>=0.19.0,<0.20.0)", "pyjwt (>=2.8.0,<3.0.0)", "pymupdf (>=1.22.3,<2.0.0)", "pypdf (>=3.4.0,<4.0.0)", "pypdfium2 (>=4.10.0,<5.0.0)", "pyspark (>=3.4.0,<4.0.0)", "rank-bm25 (>=0.2.2,<0.3.0)", "rapidfuzz (>=3.1.1,<4.0.0)", "rapidocr-onnxruntime (>=1.3.2,<2.0.0)", "rdflib (==7.0.0)", "requests-toolbelt (>=1.0.0,<2.0.0)", "rspace_client (>=2.5.0,<3.0.0)", "scikit-learn (>=1.2.2,<2.0.0)", "sqlite-vss (>=0.1.2,<0.2.0)", "streamlit (>=1.18.0,<2.0.0)", "sympy (>=1.12,<2.0)", "telethon (>=1.28.5,<2.0.0)", "tidb-vector (>=0.0.3,<1.0.0)", "timescale-vector (>=0.0.1,<0.0.2)", "tqdm (>=4.48.0)", "tree-sitter (>=0.20.2,<0.21.0)", "tree-sitter-languages (>=1.8.0,<2.0.0)", "upstash-redis (>=0.15.0,<0.16.0)", "vdms (>=0.0.20,<0.0.21)", "xata (>=1.0.0a7,<2.0.0)", "xmltodict (>=0.13.0,<0.14.0)"]
-
-[[package]]
 name = "langchain-core"
-version = "0.1.51"
+version = "0.2.1"
 description = "Building applications with LLMs through composability"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain_core-0.1.51-py3-none-any.whl", hash = "sha256:3058bdb04d43a8eaae2e249365fe2e8d0356a09c7b2c1afa1a8100f8888da4fa"},
-    {file = "langchain_core-0.1.51.tar.gz", hash = "sha256:f7ea116f939be9e74c385baf95d6c84cd7a402b59c2c1893fc054bf98abbefc2"},
+    {file = "langchain_core-0.2.1-py3-none-any.whl", hash = "sha256:3521e1e573988c47399fca9739270c5d34f8ecec147253ad829eb9ff288f76d5"},
+    {file = "langchain_core-0.2.1.tar.gz", hash = "sha256:49383126168d934559a543ce812c485048d9e6ac9b6798fbf3d4a72b6bba5b0c"},
 ]
 
 [package.dependencies]
@@ -1560,20 +1535,20 @@ extended-testing = ["jinja2 (>=3,<4)"]
 
 [[package]]
 name = "langchain-text-splitters"
-version = "0.0.1"
+version = "0.2.0"
 description = "LangChain text splitting utilities"
 optional = false
-python-versions = ">=3.8.1,<4.0"
+python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "langchain_text_splitters-0.0.1-py3-none-any.whl", hash = "sha256:f5b802f873f5ff6a8b9259ff34d53ed989666ef4e1582e6d1adb3b5520e3839a"},
-    {file = "langchain_text_splitters-0.0.1.tar.gz", hash = "sha256:ac459fa98799f5117ad5425a9330b21961321e30bc19a2a2f9f761ddadd62aa1"},
+    {file = "langchain_text_splitters-0.2.0-py3-none-any.whl", hash = "sha256:7b4c6a45f8471630a882b321e138329b6897102a5bc62f4c12be1c0b05bb9199"},
+    {file = "langchain_text_splitters-0.2.0.tar.gz", hash = "sha256:b32ab4f7397f7d42c1fa3283fefc2547ba356bd63a68ee9092865e5ad83c82f9"},
 ]
 
 [package.dependencies]
-langchain-core = ">=0.1.28,<0.2.0"
+langchain-core = ">=0.2.0,<0.3.0"
 
 [package.extras]
-extended-testing = ["lxml (>=5.1.0,<6.0.0)"]
+extended-testing = ["beautifulsoup4 (>=4.12.3,<5.0.0)", "lxml (>=4.9.3,<6.0)"]
 
 [[package]]
 name = "langsmith"
@@ -1659,25 +1634,6 @@ files = [
     {file = "MarkupSafe-2.1.5-cp39-cp39-win_amd64.whl", hash = "sha256:fa173ec60341d6bb97a89f5ea19c85c5643c1e7dedebc22f5181eb73573142c5"},
     {file = "MarkupSafe-2.1.5.tar.gz", hash = "sha256:d283d37a890ba4c1ae73ffadf8046435c76e7bc2247bbb63c00bd1a709c6544b"},
 ]
-
-[[package]]
-name = "marshmallow"
-version = "3.21.2"
-description = "A lightweight library for converting complex datatypes to and from native Python datatypes."
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "marshmallow-3.21.2-py3-none-any.whl", hash = "sha256:70b54a6282f4704d12c0a41599682c5c5450e843b9ec406308653b47c59648a1"},
-    {file = "marshmallow-3.21.2.tar.gz", hash = "sha256:82408deadd8b33d56338d2182d455db632c6313aa2af61916672146bb32edc56"},
-]
-
-[package.dependencies]
-packaging = ">=17.0"
-
-[package.extras]
-dev = ["marshmallow[tests]", "pre-commit (>=3.5,<4.0)", "tox"]
-docs = ["alabaster (==0.7.16)", "autodocsumm (==0.2.12)", "sphinx (==7.3.7)", "sphinx-issues (==4.1.0)", "sphinx-version-warning (==1.1.2)"]
-tests = ["pytest", "pytz", "simplejson"]
 
 [[package]]
 name = "matplotlib-inline"
@@ -3253,21 +3209,6 @@ files = [
 ]
 
 [[package]]
-name = "typing-inspect"
-version = "0.9.0"
-description = "Runtime inspection utilities for typing module."
-optional = false
-python-versions = "*"
-files = [
-    {file = "typing_inspect-0.9.0-py3-none-any.whl", hash = "sha256:9ee6fc59062311ef8547596ab6b955e1b8aa46242d854bfc78f4f6b0eff35f9f"},
-    {file = "typing_inspect-0.9.0.tar.gz", hash = "sha256:b23fc42ff6f6ef6954e4852c1fb512cdd18dbea03134f91f856a95ccc9461f78"},
-]
-
-[package.dependencies]
-mypy-extensions = ">=0.3.0"
-typing-extensions = ">=3.7.4"
-
-[[package]]
 name = "tzdata"
 version = "2024.1"
 description = "Provider of IANA time zone data"
@@ -3496,4 +3437,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5947049e9597f938d5760d5186ba67bfe8fc3d6c8ac7a6e8fccf22430b7e7e67"
+content-hash = "52e4987a8998957894669b942c3472f73ac4422060cae87fe4ba27b85887b189"
