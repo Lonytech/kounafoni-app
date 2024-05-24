@@ -11,19 +11,12 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from utils import format_docs
+
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
 CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db"
 LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
 EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
-
-
-def format_docs(docs):
-    """
-    Simple Doc formatter for langchain template
-    :param docs:
-    :return:
-    """
-    return "\n\n".join([d.page_content for d in docs])
 
 
 class LocalRag:
@@ -190,7 +183,6 @@ class LocalRag:
             input_question = input(
                 "Posez moi une question sur l'actualité malienne : \n"
             )
-            print(input_question)
             print(self.chain.invoke(input_question))
 
 
