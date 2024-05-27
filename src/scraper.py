@@ -15,6 +15,7 @@ class MaliJetDataScraper:
         self.date_range = date_range
         self.begin_date = date_range.begin_date
         self.end_date = date_range.end_date
+        self.columns = ["title", "source_paper", "date", "link", "content"]
 
     @staticmethod
     def get_soup_parser(url):
@@ -31,7 +32,11 @@ class MaliJetDataScraper:
         for article in tqdm(articles[:-1]):
             header = article.find("div", class_="card-header")
             link = header.find("a", href=True)
-            title = None if not header else header.text.strip().split("\n")[-1]
+            title = (
+                None
+                if not header
+                else unicodedata.normalize("NFKD", header.text.strip().split("\n")[-1])
+            )
             infos = article.find("div", class_="card-body")
             infos = None if not infos else infos.text.strip().split("\n")
 
@@ -42,7 +47,7 @@ class MaliJetDataScraper:
                 if not infos or not dateparser.parse(infos[1])
                 else dateparser.parse(infos[1]).date()
             )
-            links.append(link["href"])
+            links.append(unicodedata.normalize("NFKD", link["href"]))
             # print("*"*100)
         return pd.DataFrame(
             {
@@ -69,25 +74,26 @@ class MaliJetDataScraper:
         if content != "":
             return content
         else:
+            large_paragraphs = (
+                soup.find("div", class_="card-header")
+                .text.split("Date : ")[1]
+                .split("À lire aussi \n\n\n")
+            )
+            if len(large_paragraphs) > 1:
+                large_paragraphs[1] = large_paragraphs[1].split("\n\n\n\n")[
+                    -1
+                ]  # take the text after "A lire aussi"
+            final_content = " ".join(large_paragraphs)
             return (
-                unicodedata.normalize(
-                    "NFKD",
-                    " ".join(
-                        soup.find("div", class_="card-header")
-                        .text.split("Date : ")[1]
-                        .split("\n")[1:]
-                    ),
-                )
+                unicodedata.normalize("NFKD", " ".join(final_content.split("\n")[1:]))
                 .strip()
                 .replace("     ", " ")
             )
 
     def get_new_articles(self, save_directory):
-        # Collecting list of articles
+        # Collecting a list of articles
         page_number = 1
-        articles_to_fetch_df = pd.DataFrame(
-            columns=["title", "source_paper", "date", "link"]
-        )
+        articles_to_fetch_df = pd.DataFrame(columns=self.columns)
 
         current_date = self.end_date
         while self.begin_date <= current_date:
@@ -106,7 +112,14 @@ class MaliJetDataScraper:
             "date >= @self.begin_date and date <= @self.end_date"
         ).copy()
         article_contents, new_titles = [], []
-        existing_article_titles = pd.read_csv(save_directory, sep="\t").title.tolist()
+        read_source = pd.read_csv(save_directory, sep="\t")
+
+        # check on dataframe source
+        if read_source.empty:
+            existing_article_titles = []
+        else:
+            existing_article_titles = read_source["title"].tolist()
+
         for _, row in tqdm(
             subset_fetching_articles_df.iterrows(),
             total=subset_fetching_articles_df.shape[0],
@@ -118,13 +131,13 @@ class MaliJetDataScraper:
             print("New articles found, writing article contents to file...")
             subset_fetching_articles_df.query("title in @new_titles").assign(
                 content=article_contents
-            ).to_csv(save_directory, mode="a", sep="\t", index=False)
+            ).to_csv(save_directory, mode="a", sep="\t", index=False, header=False)
         else:
             print("No new articles found, skipping...")
 
 
 if __name__ == "__main__":
-    START_DATE = dateparser.parse("2024-05-06").date()
+    START_DATE = "2024-05-22"
     END_DATE = dateparser.date.datetime.today().date()
 
     scraper = MaliJetDataScraper(
@@ -133,4 +146,8 @@ if __name__ == "__main__":
 
     CSV_DIR = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
 
+    if not CSV_DIR.exists():
+        if not CSV_DIR.parent.exists():
+            CSV_DIR.parent.mkdir(parents=True)
+        pd.DataFrame(columns=scraper.columns).to_csv(CSV_DIR, sep="\t", index=False)
     scraper.get_new_articles(save_directory=CSV_DIR)
