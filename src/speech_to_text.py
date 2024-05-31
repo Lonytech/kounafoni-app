@@ -8,7 +8,7 @@ import moviepy.editor as mp
 import whisper  # From OpenAI: see https://github.com/openai/whisper?tab=readme-ov-file
 from pytube import Playlist, YouTube
 
-STT_PATH = Path().resolve().parents[1] / "data" / "whisper"
+STT_PATH = Path(__file__).parents[1] / "data" / "whisper"
 JT_20H_PLAYLIST_URL = "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
 
 
