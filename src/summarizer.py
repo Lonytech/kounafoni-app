@@ -5,6 +5,7 @@ from pathlib import Path
 from langchain_community.llms import Ollama
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tqdm import tqdm
+
 from models import SummaryDuration
 from speech_to_text import timeit
 
@@ -14,7 +15,7 @@ SHORT_TEXT_MAXI_LENGTH = 5_000
 
 class Summarizer:
     def __init__(self):
-        self.llm = Ollama(model=LLM_MODEL_NAME)
+        self.llm = Ollama(model=LLM_MODEL_NAME, temperature=0)
         self.text_to_summarize = None
         self.summarized_text = None
 
@@ -22,7 +23,7 @@ class Summarizer:
     def summarize(self, speech_duration: SummaryDuration):
         prompt_template = """
                 Résume moi ce texte dans un format spécifique. Tu joues le rôle d'un journaliste TV et tu es chargé de 
-                résumer l'actualité en une {0}. Le texte résumé doit être lisible en {1}.
+                résumer l'actualité en {0}. Le texte résumé doit être lisible en {1}.
 
                 "{2}"
                 """
@@ -77,7 +78,9 @@ class Summarizer:
     #     return partial(self.summarize, speech_duration=SummaryDuration.SHORT_DURATION)
 
     def get_medium_summary(self):
-        return partial(self.summarize, speech_duration=SummaryDuration.MEDIUM_DURATION)()
+        return partial(
+            self.summarize, speech_duration=SummaryDuration.MEDIUM_DURATION
+        )()
 
     def get_long_summary(self):
         return partial(self.summarize, speech_duration=SummaryDuration.LONG_DURATION)()

@@ -17,6 +17,8 @@ beautifulsoup4 = "^4.12.3"
 black = "^24.4.2"
 isort = "^5.13.2"
 gtts = "^2.5.1"
+piper-tts = "^1.2.0"
+pydub = "^0.25.1"
 
 
 [build-system]
