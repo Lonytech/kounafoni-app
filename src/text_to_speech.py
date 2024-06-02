@@ -96,34 +96,46 @@ class NewsTextToSpeech:
         split_texts_path = SPLIT_TEXTS_PATH / self.input_text_path.name
         if split_texts_path.exists():
             print("Document have already been split and stored. Skipping...")
-        else:
-            print("Using LLM to semantically split text in two parts...")
-            news_text: str = self.llm.invoke(
-                f"""Tu es expert en découpage de texte. Découpe moi ce texte en deux parties en utilisant ce 
-                délimiteur. La première partie, plus courte, est le sommaire qui se trouve au début. La seconde 
-                partie est le contenu qui est le reste du texte. Le texte original doit rester intact !
-                
-                Texte original: 
-                '''{self.input_text}'''
-                """
-            )
 
-            news_text = " ".join(news_text.split("Première partie")[1:])
+            self.intro_toc_text = (
+                (split_texts_path / "intro_toc_text.txt").read_text().replace("\n", " ")
+            )
+            self.jt_20h_content_text = (
+                (split_texts_path / "jt_20h_content_text.txt")
+                .read_text()
+                .replace("\n", " ")
+            )
+        else:
+            # print("Using LLM to semantically split text in two parts...")
+            # news_text: str = self.llm.invoke(
+            #     f"""
+            #     Tu es expert en découpage de texte. Découpe moi ce texte en deux parties en utilisant ce délimiteur. La première partie, plus courte, est le sommaire qui se trouve au début. La seconde partie est le contenu qui est le reste du texte. Le texte original doit rester intact !
+            #
+            #     Texte original:
+            #     '''{self.input_text}'''
+            #     """
+            # )
+
+            # news_text = " ".join(news_text.split("Première partie")[1:])
+
+            print("Using predefined split pattern to split text in two parts...")
+            news_texts = self.input_text.split("-------")
 
             # Introduction table of content and content retriever
-            self.intro_toc_text = news_text.split("Seconde partie")[0]
-            self.jt_20h_content_text = news_text.split("Seconde partie")[1]
+            self.intro_toc_text = news_texts[0]
+            self.jt_20h_content_text = news_texts[1]
             self.save_split_jt_20h_texts(split_texts_path)
 
     def generate_and_run_speech_command(self, speaker_reading_text):
         print("Generating speech...")
+        # os.system(f"""echo Hello World and {speaker_reading_text}""")
         # Generation
         generated_speech_command = f"""echo {speaker_reading_text} | piper \
         --model {self.tts_model_name} \
         --output_file {TMP_AUDIO_FILE_PATH.as_posix()} \
         --data-dir {TTS_MODELS_DIR.as_posix()} \
         --download-dir {TTS_MODELS_DIR.as_posix()} \
-        --sentence-silence 1.17 \
+        --sentence-silence 1.3 \
         --length-scale 1.0 \
         {f"--speaker {self.speaker_id}" if self.speaker_id else ""} \
         """
@@ -137,7 +149,7 @@ class NewsTextToSpeech:
         introduction_sentence = f"""Bonjour, vous êtes sur Kounafôni et vous écoutez le résumé de l'actualité malienne \
         du {self.publish_date.day} {MONTH_NAMES_FR[self.publish_date.month]} {self.publish_date.year} \
         et voici le sommaire. \
-        A la une : {self.intro_toc_text}"""
+        A la une, {self.intro_toc_text}"""
         introduction_sentence = introduction_sentence.replace("'", r"\'")
 
         # generate audio from it
@@ -146,7 +158,7 @@ class NewsTextToSpeech:
         # mix intro with background song
         intro_jt = AudioSegment.from_wav(TMP_AUDIO_FILE_PATH)
         background_sound = AudioSegment.from_mp3(BACKGROUND_AUDIO_PATH).apply_gain(
-            ratio_to_db(0.5)  # volume reduced to 50%
+            ratio_to_db(0.25)  # volume reduced to 25%
         )
         mixed_sound = intro_jt.overlay(background_sound, loop=True)
         mixed_sound.export(TMP_AUDIO_FILE_PATH, format="wav")
@@ -162,6 +174,7 @@ class NewsTextToSpeech:
 
     def save_audio(self, voice_summary, export_path: Path):
         print("Saving audio...")
+        export_path.parent.mkdir(parents=True, exist_ok=True)
         voice_summary.export(export_path, format="mp3")
         self.daily_voice_summary = voice_summary
 
@@ -173,7 +186,7 @@ class NewsTextToSpeech:
         saving_path = (
             KOUNAFONI_EXPORT_APP_DIR
             / f"{self.publish_date}"
-            / f"Résumé ORTM - {self.publish_date}"
+            / f"Résumé ORTM - {self.publish_date}.mp3"
         )
         self.save_audio(voice_summary=daily_voice_summary, export_path=saving_path)
 
@@ -188,9 +201,11 @@ class NewsTextToSpeech:
         self.save_audio(voice_summary=full_content_audio, export_path=saving_path)
 
     def generate_and_save_audio_from_text(self):
-        print("Starting the generation process...")
+        print("Starting the audio generation process...")
         if self.input_text_path.exists():
-            self.input_text = self.input_text_path.read_text()
+            self.input_text = (
+                self.input_text_path.read_text().replace("\n", " ").replace(".", ". ").replace("  ", " ")
+            )
 
             # TODO: Do not suppose all articles are named 'source.csv'.
             #  At this time, all of them (malijet, bamada net, etc.) have their own folder with 'source.csv' inside.
@@ -217,13 +232,22 @@ class NewsTextToSpeech:
 
 if __name__ == "__main__":
     # from ORTM speech to text example
+    # summarized_text = (
+    #     Path(__file__).parents[1]
+    #     / "data"
+    #     / "whisper"
+    #     / "summarized_texts"
+    #     / "2024-05-24"
+    #     / "🔴 Direct | JT 20H de ORTM1 du 24 mai 2024.txt"
+    # )
+
     summarized_text = (
-        Path(__file__).parents[1]
-        / "data"
-        / "whisper"
-        / "stt_texts"
-        / "2024-05-24"
-        / "énergie| Les enjeux de la pose de la première pierre des travaux de construction du centrale solaire.txt"
+            Path(__file__).parents[1]
+            / "data"
+            / "whisper"
+            / "summarized_texts"
+            / "2024-05-14"
+            / "Le 20heures de ORTM1 du 13 mai 2024..txt"
     )
 
     tts = NewsTextToSpeech(input_text_path=summarized_text)
