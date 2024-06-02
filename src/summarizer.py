@@ -8,7 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tqdm import tqdm
 
 from models import SummaryDuration
-from speech_to_text import timeit
+from utils import timeit
 
 SUMMARIZED_TEXTS_PATH = (
     Path(__file__).parents[1] / "data" / "whisper" / "summarized_texts"
@@ -87,7 +87,7 @@ class Summarizer:
                     prompt_template.format(
                         SummaryDuration.SHORT_DURATION.value,
                         SummaryDuration.SHORT_DURATION.value,
-                        text
+                        text,
                     )
                 )
         self.summarized_text = summarized_text
@@ -108,8 +108,21 @@ class Summarizer:
 
     def auto_detect_duration_and_summarize(self, input_text_path: Path):
         print(input_text_path)
-        print((SUMMARIZED_TEXTS_PATH / input_text_path.parent.name / input_text_path.name).exists())
-        if input_text_path.exists() and not (SUMMARIZED_TEXTS_PATH / input_text_path.parent.name / input_text_path.name).exists():
+        print(
+            (
+                SUMMARIZED_TEXTS_PATH
+                / input_text_path.parent.name
+                / input_text_path.name
+            ).exists()
+        )
+        if (
+            input_text_path.exists()
+            and not (
+                SUMMARIZED_TEXTS_PATH
+                / input_text_path.parent.name
+                / input_text_path.name
+            ).exists()
+        ):
             self.input_text_path = input_text_path
             self.text_to_summarize = input_text_path.read_text().replace("\n", " ")
 
@@ -130,10 +143,16 @@ class Summarizer:
                 print("Getting the long summary...")
                 self.get_long_summary()
         else:
-            print("Error, input text file does not exist or summarization already exists. Skipping...")
+            print(
+                "Error, input text file does not exist or summarization already exists. Skipping..."
+            )
 
     def save_summary(self):
-        summarized_text_path = SUMMARIZED_TEXTS_PATH / self.input_text_path.parent.name / self.input_text_path.name
+        summarized_text_path = (
+            SUMMARIZED_TEXTS_PATH
+            / self.input_text_path.parent.name
+            / self.input_text_path.name
+        )
         if summarized_text_path.exists():
             print("Summarization already exists, skipping...")
         else:
@@ -164,12 +183,12 @@ if __name__ == "__main__":
     # )
 
     jt_20h_transcript_path = (
-            Path(__file__).parents[1]
-            / "data"
-            / "whisper"
-            / "stt_texts"
-            / "2024-05-14"
-            / "Le 20heures de ORTM1 du 13 mai 2024..txt"
+        Path(__file__).parents[1]
+        / "data"
+        / "whisper"
+        / "stt_texts"
+        / "2024-05-14"
+        / "Le 20heures de ORTM1 du 13 mai 2024..txt"
     )
 
     summary.auto_detect_duration_and_summarize(input_text_path=jt_20h_transcript_path)
