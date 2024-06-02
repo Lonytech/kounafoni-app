@@ -1,6 +1,14 @@
 from datetime import date
+from enum import Enum
+from typing import ClassVar
 
 from pydantic import BaseModel, field_validator
+
+
+class SummaryDuration(str, Enum):
+    SHORT_DURATION: str = "1 minute"
+    MEDIUM_DURATION: str = "5 minutes"
+    LONG_DURATION: str = "10 minutes"
 
 
 class ScrapDate(BaseModel):
