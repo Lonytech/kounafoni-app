@@ -1,27 +1,15 @@
 import textwrap
-import time
 from datetime import date, datetime
-from functools import wraps
 from pathlib import Path
 
 import moviepy.editor as mp
 import whisper  # From OpenAI: see https://github.com/openai/whisper?tab=readme-ov-file
 from pytube import Playlist, YouTube
 
+from utils import timeit
+
 STT_PATH = Path(__file__).parents[1] / "data" / "whisper"
 JT_20H_PLAYLIST_URL = "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
-
-
-def timeit(func):
-    @wraps(func)
-    def time_wrapper(*args, **kwargs):
-        start = time.perf_counter()
-        result = func(*args, **kwargs)
-        end = time.perf_counter()
-        print(f"{func.__name__} took {end-start:.2f} seconds to execute")
-        return result
-
-    return time_wrapper
 
 
 class TVNewsSpeechToText:

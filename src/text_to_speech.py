@@ -9,6 +9,8 @@ from pydub import AudioSegment
 from pydub.playback import play
 from pydub.utils import ratio_to_db
 
+from utils import timeit
+
 LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
 TMP_AUDIO_FILE_PATH = (
     Path(__file__).parents[1] / "data" / "piper" / "tts_audio" / "tmp.wav"
@@ -106,12 +108,16 @@ class NewsTextToSpeech:
                 .replace("\n", " ")
             )
         else:
-            # print("Using LLM to semantically split text in two parts...")
-            # news_text: str = self.llm.invoke(
-            #     f"""
-            #     Tu es expert en découpage de texte. Découpe moi ce texte en deux parties en utilisant ce délimiteur. La première partie, plus courte, est le sommaire qui se trouve au début. La seconde partie est le contenu qui est le reste du texte. Le texte original doit rester intact !
+            # print("Using LLM to semantically divide text in two parts...") news_text: str = self.llm.invoke(
+            # f""" Tu es expert en découpage de texte.
+            # Découpe-moi ce texte en deux parties en utilisant ce
+            # délimiteur.
+            # La première partie, plus courte, est le sommaire qui se trouve au début.
+            # La seconde partie
+            # est le contenu qui est le reste du texte.
+            # Le texte original doit rester intact !
             #
-            #     Texte original:
+            #     Texte original :
             #     '''{self.input_text}'''
             #     """
             # )
@@ -143,6 +149,7 @@ class NewsTextToSpeech:
         # Running on shell
         os.system(generated_speech_command)
 
+    @timeit
     def build_jt_20h_intro_audio(self):
         print("Building JT 20h intro audio...")
         # get complete intro text
@@ -204,7 +211,10 @@ class NewsTextToSpeech:
         print("Starting the audio generation process...")
         if self.input_text_path.exists():
             self.input_text = (
-                self.input_text_path.read_text().replace("\n", " ").replace(".", ". ").replace("  ", " ")
+                self.input_text_path.read_text()
+                .replace("\n", " ")
+                .replace(".", ". ")
+                .replace("  ", " ")
             )
 
             # TODO: Do not suppose all articles are named 'source.csv'.
@@ -242,12 +252,12 @@ if __name__ == "__main__":
     # )
 
     summarized_text = (
-            Path(__file__).parents[1]
-            / "data"
-            / "whisper"
-            / "summarized_texts"
-            / "2024-05-14"
-            / "Le 20heures de ORTM1 du 13 mai 2024..txt"
+        Path(__file__).parents[1]
+        / "data"
+        / "whisper"
+        / "summarized_texts"
+        / "2024-05-14"
+        / "Le 20heures de ORTM1 du 13 mai 2024..txt"
     )
 
     tts = NewsTextToSpeech(input_text_path=summarized_text)
