@@ -17,8 +17,7 @@ from utils import format_docs, human_readable_time
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
 CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db"
-# LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
-LLM_MODEL_NAME = "falcon2:11b-q4_0"
+LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
 EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
 
 

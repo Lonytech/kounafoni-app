@@ -21,6 +21,7 @@ openai-whisper = "^20231117"
 chromadb = "^0.5.0"
 langchain-community = "^0.2.0"
 jupyter = "^1.0.0"
+chainlit = "^1.1.202"
 
 
 [tool.poetry.group.explo]

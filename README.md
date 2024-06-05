@@ -1,4 +1,4 @@
-# kounafoni-app
+# 🗞️ kounafoni-app [kùnnafoni]
 Mali local news summary web app
 
 ## 📝 Description: 
@@ -39,3 +39,11 @@ See [License](LICENSE).
 ## 📧 Contact
 - website: lonytech.com
 - mail: contact@lonytech.com or abubakrtraore@gmail.com
+
+## More information
+The lexicon used for the words present in this project comes from **BAMADABA**, a Bambara dictionary project
+of the Bambara Reference Corpus.
+See : 
+- http://cormand.huma-num.fr/Bamadaba/lexicon/index.htm
+- http://cormand.huma-num.fr/Bamadaba/index-french/a.htm (use the search button to find any word)
+- https://aclanthology.org/W14-6501.pdf (about the corpus project)
