@@ -1,0 +1,165 @@
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 50px; /* Increased padding */
+    border-bottom: 1px solid #e0e0e0;
+    flex-wrap: wrap;
+}
+.header img {
+    max-width: 50px; /* Adjust the maximum width as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+.header-center {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+.header-center h1 {
+    margin: 0;
+    font-size: 1.5rem; /* Adjusted font size */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.header-buttons a {
+    text-decoration: none;
+    margin: 0 5px; /* Adjusted margin */
+    color: black;
+    padding: 5px 10px; /* Adjusted padding */
+    border-radius: 4px;
+    white-space: nowrap; /* Prevent buttons from wrapping text */
+    background-color: #e0e0e0;
+    border: 1px solid #e0e0e0;
+    transition: background-color 0.3s, border 0.3s;
+}
+.header-buttons a:hover {
+    background-color: #000;
+    color: #fff;
+    border: 1px solid #000;
+}
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    flex: 1;
+}
+.main-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.main-container p {
+    margin-bottom: 40px; /* Add space between text and buttons */
+}
+.main-buttons {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.main-buttons a {
+    text-decoration: none;
+    color: black;
+    padding: 8px 16px;
+    border-radius: 4px;
+    background-color: #e0e0e0;
+    border: 1px solid #e0e0e0;
+    transition: background-color 0.3s, border 0.3s;
+}
+.main-buttons a:hover {
+    background-color: #000;
+    color: #fff;
+    border: 1px solid #000;
+}
+.footer {
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: 20px 50px; /* Increased padding */
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.footer-left {
+    display: flex;
+    align-items: center;
+}
+.footer-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.footer-right img {
+    max-width: 50px; /* Same size as header logo */
+    margin-bottom: 10px;
+}
+.footer a {
+    color: white;
+    margin: 0 10px;
+}
+.footer .material-icons {
+    vertical-align: middle;
+}
+.blinking-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background-color: black;
+    margin-left: 2px;
+    animation: blink 1s infinite;
+}
+@keyframes blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    50%, 100% {
+        opacity: 0;
+    }
+}
+/* Media Queries for responsiveness */
+@media (max-width: 768px) {
+    .header {
+        justify-content: center;
+        text-align: center;
+    }
+    .header-center {
+        order: -1;
+        width: 100%;
+    }
+    .header-buttons {
+        justify-content: center;
+        width: 100%;
+        gap: 5px;
+    }
+    .main-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .footer {
+        flex-direction: column;
+        align-items: center;
+    }
+    .footer-left, .footer-right {
+        text-align: center;
+        margin: 10px 0;
+    }
+}
