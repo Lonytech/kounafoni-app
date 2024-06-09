@@ -22,8 +22,6 @@ async def main(message: cl.Message):
     # Retrieve the chain from the user session
     llm_chain = cl.user_session.get("llm_chain")  # type: LLMChain
 
-    await cl.Message(content=f"I received this : '{message.content}'").send()
-
     # Call the chain asynchronously
     res = await llm_chain.acall(
         message.content, callbacks=[cl.AsyncLangchainCallbackHandler()]
