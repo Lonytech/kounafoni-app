@@ -2,28 +2,29 @@ from flask import Flask, redirect, render_template, url_for, request
 
 app = Flask(__name__)
 
-# Dummy audio data
-audio_files = [
-    {
-        "name": "Audio 1",
-        "duration": "3:45",
-        "file": "Le 20heures de ORTM1 du 13 mai 2024..wav",
-    },
-    {
-        "name": "Audio 2",
-        "duration": "2:30",
-        "file": "🔴 Direct | JT 20H de ORTM1 du 24 mai 2024.wav",
-    },
-    {"name": "Audio 3", "duration": "4:15", "file": "audio3.mp3"},
-]
+# Test audio data
+audios = {
+    "2024-05-14": [
+        {"date": "2024-05-14", "media": "ORTM", "duration": "3:45", "file": "Résumé ORTM - 2024-05-14.mp3"},
+        {"date": "2024-05-14", "media": "Malijet", "duration": "4:20", "file": "Résumé ORTM - 2024-05-14.mp3"},
+        {"date": "2024-05-14", "media": "Bamada", "duration": "3:45", "file": "Résumé ORTM - 2024-05-14.mp3"},
+        {"date": "2024-05-14", "media": "aBamako", "duration": "4:20", "file": "Résumé ORTM - 2024-05-14.mp3"}
+    ],
 
-audios = [
-    {"date": "2024-05-14", "media": "ORTM", "duration": "3:45", "file": "Résumé ORTM - 2024-05-14.mp3"},
-    {"date": "2024-05-24", "media": "Malijet", "duration": "4:20", "file": "Résumé ORTM - 2024-05-24.mp3"},
-    {"date": "2024-05-14", "media": "Bamada", "duration": "3:45", "file": "Résumé ORTM - 2024-05-14.mp3"},
-    {"date": "2024-05-24", "media": "aBamako", "duration": "4:20", "file": "Résumé ORTM - 2024-05-24.mp3"},
-    # Ajoutez plus d'audios ici
-]
+    "2024-05-24": [
+        {"date": "2024-05-24", "media": "ORTM", "duration": "3:45", "file": "Résumé ORTM - 2024-05-24.mp3"},
+        {"date": "2024-05-24", "media": "Malijet", "duration": "4:20", "file": "Résumé ORTM - 2024-05-24.mp3"},
+        {"date": "2024-05-24", "media": "Bamada", "duration": "3:45", "file": "Résumé ORTM - 2024-05-24.mp3"},
+        {"date": "2024-05-24", "media": "aBamako", "duration": "4:20", "file": "Résumé ORTM - 2024-05-24.mp3"}
+    ],
+
+    "2024-05-16": [
+        {"date": "2024-05-16", "media": "ORTM", "duration": "3:45", "file": "Résumé ORTM - 2024-05-16.mp3"},
+        {"date": "2024-05-16", "media": "Malijet", "duration": "4:20", "file": "Résumé Malijet - 2024-05-16.mp3"},
+        {"date": "2024-05-16", "media": "Bamada", "duration": "3:45", "file": "Résumé ORTM - 2024-05-16.mp3"},
+        {"date": "2024-05-16", "media": "aBamako", "duration": "4:20", "file": "Résumé ORTM - 2024-05-16.mp3"}
+    ]
+}
 
 
 @app.route("/")
@@ -40,7 +41,8 @@ def news():
     #     ]
     # else:
     #     filtered_audio = audio_files
-    return render_template("news2.html", audio_files=audios)
+    sorted_audio = sorted(audios.items(), key=lambda x: x[0], reverse=True)
+    return render_template("news2.html", audio_files=sorted_audio)
 
 
 @app.route("/chat")
