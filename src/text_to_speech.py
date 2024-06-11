@@ -177,7 +177,9 @@ class NewsTextToSpeech:
         print("Building full content audio...")
 
         # get audio from content
-        self.generate_and_run_speech_command(speaker_reading_text=content_text.replace("'", r"\'"))
+        self.generate_and_run_speech_command(
+            speaker_reading_text=content_text.replace("'", r"\'")
+        )
         # time.sleep(5)  # take time before reading from tmp_file
 
         return AudioSegment.from_wav(TMP_AUDIO_FILE_PATH)

@@ -6,7 +6,16 @@ The idea is to provide a web interface to enable easy access to Malian news on a
 It highlights the work of the local press and official media through high-quality summary reports.
 
 ## ℹ️📚 Usage
-To be defined
+### Local 
+To run the application locally, the easiest way is to open two separate shell terminals.
+- In the first terminal, you will launch the flask application from the root directory,
+the project's basic webapp: `python src/app/app.py`
+
+- In the second terminal, you will launch the chainlit application in headless mode,
+which is the server dedicated to interact with the chatbot: `chainlit run --headless src/chatbot.py`
+
+Once you've launched these two servers, go to http://localhost:5000/ or http://127.0.0.1:5000
+
 
 ## ⚙️ Features
 Using various data sources (ORTM, Malijet, etc.) :

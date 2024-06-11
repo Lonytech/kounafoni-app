@@ -140,7 +140,9 @@ class Summarizer:
                 print("Getting the long summary...")
                 self.get_long_summary()
         else:
-            sys.exit("Error, input text file does not exist or summarization already exists. Skipping...")
+            sys.exit(
+                "Error, input text file does not exist or summarization already exists. Skipping..."
+            )
 
     def save_summary(self):
         summarized_text_path = (
@@ -166,6 +168,7 @@ if __name__ == "__main__":
     )
     summary.auto_detect_duration_and_summarize(input_text_path=malijet_articles_path)
     print(summary.summarized_text)
+    summary.save_summary()
 
     # From jt_20h
     # jt_20h_transcript_path = (
