@@ -1,6 +1,8 @@
 import os
 import random
+import sys
 import textwrap
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -133,8 +135,8 @@ class NewsTextToSpeech:
             self.save_split_jt_20h_texts(split_texts_path)
 
     def generate_and_run_speech_command(self, speaker_reading_text):
-        print("Generating speech...")
-        # os.system(f"""echo Hello World and {speaker_reading_text}""")
+        print(f"Generating speech from text...")
+        os.system(f"""echo Hello World and {speaker_reading_text}""")
         # Generation
         generated_speech_command = f"""echo {speaker_reading_text} | piper \
         --model {self.tts_model_name} \
@@ -175,7 +177,10 @@ class NewsTextToSpeech:
         print("Building full content audio...")
 
         # get audio from content
-        self.generate_and_run_speech_command(speaker_reading_text=content_text)
+        self.generate_and_run_speech_command(
+            speaker_reading_text=content_text.replace("'", r"\'")
+        )
+        # time.sleep(5)  # take time before reading from tmp_file
 
         return AudioSegment.from_wav(TMP_AUDIO_FILE_PATH)
 
@@ -208,6 +213,7 @@ class NewsTextToSpeech:
         self.save_audio(voice_summary=full_content_audio, export_path=saving_path)
 
     def generate_and_save_audio_from_text(self):
+        print(self.input_text_path)
         print("Starting the audio generation process...")
         if self.input_text_path.exists():
             self.input_text = (
@@ -234,7 +240,7 @@ class NewsTextToSpeech:
                 self.split_jt_20h_text_to_intro_and_content()
                 self.process_build_and_save_jt_20h_audio()
         else:
-            print("Error, input text file does not exist. Skipping...")
+            sys.exit("Error, input text file does not exist. Skipping...")
 
     def play_generated_audio(self):
         play(self.daily_voice_summary)
@@ -256,8 +262,8 @@ if __name__ == "__main__":
         / "data"
         / "whisper"
         / "summarized_texts"
-        / "2024-05-14"
-        / "Le 20heures de ORTM1 du 13 mai 2024..txt"
+        / "2024-05-16"
+        / "Le 20heures de ORTM1 du 16 mai 2024.txt"
     )
 
     tts = NewsTextToSpeech(input_text_path=summarized_text)

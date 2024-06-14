@@ -1,0 +1,90 @@
+.hero-figure {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    margin-top: 2rem;
+}
+
+.circle {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.7;
+    animation: move 5s infinite;
+}
+
+.circle-1 {
+    width: 60px;
+    height: 60px;
+    background-color: #0270D7;
+    top: 10%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.circle-2 {
+    width: 80px;
+    height: 80px;
+    background-color: #00a8ff;
+    top: 30%;
+    left: 50%;
+    animation-delay: 1s;
+}
+
+.circle-3 {
+    width: 100px;
+    height: 100px;
+    background-color: #66a6ff;
+    top: 50%;
+    left: 70%;
+    animation-delay: 2s;
+}
+
+.circle-4 {
+    width: 120px;
+    height: 120px;
+    background-color: #0097e6;
+    top: 70%;
+    left: 30%;
+    animation-delay: 3s;
+}
+
+.circle-5 {
+    width: 140px;
+    height: 140px;
+    background-color: #4cd137;
+    top: 90%;
+    left: 80%;
+    animation-delay: 4s;
+}
+
+@keyframes move {
+    0%, 100% {
+        transform: translateY(0) translateX(0);
+    }
+    50% {
+        transform: translateY(-20px) translateX(-20px);
+    }
+}
+
+.header-logo-image {
+    max-height: 50px;
+    height: auto;
+    width: auto;
+    vertical-align: middle;
+}
+
+.app-name {
+    font-size: 1.5rem;
+    margin-left: 10px;
+    vertical-align: middle;
+    display: inline-block;
+    color: inherit;
+    font-weight: bold;
+}
+
+.logo-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none; /* Optional: remove underline from link */
+}
+

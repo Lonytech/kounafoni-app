@@ -95,7 +95,7 @@ if __name__ == "__main__":
     stt = TVNewsSpeechToText()
 
     # get ORTM specific news for one date
-    JT_PUBLISH_DATE = datetime.strptime("2024-05-24", "%Y-%m-%d").date()
+    JT_PUBLISH_DATE = datetime.strptime("2024-05-16", "%Y-%m-%d").date()
     stt.get_jt_20h_by_date(publish_date=JT_PUBLISH_DATE)
     stt.download_youtube_audio(
         output_path=STT_PATH

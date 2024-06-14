@@ -1,7 +1,9 @@
+import time
 import uuid
 from pathlib import Path
 
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms import Ollama
@@ -11,7 +13,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from utils import format_docs
+from utils import format_docs, human_readable_time
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
 CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db"
@@ -179,11 +181,16 @@ class LocalRag:
         self.build_llm_chain()
 
     def run_question_answer(self):
-        while True:
+        input_question = str()
+        while input_question.lower() != "bye":
+            start = time.perf_counter()
             input_question = input(
                 "Posez moi une question sur l'actualité malienne : \n"
             )
             print(self.chain.invoke(input_question))
+            end = time.perf_counter()
+            elapsed_time = human_readable_time(relativedelta(seconds=int(end - start)))
+            print(f" This answer took {', '.join(elapsed_time)} to execute")
 
 
 if __name__ == "__main__":

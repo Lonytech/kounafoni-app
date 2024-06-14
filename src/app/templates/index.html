@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>kùnnafonIA</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans:400,600" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/solid_style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modified_solid_style.css') }}">
+    <script src="https://unpkg.com/animejs@3.0.1/lib/anime.min.js"></script>
+    <script src="https://unpkg.com/scrollreveal@4.0.0/dist/scrollreveal.min.js"></script>
+</head>
+<body class="is-boxed has-animations">
+<div class="body-wrap">
+    <header class="site-header">
+        <div class="container">
+            <div class="site-header-inner">
+                <div class="brand header-brand">
+                    <a href="#" class="logo-link">
+                        <img class="header-logo-image" src="../static/images/kunnafoni_logo.png" alt="Logo">
+                        <span class="app-name">kùnnafonIA</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-inner">
+                    <div class="hero-copy">
+                        <h3 class="hero-title mt-0">L'actualité malienne grâce à l'Intelligence Artificielle, basé sur
+                            des sources locales fiables comme
+                            <span id="changing-text"></span><span class="blinking-cursor"></span></h3>
+                        <p class="hero-paragraph">Écoutez les résumés de l'actualité ou discutez avec un agent
+                            conversationnel, grâce à la puissance des LLM.</p>
+                        <div class="hero-cta" style="margin-top: 20px">
+                            <a class="button button-primary" href="{{ url_for('news') }}">News</a>
+                            <a class="button" href="{{ url_for('chat') }}">Chat</a>
+                        </div>
+                    </div>
+                    <div class="hero-figure">
+                        <div class="circle circle-1"></div>
+                        <div class="circle circle-2"></div>
+                        <div class="circle circle-3"></div>
+                        <div class="circle circle-4"></div>
+                        <div class="circle circle-5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    {% include 'footer.html' %}
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
