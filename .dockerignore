@@ -1,0 +1,9 @@
+**/*.pyc
+.idea/
+.files/
+.venv/
+.git/
+data/piper/
+data/whisper/
+.gitignore
+project_notes.md
