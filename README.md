@@ -36,6 +36,9 @@ Essentially built with python.
   - For linux users :
     - curl -fsSL https://ollama.com/install.sh | sh
     - ollama run mistral:7b-instruct-q4_0
+    - To use GPU for fast inference on Colab or local computer :
+      - https://github.com/ollama/ollama/issues/832
+      - Use this command before installing Ollama and it should work : `sudo apt-get update && sudo apt-get install -y cuda-drivers`
 
 (Schema of underlying technologies used for the app will come soon)
 

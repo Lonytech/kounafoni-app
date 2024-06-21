@@ -1,9 +1,14 @@
+from pathlib import Path
+
 import chainlit as cl
-from langchain.chains import LLMChain
-from langchain_community.llms import Ollama
+from langchain.schema.runnable.config import RunnableConfig
 from langchain_core.prompts import PromptTemplate
 
-llm = Ollama(model="mayflowergmbh/occiglot-7b-fr-en-instruct")
+from rag import LocalRag
+
+ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
+LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
+# llm = Ollama(model="mayflowergmbh/occiglot-7b-fr-en-instruct")
 template = """Question: {question}"""
 
 
@@ -11,23 +16,25 @@ template = """Question: {question}"""
 def main():
     # Instantiate the chain for that user session
     prompt = PromptTemplate(template=template, input_variables=["question"])
-    llm_chain = LLMChain(prompt=prompt, llm=llm, verbose=True)
+    rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
+    rag.llm = LLM_MODEL_NAME
+    rag.build_rag_pipeline_chain()
 
     # Store the chain in the user session
-    cl.user_session.set("llm_chain", llm_chain)
+    cl.user_session.set("runnable_sequence_llm_chain", rag.chain)
 
 
 @cl.on_message
-async def main(message: cl.Message):
+async def on_message(message: cl.Message):
     # Retrieve the chain from the user session
-    llm_chain = cl.user_session.get("llm_chain")  # type: LLMChain
+    agent = cl.user_session.get("runnable_sequence_llm_chain")  # type: Runnable
 
-    # Call the chain asynchronously
-    res = await llm_chain.acall(
-        message.content, callbacks=[cl.AsyncLangchainCallbackHandler()]
-    )
+    msg = cl.Message(content="")
 
-    # Do any post-processing here
+    async for chunk in agent.astream(
+        {"question": message.content},
+        config=RunnableConfig(callbacks=[cl.LangchainCallbackHandler()]),
+    ):
+        await msg.stream_token(chunk)
 
-    # Send the response
-    await cl.Message(content=res["text"]).send()
+    await msg.send()

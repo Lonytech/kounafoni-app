@@ -20,17 +20,25 @@ moviepy = "^1.0.3"
 openai-whisper = "^20231117"
 chromadb = "^0.5.0"
 langchain-community = "^0.2.0"
-jupyter = "^1.0.0"
-chainlit = "^1.1.202"
+chainlit = "1.1.202"
 flask = "^3.0.3"
+torch = {version = "^2.3.1+cpu", source = "pytorch_cpu"}
+gunicorn = "^22.0.0"
 
 
 [tool.poetry.group.explo]
 optional = true
 
 [tool.poetry.group.explo.dependencies]
+jupyter = "^1.0.0"
 langchain-openai = "^0.1.7"
 docarray = "^0.40.0"
+
+
+[[tool.poetry.source]]
+name = "pytorch_cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core"]

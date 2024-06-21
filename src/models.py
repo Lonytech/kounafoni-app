@@ -1,6 +1,5 @@
 from datetime import date
 from enum import Enum
-from typing import ClassVar
 
 from pydantic import BaseModel, field_validator
 
