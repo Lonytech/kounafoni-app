@@ -2,8 +2,9 @@ import time
 import uuid
 from pathlib import Path
 
-import pandas as pd
 from dateutil.relativedelta import relativedelta
+import pandas as pd
+
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms import Ollama
