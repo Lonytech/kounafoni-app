@@ -13,9 +13,9 @@ jobs:
   lint:
     runs-on: ubuntu-22.04
 
-    env:
-      POETRY_HOME: ${{ runner.temp }}/.poetry
-      PATH: ${{ runner.temp }}/.poetry/bin:${{ env.PATH }}
+#    env:
+#      POETRY_HOME: ${{ runner.temp }}/.poetry
+#      PATH: ${{ runner.temp }}/.poetry/bin:${{ env.PATH }}
 
     steps:
       - name: Checking code availability
@@ -26,9 +26,10 @@ jobs:
           apt update -y
           apt install -y pipx
           pipx install poetry==1.7.1
+          export PATH="/root/.local/bin:$PATH"
 #          apt install -y ffmpeg
 #          rm -rf /var/lib/apt/lists/*
-#          export PATH="/root/.local/bin:$PATH"
+
 
       - name: Install dependencies with poetry
         run: poetry install --no-root --no-cache --without explo
