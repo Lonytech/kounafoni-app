@@ -23,8 +23,8 @@ jobs:
 
       - name: Install poetry and other external dependencies
         run: |
-          apt update -y
-          apt install -y pipx
+          sudo apt update -y
+          sudo apt install -y pipx
           pipx install poetry==1.7.1
           export PATH="/root/.local/bin:$PATH"
 #          apt install -y ffmpeg
