@@ -3,6 +3,8 @@ FROM ollama/ollama
 ENV DEBIAN_FRONTEND=noninteractive \
     PATH="/root/.local/bin:$PATH"
 
+ENV HOST 0.0.0.0
+
 # Update package list and install pipx
 RUN apt-get update -y && \
     apt-get install -y ffmpeg && \
@@ -20,6 +22,6 @@ COPY . .
 RUN poetry install --no-root --no-cache --without explo && \
     chmod +x pull_ollama_models_and_launch_app_servers.sh
 
-EXPOSE 5000 8000
+EXPOSE 8080
 
 ENTRYPOINT ["./pull_ollama_models_and_launch_app_servers.sh"]

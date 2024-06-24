@@ -20,7 +20,7 @@ export FLASK_APP=src/app/app.py
 export FLASK_ENV=production
 
 # start flask landing page
-poetry run python -m gunicorn -b 0.0.0.0:5000 src.app.app:app &
+poetry run python -m gunicorn -b 0.0.0.0:8080 src.app.app:app &
 
 # Start Chainlit
 poetry run python -m chainlit run --watch --headless src/chatbot.py &
