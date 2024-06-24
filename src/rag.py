@@ -151,7 +151,6 @@ class LocalRag:
             retriever = None
         self.retriever = retriever
 
-
     def build_llm_chain(self):
         template = """Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
         Si tu n'as pas de réponse explicite dans le contexte, réponds "Je n'ai pas assez d'informations pour répondre 
