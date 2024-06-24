@@ -2,9 +2,8 @@ import time
 import uuid
 from pathlib import Path
 
-from dateutil.relativedelta import relativedelta
 import pandas as pd
-
+from dateutil.relativedelta import relativedelta
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms import Ollama
@@ -151,6 +150,7 @@ class LocalRag:
         else:
             retriever = None
         self.retriever = retriever
+
 
     def build_llm_chain(self):
         template = """Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
