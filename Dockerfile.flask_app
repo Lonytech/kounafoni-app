@@ -1,0 +1,27 @@
+FROM python:3.10.12-slim
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PATH="/root/.local/bin:$PATH"
+
+ENV HOST 0.0.0.0
+
+# Update package list and install necessary packages
+RUN apt update -y && \
+    apt install -y ffmpeg pipx nginx && \
+    pipx install poetry==1.7.1 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /kounafoni_app
+
+# Copy only the current flask app directory contents into the container
+COPY ./src/app ./src/app
+COPY ./poetry.lock ./pyproject.toml ./launch_flask_app_server.sh ./
+
+# Install dependencies with poetry
+RUN pipx run poetry install --no-root --no-cache --only app_gui && \
+    chmod +x launch_flask_app_server.sh
+
+EXPOSE 5000
+
+ENTRYPOINT ["./launch_flask_app_server.sh"]

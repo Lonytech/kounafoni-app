@@ -5,5 +5,6 @@
 .git/
 data/piper/
 data/whisper/
+src/__pycache__
 .gitignore
 project_notes.md
