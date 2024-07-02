@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 import chainlit as cl
 from langchain.schema.runnable.config import RunnableConfig
@@ -11,6 +12,14 @@ LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
 # llm = Ollama(model="mayflowergmbh/occiglot-7b-fr-en-instruct")
 template = """Question: {question}"""
 
+if os.environ.get('CHATBOT_ENV') == 'production':
+    # Pull llm and embeddings models before anything
+    print("🔵 Launch Ollama...")
+    os.system("ollama serve &")
+    print("🔵 Retrieving models 2...")
+    os.system("ollama pull mayflowergmbh/occiglot-7b-fr-en-instruct")
+    os.system("ollama pull sammcj/sfr-embedding-mistral:Q4_K_M")
+    print("🟢 Done in python !")
 
 @cl.on_chat_start
 def main():
