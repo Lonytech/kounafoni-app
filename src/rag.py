@@ -12,12 +12,14 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_groq import ChatGroq
 
 from utils import format_docs, human_readable_time
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
 CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db"
-LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
+LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct:latest"
+GROQ_LLM_MODEL_NAME = "llama3-70b-8192"
 EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
 
 
@@ -41,7 +43,13 @@ class LocalRag:
             "Tu es un expert sur les actualités du Mali et tu parles uniquement français (spécialisé en "
             "langue française)."
         )
-        self._llm = Ollama(model=model_name, system=system_role)
+        try:
+            # Launch from Ollama
+            self._llm = Ollama(model=model_name, system=system_role)
+        except Exception as e:
+            # model not in Ollama
+            print(e)
+            self._llm = ChatGroq(temperature=0, model=model_name)
 
     def load_documents(self, file_path: Path):
         print("Loading documents...")
@@ -196,5 +204,6 @@ class LocalRag:
 if __name__ == "__main__":
     rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
     rag.llm = LLM_MODEL_NAME
+    # rag.llm = GROQ_LLM_MODEL_NAME
     rag.build_rag_pipeline_chain()
     rag.run_question_answer()

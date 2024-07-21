@@ -1,3 +1,4 @@
+import time
 from pathlib import Path
 import os
 
@@ -8,25 +9,20 @@ from langchain_core.prompts import PromptTemplate
 from rag import LocalRag
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
-LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
-# llm = Ollama(model="mayflowergmbh/occiglot-7b-fr-en-instruct")
-template = """Question: {question}"""
 
-if os.environ.get('CHATBOT_ENV') == 'production':
-    # Pull llm and embeddings models before anything
-    print("🔵 Launch Ollama...")
-    os.system("ollama serve &")
-    print("🔵 Retrieving models 2...")
-    os.system("ollama pull mayflowergmbh/occiglot-7b-fr-en-instruct")
-    os.system("ollama pull sammcj/sfr-embedding-mistral:Q4_K_M")
-    print("🟢 Done in python !")
+rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
+if os.environ.get("CHATBOT_ENV") == "production":
+    print("🔵 Using Groq for production mode (fast inference)...")
+    rag.llm = "llama3-70b-8192"
+else:
+    print("🔵 Using slow and free inference...")
+    rag.llm = "mayflowergmbh/occiglot-7b-fr-en-instruct"
+    
 
 @cl.on_chat_start
 def main():
-    # Instantiate the chain for that user session
-    prompt = PromptTemplate(template=template, input_variables=["question"])
-    rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
-    rag.llm = LLM_MODEL_NAME
+
+    # Build the entire RAG pipeline chain
     rag.build_rag_pipeline_chain()
 
     # Store the chain in the user session
@@ -45,5 +41,6 @@ async def on_message(message: cl.Message):
         config=RunnableConfig(callbacks=[cl.LangchainCallbackHandler()]),
     ):
         await msg.stream_token(chunk)
+        time.sleep(.07)  # slow down Groq inference only in production
 
     await msg.send()
