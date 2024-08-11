@@ -36,27 +36,23 @@ Essentially built with python.
   - For linux users :
     - curl -fsSL https://ollama.com/install.sh | sh
     - ollama run mistral:7b-instruct-q4_0
-    - To use GPU for fast inference on Colab or local computer :
-      - https://github.com/ollama/ollama/issues/832
-      - Use this command before installing Ollama and it should work : `sudo apt-get update && sudo apt-get install -y cuda-drivers`
 
 (Schema of underlying technologies used for the app will come soon)
 
 ## 🤝 Contribute
-
 We greatly value and appreciate contributions from users. 
-You can contribute to this project in two primary ways: by submitting pull requests or by creating issues.
+You can contribute to this project in two ways: by submitting pull requests or by creating issues.
 
 ### Pull Requests
-1. Fork the repository and create a branch from the main branch. 
-2. Make your changes or additions to the code. 
-3. Commit your changes and push them to your branch. 
+1. Fork the repository and create a branch from the main branch.
+2. Make your changes or additions to the code.
+3. Commit your changes and push them to your branch.
 4. Open a pull request to the main branch, including a clear and concise description of the changes.
 
 ### Issues
-1. Navigate to the Issues section of the repository. 
-2. Check if a similar issue already exists. 
-3. If no similar issue exists, create a new one by clicking the "New issue" button. 
+1. Navigate to the Issues section of the repository.
+2. Check if a similar issue already exists.
+3. If no similar issue exists, create a new one by clicking the "New issue" button.
 4. Provide a descriptive title and detailed information about the proposed changes you wish to add to the current script.
 
 ## ©️ License
