@@ -1,6 +1,7 @@
 .idea/
 *.pyc
+src/__pycache__/
 data/piper/
 data/whisper/
 project_notes.md
-docker-compose.yml
+lonytech-kounafonia-sa.json

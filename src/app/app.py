@@ -1,5 +1,6 @@
 from flask import Flask, redirect, render_template
 import os
+
 app = Flask(__name__)
 
 # Test audio data
@@ -98,8 +99,8 @@ def news():
 
 @app.route("/chat")
 def chat():
-    if os.environ.get('FLASK_ENV') == 'production':
-        return redirect("https://only-chatbot-app-service-hnmni2u5xq-ew.a.run.app/")
+    if os.environ.get("FLASK_ENV") == "production":
+        return redirect("https://chat.kounafonia.lonytech.com/")
     else:
         return redirect("http://127.0.0.1:8000")
 

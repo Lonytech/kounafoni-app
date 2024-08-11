@@ -16,7 +16,7 @@ black = "^24.4.2"
 isort = "^5.13.2"
 chromadb = "^0.5.0"
 langchain-community = "^0.2.0"
-
+langchain-groq = "^0.1.6"
 
 # Install app_gui dependencies to render landing page GUI
 [tool.poetry.group.app_gui]

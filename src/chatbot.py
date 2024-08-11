@@ -4,19 +4,28 @@ import os
 
 import chainlit as cl
 from langchain.schema.runnable.config import RunnableConfig
-from langchain_core.prompts import PromptTemplate
 
 from rag import LocalRag
+from models import LLMModelName
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
-
+# API_KEY = os.environ.get("GROQ_API_KEY")  # get API token from any secret manager if exists
+API_KEY = os.getenv("GROQ_API_KEY")
+SECOND_API_KEY = os.environ.get("SECOND_API_KEY")
+os.environ["GROQ_API_KEY"] = SECOND_API_KEY
 rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
-if os.environ.get("CHATBOT_ENV") == "production":
+
+os.system("curl http://localhost:11434/api/tags")
+# os.system("""curl http://localhost:11434/api/pull -d '{"name": "mayflowergmbh/occiglot-7b-fr-en-instruct:latest"}'""")
+# os.system("curl http://localhost:11434/api/tags")
+
+if os.environ.get("CHATBOT_ENV") == "production" and SECOND_API_KEY:
     print("🔵 Using Groq for production mode (fast inference)...")
-    rag.llm = "llama3-70b-8192"
+    rag.llm = LLMModelName.GROQ_LLAMA3
+
 else:
     print("🔵 Using slow and free inference...")
-    rag.llm = "mayflowergmbh/occiglot-7b-fr-en-instruct"
+    rag.llm = LLMModelName.OLLAMA_OCCIGLOT
     
 
 @cl.on_chat_start
