@@ -1,12 +1,12 @@
+import os
 import time
 from pathlib import Path
-import os
 
 import chainlit as cl
 from langchain.schema.runnable.config import RunnableConfig
 
-from rag import LocalRag
 from models import LLMModelName
+from rag import LocalRag
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
 
@@ -27,7 +27,7 @@ if os.environ.get("CHATBOT_ENV") == "production" and SECOND_API_KEY:
 else:
     print("🔵 Using slow and free inference...")
     rag.llm = LLMModelName.OLLAMA_OCCIGLOT
-    
+
 
 @cl.on_chat_start
 def main():
@@ -51,6 +51,6 @@ async def on_message(message: cl.Message):
         config=RunnableConfig(callbacks=[cl.LangchainCallbackHandler()]),
     ):
         await msg.stream_token(chunk)
-        time.sleep(.07)  # slow down Groq inference only in production
+        time.sleep(0.07)  # slow down Groq inference only in production
 
     await msg.send()
