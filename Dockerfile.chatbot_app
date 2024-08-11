@@ -1,0 +1,29 @@
+# syntax=docker.io/docker/dockerfile:1.7-labs
+
+FROM python:3.10.12-slim
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PATH="/root/.local/bin:$PATH"
+
+ENV HOST 0.0.0.0
+
+# Update package list and install pipx
+RUN apt update -y && \
+    apt install -y pipx curl && \
+    pipx install poetry==1.7.1 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /kounafoni_app
+
+# Copy the current directory contents needed into the container
+COPY --parents .chainlit/ data/ src/ ./
+COPY ./chainlit.md ./poetry.lock ./pyproject.toml ./launch_chatbot_app_server.sh ./
+
+# Install dependencies with poetry
+RUN poetry install --no-root --no-cache --only main,rag && \
+    chmod +x launch_chatbot_app_server.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["./launch_chatbot_app_server.sh"]

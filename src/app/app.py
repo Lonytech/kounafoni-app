@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, redirect, render_template
 
 app = Flask(__name__)
@@ -98,8 +100,11 @@ def news():
 
 @app.route("/chat")
 def chat():
-    return redirect("http://localhost:8000")
+    if os.environ.get("FLASK_ENV") == "production":
+        return redirect("https://chat.kounafonia.lonytech.com/")
+    else:
+        return redirect("http://127.0.0.1:8000")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)

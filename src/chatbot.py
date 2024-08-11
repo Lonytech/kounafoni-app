@@ -1,33 +1,56 @@
-import chainlit as cl
-from langchain.chains import LLMChain
-from langchain_community.llms import Ollama
-from langchain_core.prompts import PromptTemplate
+import os
+import time
+from pathlib import Path
 
-llm = Ollama(model="mayflowergmbh/occiglot-7b-fr-en-instruct")
-template = """Question: {question}"""
+import chainlit as cl
+from langchain.schema.runnable.config import RunnableConfig
+
+from models import LLMModelName
+from rag import LocalRag
+
+ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
+
+# Get the API KEY from ENV variables
+SECOND_API_KEY = os.environ.get("SECOND_API_KEY")
+os.environ["GROQ_API_KEY"] = SECOND_API_KEY
+
+# Prepare RAG var
+rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
+
+# get list of models from Ollama API in logs
+os.system("curl http://localhost:11434/api/tags")
+
+if os.environ.get("CHATBOT_ENV") == "production" and SECOND_API_KEY:
+    print("🔵 Using Groq for production mode (fast inference)...")
+    rag.llm = LLMModelName.GROQ_LLAMA3
+
+else:
+    print("🔵 Using slow and free inference...")
+    rag.llm = LLMModelName.OLLAMA_OCCIGLOT
 
 
 @cl.on_chat_start
 def main():
-    # Instantiate the chain for that user session
-    prompt = PromptTemplate(template=template, input_variables=["question"])
-    llm_chain = LLMChain(prompt=prompt, llm=llm, verbose=True)
+
+    # Build the entire RAG pipeline chain
+    rag.build_rag_pipeline_chain()
 
     # Store the chain in the user session
-    cl.user_session.set("llm_chain", llm_chain)
+    cl.user_session.set("runnable_sequence_llm_chain", rag.chain)
 
 
 @cl.on_message
-async def main(message: cl.Message):
+async def on_message(message: cl.Message):
     # Retrieve the chain from the user session
-    llm_chain = cl.user_session.get("llm_chain")  # type: LLMChain
+    agent = cl.user_session.get("runnable_sequence_llm_chain")  # type: Runnable
 
-    # Call the chain asynchronously
-    res = await llm_chain.acall(
-        message.content, callbacks=[cl.AsyncLangchainCallbackHandler()]
-    )
+    msg = cl.Message(content="")
 
-    # Do any post-processing here
+    async for chunk in agent.astream(
+        {"question": message.content},
+        config=RunnableConfig(callbacks=[cl.LangchainCallbackHandler()]),
+    ):
+        await msg.stream_token(chunk)
+        time.sleep(0.07)  # slow down Groq inference only in production
 
-    # Send the response
-    await cl.Message(content=res["text"]).send()
+    await msg.send()

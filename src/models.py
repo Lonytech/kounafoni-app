@@ -1,6 +1,5 @@
 from datetime import date
 from enum import Enum
-from typing import ClassVar
 
 from pydantic import BaseModel, field_validator
 
@@ -9,6 +8,11 @@ class SummaryDuration(str, Enum):
     SHORT_DURATION: str = "1 minute"
     MEDIUM_DURATION: str = "5 minutes"
     LONG_DURATION: str = "10 minutes"
+
+
+class LLMModelName(str, Enum):
+    OLLAMA_OCCIGLOT: str = "mayflowergmbh/occiglot-7b-fr-en-instruct:latest"
+    GROQ_LLAMA3: str = "llama3-70b-8192"
 
 
 class ScrapDate(BaseModel):

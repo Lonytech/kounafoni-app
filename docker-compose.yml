@@ -1,0 +1,23 @@
+services:
+  flask_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask_app
+      tags:
+        - "europe-west1-docker.pkg.dev/lonytech/kounafonia/dev-flask-main-app:latest"
+        - "europe-west1-docker.pkg.dev/lonytech/kounafonia/dev-flask-main-app:single_app_flask"
+        - "europe-west1-docker.pkg.dev/lonytech/kounafonia/dev-flask-main-app:${commit_hash}"
+
+    ports:
+      - "5000:5000"
+
+  chatbot_server:
+    build:
+      context: .
+      dockerfile: Dockerfile.chatbot_app
+      tags:
+        - "europe-west1-docker.pkg.dev/lonytech/kounafonia/dev-chatbot-app:latest"
+        - "europe-west1-docker.pkg.dev/lonytech/kounafonia/dev-chatbot-app:python_image_docker"
+        - "europe-west1-docker.pkg.dev/lonytech/kounafonia/dev-chatbot-app:${commit_hash}"
+    ports:
+      - "8000:8000"

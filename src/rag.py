@@ -11,14 +11,16 @@ from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+from models import LLMModelName
 from utils import format_docs, human_readable_time
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
-CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db"
-LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
-EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
+CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db_1024"
+# EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
+EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
 
 class LocalRag:
@@ -36,12 +38,19 @@ class LocalRag:
         return self._llm
 
     @llm.setter
-    def llm(self, model_name):
+    def llm(self, model_name: LLMModelName):
         system_role = (
             "Tu es un expert sur les actualités du Mali et tu parles uniquement français (spécialisé en "
             "langue française)."
         )
-        self._llm = Ollama(model=model_name, system=system_role)
+
+        if model_name == LLMModelName.OLLAMA_OCCIGLOT:
+            # Launch from Ollama
+            self._llm = Ollama(model=model_name.value, system=system_role)
+
+        elif model_name == LLMModelName.GROQ_LLAMA3:
+            # Get model from Groq LLM. Don't forget to set env variable "GROQ_API_KEY"
+            self._llm = ChatGroq(temperature=0, model=model_name.value)
 
     def load_documents(self, file_path: Path):
         print("Loading documents...")
@@ -195,6 +204,7 @@ class LocalRag:
 
 if __name__ == "__main__":
     rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
-    rag.llm = LLM_MODEL_NAME
+    rag.llm = LLMModelName.GROQ_LLAMA3
+    # rag.llm = LLMModelName.OLLAMA_OCCIGLOT
     rag.build_rag_pipeline_chain()
     rag.run_question_answer()
