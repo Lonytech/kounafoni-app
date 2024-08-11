@@ -9,15 +9,16 @@ from rag import LocalRag
 from models import LLMModelName
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
-# API_KEY = os.environ.get("GROQ_API_KEY")  # get API token from any secret manager if exists
-API_KEY = os.getenv("GROQ_API_KEY")
+
+# Get the API KEY from ENV variables
 SECOND_API_KEY = os.environ.get("SECOND_API_KEY")
 os.environ["GROQ_API_KEY"] = SECOND_API_KEY
+
+# Prepare RAG var
 rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
 
+# get list of models from Ollama API in logs
 os.system("curl http://localhost:11434/api/tags")
-# os.system("""curl http://localhost:11434/api/pull -d '{"name": "mayflowergmbh/occiglot-7b-fr-en-instruct:latest"}'""")
-# os.system("curl http://localhost:11434/api/tags")
 
 if os.environ.get("CHATBOT_ENV") == "production" and SECOND_API_KEY:
     print("🔵 Using Groq for production mode (fast inference)...")

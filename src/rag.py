@@ -21,7 +21,6 @@ ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "sou
 CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db_1024"
 # EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
 EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
-# EMBEDDING_MODEL_NAME = "bge-large:335m-en-v1.5-fp16"
 
 
 class LocalRag:
