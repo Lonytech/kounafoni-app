@@ -1,0 +1,29 @@
+name: Upload CSV to GCS
+
+on:
+  schedule:
+    # S'exécute tous les jours à 07:00 UTC
+    - cron: '0 7 * * *'
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository and code validity
+      uses: actions/checkout@v2
+
+    - name: Install poetry
+      run: |
+        sudo apt update -y
+        sudo apt install -y pipx
+        pipx install poetry==1.7.1
+        export PATH="/root/.local/bin:$PATH"
+
+    - name: Install dependencies with poetry
+      run: poetry install --no-root --no-cache --only main,news_processing
+
+    - name: Python script to scrap info from Malijet and save to GCS
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+      run: poetry run python src/malijet_news_updater.py

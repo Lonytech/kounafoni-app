@@ -24,8 +24,8 @@ jobs:
           export PATH="/root/.local/bin:$PATH"
 
       - name: Install dependencies with poetry
-        run: poetry install --no-root --no-cache --without explo
-          
+        run: poetry install --no-root --no-cache --only main
+
       - name: Black file formatting
         run: poetry run black --check .
 
