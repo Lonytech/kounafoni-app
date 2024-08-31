@@ -1,4 +1,5 @@
 import unicodedata
+from datetime import date
 from pathlib import Path
 
 import dateparser
@@ -22,6 +23,27 @@ class MaliJetDataScraper:
         response = requests.get(url)
         return BeautifulSoup(response.text, "html.parser")
 
+    @staticmethod
+    def date_encoding_replacer(date_text):
+        replace_map = {"ao�t": "août"}
+        for k, v in replace_map.items():
+            date_text = date_text.replace(k, v)
+        return date_text
+
+    @staticmethod
+    def find_associated_path(list_of_dates: list[date]):
+        date_path_map = dict()
+        for d in set(list_of_dates):
+            date_path_map[d] = (
+                Path(__file__).parents[1]
+                / "data"
+                / "malijet"
+                / f"{d.year}"
+                / f"{d.month:02d}"
+                / f"{d.day:02d}.csv"
+            )
+        return date_path_map
+
     def get_mali_jet_page_list_of_articles(self, num_page):
         soup = self.get_soup_parser(
             url=f"https://malijet.com/a_la_une_du_mali/?page={num_page}"
@@ -44,8 +66,9 @@ class MaliJetDataScraper:
             source_papers.append(None if not infos else infos[0])
             dates.append(
                 None
-                if not infos or not dateparser.parse(infos[1])
-                else dateparser.parse(infos[1]).date()
+                if not infos
+                or not dateparser.parse(self.date_encoding_replacer(infos[1]))
+                else dateparser.parse(self.date_encoding_replacer(infos[1])).date()
             )
             links.append(unicodedata.normalize("NFKD", link["href"]))
             # print("*"*100)
@@ -90,7 +113,7 @@ class MaliJetDataScraper:
                 .replace("     ", " ")
             )
 
-    def get_new_articles(self, save_directory):
+    def get_new_articles(self):
         # Collecting a list of articles
         page_number = 1
         articles_to_fetch_df = pd.DataFrame(columns=self.columns)
@@ -111,43 +134,64 @@ class MaliJetDataScraper:
         subset_fetching_articles_df = articles_to_fetch_df.query(
             "date >= @self.begin_date and date <= @self.end_date"
         ).copy()
-        article_contents, new_titles = [], []
-        read_source = pd.read_csv(save_directory, sep="\t")
-
-        # check on dataframe source
-        if read_source.empty:
-            existing_article_titles = []
-        else:
-            existing_article_titles = read_source["title"].tolist()
+        new_titles = []
+        date_path_map = self.find_associated_path(
+            subset_fetching_articles_df["date"].tolist()
+        )
 
         for _, row in tqdm(
             subset_fetching_articles_df.iterrows(),
             total=subset_fetching_articles_df.shape[0],
         ):
+            current_saving_path = date_path_map[row["date"]]
+            if current_saving_path.exists():
+                existing_article_titles = pd.read_csv(
+                    current_saving_path, sep="\t"
+                ).title.tolist()
+            else:
+                # build directory if it doesn't exist
+                current_saving_path.parent.mkdir(parents=True, exist_ok=True)
+                existing_article_titles = list()
+
             if row.title not in existing_article_titles:
+                new_title = row.title
+                article_content = self.fetch_article_content(row.link)
+
+                # store titles of articles
                 new_titles.append(row.title)
-                article_contents.append(self.fetch_article_content(row.link))
-        if article_contents:
-            print("New articles found, writing article contents to file...")
-            subset_fetching_articles_df.query("title in @new_titles").assign(
-                content=article_contents
-            ).to_csv(save_directory, mode="a", sep="\t", index=False, header=False)
+
+                print(
+                    f"New article found : « {new_title[:50]}... », writing article content to file..."
+                )
+                is_header_required_as_first_article = not bool(
+                    existing_article_titles
+                )  # write header only if it is the first article of this specific date
+
+                # get the first article if multiple same title founds and save it
+                subset_fetching_articles_df.query("title==@new_title").head(1).assign(
+                    content=[article_content]
+                ).to_csv(
+                    current_saving_path,
+                    mode="a",
+                    sep="\t",
+                    index=False,
+                    header=is_header_required_as_first_article,
+                )
+        if new_titles:
+            print("\n --- New articles successfully written to files... ---")
         else:
-            print("No new articles found, skipping...")
+            print("\n --- No new articles found. ---")
 
 
 if __name__ == "__main__":
-    START_DATE = "2024-05-22"
-    END_DATE = dateparser.date.datetime.today().date()
+    START_DATE = "2024-08-24"
+    END_DATE = date.today()
+
+    print(Path().resolve().parent / "data")
 
     scraper = MaliJetDataScraper(
         date_range=ScrapDate(end_date=END_DATE, begin_date=START_DATE)
     )
 
-    CSV_DIR = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
-
-    if not CSV_DIR.exists():
-        if not CSV_DIR.parent.exists():
-            CSV_DIR.parent.mkdir(parents=True)
-        pd.DataFrame(columns=scraper.columns).to_csv(CSV_DIR, sep="\t", index=False)
-    scraper.get_new_articles(save_directory=CSV_DIR)
+    # get all articles "A la Une" from Malijet in the date range given
+    scraper.get_new_articles()
