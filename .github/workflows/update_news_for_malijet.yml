@@ -3,7 +3,7 @@ name: Upload CSV to GCS
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '*/7 * * * *'
+    - cron: '00 11 * * *'
 
 jobs:
   upload:
