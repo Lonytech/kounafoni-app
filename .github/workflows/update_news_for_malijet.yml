@@ -1,34 +1,34 @@
-name: Upload CSV to GCS
+# name: Upload CSV to GCS
 
-on:
-  schedule:
-    # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '45 15 * * *'
+# on:
+#   schedule:
+#     # Set execution hour and minutes in UTC (a.k.a GMT)
+#     - cron: '45 15 * * *'
 
-jobs:
-  upload:
-    runs-on: ubuntu-latest
+# jobs:
+#   upload:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository and code validity
-      uses: actions/checkout@v2
+#     steps:
+#     - name: Checkout repository and code validity
+#       uses: actions/checkout@v2
 
-    - name: Google Cloud Auth
-      uses: 'google-github-actions/auth@v2'
-      with:
-        credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+#     - name: Google Cloud Auth
+#       uses: 'google-github-actions/auth@v2'
+#       with:
+#         credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
 
-    - name: Install poetry
-      run: |
-        sudo apt update -y
-        sudo apt install -y pipx
-        pipx install poetry==1.7.1
-        export PATH="/root/.local/bin:$PATH"
+#     - name: Install poetry
+#       run: |
+#         sudo apt update -y
+#         sudo apt install -y pipx
+#         pipx install poetry==1.7.1
+#         export PATH="/root/.local/bin:$PATH"
 
-    - name: Install dependencies with poetry
-      run: poetry install --no-root --no-cache --only main,news_processing
+#     - name: Install dependencies with poetry
+#       run: poetry install --no-root --no-cache --only main,news_processing
 
-    - name: Python script to scrap info from Malijet and save to GCS
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-      run: poetry run python src/malijet_news_updater.py
+#     - name: Python script to scrap info from Malijet and save to GCS
+#       env:
+#         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#       run: poetry run python src/malijet_news_updater.py
