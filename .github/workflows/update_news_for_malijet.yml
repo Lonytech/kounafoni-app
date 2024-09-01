@@ -3,7 +3,7 @@ name: Upload CSV to GCS
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '20 13 * * *'
+    - cron: '45 15 * * *'
 
 jobs:
   upload:
@@ -12,6 +12,11 @@ jobs:
     steps:
     - name: Checkout repository and code validity
       uses: actions/checkout@v2
+
+    - name: Google Cloud Auth
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
 
     - name: Install poetry
       run: |
