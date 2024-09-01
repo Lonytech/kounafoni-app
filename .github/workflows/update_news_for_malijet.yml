@@ -3,7 +3,7 @@ name: Upload CSV to GCS
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '40 12 * * *'
+    - cron: '20 13 * * *'
 
 jobs:
   upload:
@@ -25,5 +25,5 @@ jobs:
 
     - name: Python script to scrap info from Malijet and save to GCS
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
       run: poetry run python src/malijet_news_updater.py
