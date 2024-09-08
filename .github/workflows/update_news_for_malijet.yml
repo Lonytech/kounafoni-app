@@ -25,12 +25,19 @@ jobs:
 
     - name: Install dependencies with poetry
       run: poetry install --no-root --no-cache --only main,news_processing
+    
+    - name: Python script to scrap info from Malijet and save to GCS
+      run: poetry run python src/malijet_news_updater.py
 
     - name: Google Cloud Auth
       uses: 'google-github-actions/auth@v2'
       with:
         workload_identity_provider: 'projects/1027956460426/locations/global/workloadIdentityPools/github-actions/providers/github'
         service_account: 'github-actions-sa@lonytech.iam.gserviceaccount.com'
+
+    - id: 'upload-file'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'data/malijet'
+        destination: 'kounafonia-news'
     
-    - name: Python script to scrap info from Malijet and save to GCS
-      run: poetry run python src/malijet_news_updater.py

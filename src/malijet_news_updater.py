@@ -54,8 +54,8 @@ if __name__ == "__main__":
     scraper.get_new_articles()
 
     # Calling upload functions for the whole directory
-    upload_directory_to_gcs(
-        directory_path="data/malijet",
-        dest_bucket_name="kounafonia-news",
-        dest_blob_name="data",
-    )
+    # upload_directory_to_gcs(
+    #     directory_path="data/malijet",
+    #     dest_bucket_name="kounafonia-news",
+    #     dest_blob_name="data",
+    # )
