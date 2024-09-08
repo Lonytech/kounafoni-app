@@ -1,34 +1,36 @@
-# name: Upload CSV to GCS
+name: Upload CSV to GCS
 
-# on:
-#   schedule:
-#     # Set execution hour and minutes in UTC (a.k.a GMT)
-#     - cron: '45 15 * * *'
+on:
+  schedule:
+    # Set execution hour and minutes in UTC (a.k.a GMT)
+    - cron: '25 12 * * *'
 
-# jobs:
-#   upload:
-#     runs-on: ubuntu-latest
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
 
-#     steps:
-#     - name: Checkout repository and code validity
-#       uses: actions/checkout@v2
+    steps:
+    - name: Checkout repository and code validity
+      uses: actions/checkout@v4
+        
+    - name: Install poetry
+      run: |
+        sudo apt update -y
+        sudo apt install -y pipx
+        pipx install poetry==1.7.1
+        export PATH="/root/.local/bin:$PATH"
 
-#     - name: Google Cloud Auth
-#       uses: 'google-github-actions/auth@v2'
-#       with:
-#         credentials_json: '${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}'
+    - name: Install dependencies with poetry
+      run: poetry install --no-root --no-cache --only main,news_processing
 
-#     - name: Install poetry
-#       run: |
-#         sudo apt update -y
-#         sudo apt install -y pipx
-#         pipx install poetry==1.7.1
-#         export PATH="/root/.local/bin:$PATH"
-
-#     - name: Install dependencies with poetry
-#       run: poetry install --no-root --no-cache --only main,news_processing
-
-#     - name: Python script to scrap info from Malijet and save to GCS
-#       env:
-#         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-#       run: poetry run python src/malijet_news_updater.py
+    - name: Google Cloud Auth
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: 'projects/1027956460426/locations/global/workloadIdentityPools/github-actions/providers/github'
+        service_account: 'github-actions-sa@lonytech.iam.gserviceaccount.com'
+    
+    - name: Python script to scrap info from Malijet and save to GCS
+      run: poetry run python src/malijet_news_updater.py
