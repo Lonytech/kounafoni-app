@@ -43,11 +43,13 @@ def upload_directory_to_gcs(
 if __name__ == "__main__":
 
     # Set the range to [yesterday - today] to not forget any article
-    today_date = date.today()
-    yesterday_date = today_date - timedelta(days=1)
+    # today_date = date.today()
+    # yesterday_date = today_date - timedelta(days=1)
+    begin_date = "2024-01-01"
+    end_date = "2024-01-01"
 
     scraper = MaliJetDataScraper(
-        date_range=ScrapDate(end_date=today_date, begin_date=yesterday_date)
+        date_range=ScrapDate(end_date=end_date, begin_date=begin_date)
     )
 
     # get all articles "A la Une" from Malijet in the date range given
