@@ -25,7 +25,11 @@ class MaliJetDataScraper:
 
     @staticmethod
     def date_encoding_replacer(date_text):
-        replace_map = {"ao�t": "août"}
+        replace_map = replace_map = {
+            "ao�t": "août",
+            "f�vrier": "février",
+            "d�cembre": "décembre",
+        }
         for k, v in replace_map.items():
             date_text = date_text.replace(k, v)
         return date_text
