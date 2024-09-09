@@ -46,7 +46,7 @@ if __name__ == "__main__":
     # today_date = date.today()
     # yesterday_date = today_date - timedelta(days=1)
     begin_date = "2024-01-01"
-    end_date = "2024-01-01"
+    end_date = "2024-03-31"
 
     scraper = MaliJetDataScraper(
         date_range=ScrapDate(end_date=end_date, begin_date=begin_date)
