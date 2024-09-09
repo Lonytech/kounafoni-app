@@ -56,7 +56,9 @@ class LocalRag:
     def load_documents(self, file_path: Path, is_directory=False):
         print("Loading documents...")
         if is_directory:
-            loader = DirectoryLoader(file_path.as_posix(), glob="**/*.csv", loader_cls=CSVLoader)
+            loader = DirectoryLoader(
+                file_path.as_posix(), glob="**/*.csv", loader_cls=CSVLoader
+            )
         else:
             loader = CSVLoader(file_path=file_path, csv_args={"delimiter": "\t"})
         self.documents = loader.load()
