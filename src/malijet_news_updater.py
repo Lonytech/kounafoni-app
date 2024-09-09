@@ -48,6 +48,9 @@ if __name__ == "__main__":
     begin_date = "2024-01-01"
     end_date = "2024-03-31"
 
+    begin_date = dateparser.parse(begin_date).date()
+    end_date = dateparser.parse(end_date).date()
+
     scraper = MaliJetDataScraper(
         date_range=ScrapDate(end_date=end_date, begin_date=begin_date)
     )
