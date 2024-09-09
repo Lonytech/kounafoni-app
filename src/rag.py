@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
+from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms import Ollama
@@ -52,9 +53,12 @@ class LocalRag:
             # Get model from Groq LLM. Don't forget to set env variable "GROQ_API_KEY"
             self._llm = ChatGroq(temperature=0, model=model_name.value)
 
-    def load_documents(self, file_path: Path):
+    def load_documents(self, file_path: Path, is_directory=False):
         print("Loading documents...")
-        loader = CSVLoader(file_path=file_path, csv_args={"delimiter": "\t"})
+        if is_directory:
+            loader = DirectoryLoader(file_path.as_posix(), glob="**/*.csv", loader_cls=CSVLoader)
+        else:
+            loader = CSVLoader(file_path=file_path, csv_args={"delimiter": "\t"})
         self.documents = loader.load()
 
     def split_documents(self):
