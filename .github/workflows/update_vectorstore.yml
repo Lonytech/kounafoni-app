@@ -10,10 +10,10 @@ on:
       - '**'
 
 jobs:
-  upload:
+  compute_new_vectors:
     runs-on: ubuntu-latest
-    container:
-      image: ollama/ollama  # Ollama docker image
+    # container:
+    #   image: ollama/ollama  # Ollama docker image
 
     permissions:
       contents: 'read'
@@ -47,7 +47,15 @@ jobs:
         mkdir -p data/vector_stores
         gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data/vector_stores
 
-    - name: Pull Ollama embedding model
+    # - name: Pull Ollama embedding model
+    #   run: |
+    #     ollama serve &
+    #     ollama pull bge-m3:567m-fp16
+
+    - name: Install ollama
+      run: curl -fsSL https://ollama.com/install.sh | sh
+    
+    - name: Run ollama
       run: |
         ollama serve &
         ollama pull bge-m3:567m-fp16
