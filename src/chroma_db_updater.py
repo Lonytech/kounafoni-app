@@ -1,13 +1,18 @@
-from rag import LocalRag
 from pathlib import Path
 
+from rag import LocalRag
+
 ARTICLE_DIRECTORY_PATH = Path(__file__).parents[1] / "data" / "articles"
-VECTOR_STORE_DIRECTORY_PATH = Path(__file__).parents[1] / "data" / "vector_stores" / "chroma_db_1024"
+VECTOR_STORE_DIRECTORY_PATH = (
+    Path(__file__).parents[1] / "data" / "vector_stores" / "chroma_db_1024"
+)
 from langchain_community.embeddings import OllamaEmbeddings
+
 EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
 # def pull_scraped_articles_from_gcs():
 #     pass
+
 
 def update_vectorstore():
     rag_vectorizer = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
@@ -19,7 +24,9 @@ def update_vectorstore():
     rag_vectorizer.embedding_model.show_progress = True
 
     # Load and update vector store with new
-    rag_vectorizer.read_vector_store(vector_store_directory=VECTOR_STORE_DIRECTORY_PATH.as_posix())
+    rag_vectorizer.read_vector_store(
+        vector_store_directory=VECTOR_STORE_DIRECTORY_PATH.as_posix()
+    )
     rag_vectorizer.update_vector_store()
 
 
