@@ -3,7 +3,7 @@ name: Update Vector Store
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '40 17 * * *'
+    - cron: '00 18 * * *'
 
 jobs:
   upload:
