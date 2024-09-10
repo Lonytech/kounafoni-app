@@ -1,9 +1,13 @@
 name: Update Vector Store
 
+# on:
+#   schedule:
+#     # Set execution hour and minutes in UTC (a.k.a GMT)
+#     - cron: '00 18 * * *'
 on:
-  schedule:
-    # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '00 18 * * *'
+  push:
+    branches:
+      - '**'
 
 jobs:
   upload:
