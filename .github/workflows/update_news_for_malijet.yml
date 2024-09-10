@@ -3,7 +3,7 @@ name: Upload CSV to GCS
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '00 05 * * *'
+    - cron: '37 12 * * *'
 
 jobs:
   upload:
@@ -15,7 +15,7 @@ jobs:
     steps:
     - name: Checkout repository and code validity
       uses: actions/checkout@v4
-        
+
     - name: Install poetry
       run: |
         sudo apt update -y
@@ -25,15 +25,12 @@ jobs:
 
     - name: Install dependencies with poetry
       run: poetry install --no-root --no-cache --only main,news_processing
-    
-    - name: Python script to scrap info from Malijet and save to GCS
-      run: poetry run python src/malijet_news_updater.py
 
     - name: Google Cloud Auth
       uses: 'google-github-actions/auth@v2'
       with:
-        workload_identity_provider: 'projects/1027956460426/locations/global/workloadIdentityPools/github-actions/providers/github'
-        service_account: 'github-actions-sa@lonytech.iam.gserviceaccount.com'
+        workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
     - id: 'upload-file'
       uses: 'google-github-actions/upload-cloud-storage@v2'

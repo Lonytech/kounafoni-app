@@ -102,10 +102,10 @@ class LocalRag:
     def create_vector_store(self):
         pass
 
-    def read_vector_store(self):
+    def read_vector_store(self, vector_store_directory=CHROMA_DB_PERSIST_PATH.as_posix()):
         print("Loading Chroma vector store...")
         vector_store_db = Chroma(
-            persist_directory=CHROMA_DB_PERSIST_PATH.as_posix(),
+            persist_directory=vector_store_directory,
             embedding_function=self.embedding_model,
         )
 
