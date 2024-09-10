@@ -49,7 +49,7 @@ jobs:
 
     - name: Pull Ollama embedding model
       run: |
-        ollama serve
+        ollama serve &
         ollama pull bge-m3:567m-fp16
 
     - name: Install poetry
