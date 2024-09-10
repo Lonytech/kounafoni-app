@@ -3,7 +3,7 @@ name: Update Vector Store
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '59 16 * * *'
+    - cron: '40 17 * * *'
 
 jobs:
   upload:
@@ -37,7 +37,10 @@ jobs:
 
     - name: Download articles and vector_store from GCS
       run: |
+        mkdir -p data/articles
         gsutil -m cp -r gs://kounafonia-news/data/articles ./data/articles
+
+        mkdir -p data/vector_stores
         gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data/vector_stores
 
     - name: Pull Ollama embedding model
