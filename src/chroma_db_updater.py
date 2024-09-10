@@ -16,7 +16,7 @@ EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
 def update_vectorstore():
     rag_vectorizer = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
-    rag_vectorizer.load_documents(rag_vectorizer.data_source_path)
+    rag_vectorizer.load_documents(rag_vectorizer.data_source_path, is_directory=True)
     rag_vectorizer.split_documents()
 
     print("Embedding documents...")
