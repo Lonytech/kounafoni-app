@@ -55,7 +55,7 @@ jobs:
     - name: Install ollama
       run: curl -fsSL https://ollama.com/install.sh | sh
     
-    - name: Run ollama
+    - name: Serve and pull ollama model
       run: |
         ollama serve &
         ollama pull bge-m3:567m-fp16
@@ -70,8 +70,8 @@ jobs:
     - name: Install dependencies with poetry
       run: poetry install --no-root --no-cache --only main,news_processing
     
-    - name: Python script to scrap info from Malijet and save to GCS
-      run: poetry run python src/chroma_db_updater.py
+    - name: Build new article vectors from embedding and store to vector store
+      run: ls && ls -la && poetry run python src/chroma_db_updater.py
 
     - id: 'upload-file'
       uses: 'google-github-actions/upload-cloud-storage@v2'
