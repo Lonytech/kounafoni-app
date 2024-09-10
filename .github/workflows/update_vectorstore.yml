@@ -3,7 +3,7 @@ name: Update Vector Store
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '40 12 * * *'
+    - cron: '59 16 * * *'
 
 jobs:
   upload:
@@ -25,9 +25,15 @@ jobs:
         workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
         service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
-    - name: Install gsutil (within Ollama container)
-      run: |
-        apt update && apt install -y google-cloud-sdk
+    # - name: Install gsutil (within Ollama container)
+    #   run: |
+    #     apt update && apt install -y google-cloud-sdk
+
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v2'
+
+    # - name: 'Use gcloud CLI'
+    #   run: 'gcloud info'
 
     - name: Download articles and vector_store from GCS
       run: |
