@@ -36,7 +36,7 @@ jobs:
     - name: Download articles and vector_store from GCS
       run: |
         mkdir -p data/articles
-        gsutil -m cp -r gs://kounafonia-news/data/articles ./data/articles
+        gsutil -m cp -r gs://kounafonia-news/data/articles/malijet/2024/01 ./data/articles/malijet/2024/01
 
         mkdir -p data/vector_stores
         gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data/vector_stores
@@ -72,5 +72,5 @@ jobs:
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: 'data/vector_stores'
-        destination: 'kounafonia-news/data'
+        destination: 'kounafonia-news'
         process_gcloudignore: false #no .gcloudignore file in the repo
