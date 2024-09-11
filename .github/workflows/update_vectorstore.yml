@@ -35,7 +35,7 @@ jobs:
 
     - name: Download articles and vector_store from GCS
       run: |
-        mkdir -p data/articles
+        mkdir -p data/articles/malijet/2024/01
         gsutil -m cp -r gs://kounafonia-news/data/articles/malijet/2024/01 ./data/articles/malijet/2024/01
 
         mkdir -p data/vector_stores
