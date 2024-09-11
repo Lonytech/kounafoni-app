@@ -106,16 +106,19 @@ class LocalRag:
         self, vector_store_directory=CHROMA_DB_PERSIST_PATH.as_posix()
     ):
         print("Loading Chroma vector store...")
+        print("new embedding model is : ", self.embedding_model)
         vector_store_db = Chroma(
             persist_directory=vector_store_directory,
             embedding_function=self.embedding_model,
         )
+        print(vector_store_db)
 
         # Set vector store loaded
         self.vector_store_db = vector_store_db
 
     def update_vector_store(self):
         print("Updating Chroma vector store...")
+        print(self.vector_store_db.get())
         persisted_ids = self.vector_store_db.get()["ids"]
         new_documents_to_embed_df = pd.DataFrame(
             {
