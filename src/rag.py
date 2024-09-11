@@ -134,7 +134,7 @@ class LocalRag:
         print("length persisted ids : ", len(persisted_ids))
         print(
             "length new df single ids : ",
-            len(new_documents_to_embed_df.single_id.nunique()),
+            new_documents_to_embed_df.single_id.nunique(),
         )
 
         new_documents_to_embed_df.query(
