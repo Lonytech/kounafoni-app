@@ -131,6 +131,12 @@ class LocalRag:
         new_documents_to_embed_df.drop_duplicates(subset="single_id", inplace=True)
 
         # Keep only documents not already embedded
+        print("length persisted ids : ", len(persisted_ids))
+        print(
+            "length new df single ids : ",
+            len(new_documents_to_embed_df.single_id.nunique()),
+        )
+
         new_documents_to_embed_df.query(
             f"single_id not in {persisted_ids}", inplace=True
         )
@@ -141,6 +147,7 @@ class LocalRag:
             )
         else:
             print("Embedding documents...")
+            print(new_documents_to_embed_df.shape)
             print(new_documents_to_embed_df.head())
             self.vector_store_db.add_documents(
                 documents=new_documents_to_embed_df.document.tolist(),
