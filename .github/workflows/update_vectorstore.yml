@@ -72,5 +72,5 @@ jobs:
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: 'data/vector_stores'
-        destination: 'kounafonia-news'
+        destination: 'kounafonia-news/data'
         process_gcloudignore: false #no .gcloudignore file in the repo
