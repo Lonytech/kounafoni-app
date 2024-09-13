@@ -40,6 +40,10 @@ jobs:
 
         mkdir -p data/vector_stores
         gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data/vector_stores
+        
+        ls -la
+        
+        ls data
 
 
     - name: Install ollama
