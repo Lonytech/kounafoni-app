@@ -1,13 +1,9 @@
 name: Update Vector Store
 
-# on:
-#   schedule:
-#     # Set execution hour and minutes in UTC (a.k.a GMT)
-#     - cron: '00 18 * * *'
 on:
-  push:
-    branches:
-      - '**'
+ schedule:
+   # Set execution hour and minutes in UTC (a.k.a GMT)
+   - cron: '30 05 * * *'
 
 jobs:
   compute_new_vectors:
@@ -40,10 +36,6 @@ jobs:
 
         mkdir -p data/vector_stores
         gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data
-        
-        ls -la
-        
-        ls data
 
 
     - name: Install ollama
