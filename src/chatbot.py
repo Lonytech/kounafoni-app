@@ -12,6 +12,7 @@ ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "sou
 
 # Get the API KEY from ENV variables
 SECOND_API_KEY = os.environ.get("SECOND_API_KEY")
+SECOND_API_KEY = SECOND_API_KEY if SECOND_API_KEY else ""
 os.environ["GROQ_API_KEY"] = SECOND_API_KEY
 
 # Prepare RAG var

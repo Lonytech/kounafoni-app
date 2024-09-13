@@ -1,13 +1,9 @@
 name: Update Vector Store
 
-# on:
-#   schedule:
-#     # Set execution hour and minutes in UTC (a.k.a GMT)
-#     - cron: '00 18 * * *'
 on:
-  push:
-    branches:
-      - '**'
+ schedule:
+   # Set execution hour and minutes in UTC (a.k.a GMT)
+   - cron: '30 05 * * *'
 
 jobs:
   compute_new_vectors:
@@ -36,10 +32,10 @@ jobs:
     - name: Download articles and vector_store from GCS
       run: |
         mkdir -p data/articles
-        gsutil -m cp -r gs://kounafonia-news/data/articles ./data/articles
+        gsutil -m cp -r gs://kounafonia-news/data/articles ./data
 
         mkdir -p data/vector_stores
-        gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data/vector_stores
+        gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data
 
 
     - name: Install ollama
@@ -72,5 +68,5 @@ jobs:
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: 'data/vector_stores'
-        destination: 'kounafonia-news/data/vector_stores'
+        destination: 'kounafonia-news/data'
         process_gcloudignore: false #no .gcloudignore file in the repo
