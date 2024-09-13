@@ -36,10 +36,10 @@ jobs:
     - name: Download articles and vector_store from GCS
       run: |
         mkdir -p data/articles
-        gsutil -m cp -r gs://kounafonia-news/data/articles ./data/articles
+        gsutil -m cp -r gs://kounafonia-news/data/articles ./data
 
         mkdir -p data/vector_stores
-        gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data/vector_stores
+        gsutil -m cp -r gs://kounafonia-news/data/vector_stores ./data
         
         ls -la
         
