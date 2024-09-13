@@ -19,7 +19,9 @@ from models import LLMModelName
 from utils import format_docs, human_readable_time
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
-CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db_1024"
+CHROMA_DB_PERSIST_PATH = (
+    Path(__file__).parents[1] / "data" / "vector_stores" / "chroma_db_1024"
+)
 # EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
 EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
@@ -116,7 +118,7 @@ class LocalRag:
         # Set vector store loaded
         self.vector_store_db = vector_store_db
 
-    def update_vector_store(self):
+    def update_vector_store(self, persist_directory=CHROMA_DB_PERSIST_PATH.as_posix()):
         print("Updating Chroma vector store...")
         print(self.vector_store_db.get())
         persisted_ids = self.vector_store_db.get()["ids"]
@@ -156,7 +158,7 @@ class LocalRag:
                 documents=new_documents_to_embed_df.document.tolist(),
                 embedding=self.embedding_model,
                 ids=new_documents_to_embed_df.single_id.tolist(),
-                persist_directory=CHROMA_DB_PERSIST_PATH.as_posix(),
+                persist_directory=persist_directory,
             )
 
     def delete_from_vector_store(self):

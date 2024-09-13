@@ -27,7 +27,9 @@ def update_vectorstore():
     rag_vectorizer.read_vector_store(
         vector_store_directory=VECTOR_STORE_DIRECTORY_PATH.as_posix()
     )
-    rag_vectorizer.update_vector_store()
+    rag_vectorizer.update_vector_store(
+        persist_directory=VECTOR_STORE_DIRECTORY_PATH.as_posix()
+    )
 
 
 # def push_updated_vectorstore_to_gcs():
