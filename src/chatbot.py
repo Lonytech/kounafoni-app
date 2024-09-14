@@ -10,6 +10,11 @@ from rag import LocalRag
 
 ARTICLE_DIRECTORY_PATH = Path(__file__).parents[1] / "data" / "articles"
 
+if os.environ.get("CHATBOT_ENV") == "production":
+    ARTICLE_DIRECTORY_PATH = (
+        Path(__file__).parents[2] / "external_volume" / "data" / "articles"
+    )
+
 # Get the API KEY from ENV variables
 SECOND_API_KEY = os.environ.get("SECOND_API_KEY")
 SECOND_API_KEY = SECOND_API_KEY if SECOND_API_KEY else ""
