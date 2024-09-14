@@ -28,9 +28,23 @@ EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
 if os.environ.get("CHATBOT_ENV") == "production":
     print("🔵 Using cloud run volume directory to load vector store.")
-    CHROMA_DB_PERSIST_PATH = (
-            Path(__file__).parents[2] / "external_volume" / "data" / "vector_stores" / "chroma_db_1024"
+    print(
+        Path(__file__).parents[2]
+        / "external_volume"
+        / "data"
+        / "vector_stores"
+        / "chroma_db_1024"
     )
+    CHROMA_DB_PERSIST_PATH = (
+        Path(__file__).parents[2]
+        / "external_volume"
+        / "data"
+        / "vector_stores"
+        / "chroma_db_1024"
+    )
+else:
+    print("🔴 something wrong happened")
+
 
 class LocalRag:
     def __init__(self, data_source_path: Path):
