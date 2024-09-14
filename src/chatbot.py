@@ -21,6 +21,13 @@ rag = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
 # get list of models from Ollama API in logs
 os.system("curl http://localhost:11434/api/tags")
 
+os.system("echo 'current dir'")
+os.system("ls")
+os.system("echo 'parent dir'")
+os.system("ls ..")
+os.system("echo 'grand parent dir'")
+os.system("ls ../..")
+
 if os.environ.get("CHATBOT_ENV") == "production" and SECOND_API_KEY:
     print("🔵 Using Groq for production mode (fast inference)...")
     rag.llm = LLMModelName.GROQ_LLAMA3
