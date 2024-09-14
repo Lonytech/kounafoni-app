@@ -182,7 +182,7 @@ class MaliJetDataScraper:
                     header=is_header_required_as_first_article,
                 )
         if new_titles:
-            print("\n --- New articles successfully written to files... ---")
+            print(f"\n --- {len(new_titles)} new articles successfully written to files... ---")
         else:
             print("\n --- No new articles found. ---")
 
