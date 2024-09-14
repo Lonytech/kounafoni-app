@@ -8,14 +8,14 @@ from langchain.schema.runnable.config import RunnableConfig
 from models import LLMModelName
 from rag import LocalRag
 
-ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
+ARTICLE_DIRECTORY_PATH = Path(__file__).parents[1] / "data" / "articles"
 
 # Get the API KEY from ENV variables
 SECOND_API_KEY = os.environ.get("SECOND_API_KEY")
 os.environ["GROQ_API_KEY"] = SECOND_API_KEY
 
 # Prepare RAG var
-rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
+rag = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
 
 # get list of models from Ollama API in logs
 os.system("curl http://localhost:11434/api/tags")

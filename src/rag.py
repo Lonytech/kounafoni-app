@@ -53,7 +53,7 @@ class LocalRag:
             # Get model from Groq LLM. Don't forget to set env variable "GROQ_API_KEY"
             self._llm = ChatGroq(temperature=0, model=model_name.value)
 
-    def load_documents(self, file_path: Path, is_directory=False):
+    def load_documents(self, file_path: Path, is_directory=True):
         print("Loading documents...")
         if is_directory:
             loader = DirectoryLoader(
@@ -170,8 +170,10 @@ class LocalRag:
 
     def build_llm_chain(self):
         template = """Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
+        N'hésites pas à détailler ta réponse. 
+        A la fin de ta réponse, mets en bas la source de média qui t'as permis d'avoir ces réponses.
         Si tu n'as pas de réponse explicite dans le contexte, réponds "Je n'ai pas assez d'informations pour répondre 
-        correctement".
+        correctement à votre question.".
 
         Contexte : {context}
 
