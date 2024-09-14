@@ -19,7 +19,9 @@ from models import LLMModelName
 from utils import format_docs, human_readable_time
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
-CHROMA_DB_PERSIST_PATH = Path(__file__).parents[1] / "data" / "chroma_db_1024"
+CHROMA_DB_PERSIST_PATH = (
+    Path(__file__).parents[1] / "data" / "vector_stores" / "chroma_db_1024"
+)
 # EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
 EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
@@ -106,6 +108,7 @@ class LocalRag:
         self, vector_store_directory=CHROMA_DB_PERSIST_PATH.as_posix()
     ):
         print("Loading Chroma vector store...")
+        print("new embedding model is : ", self.embedding_model)
         vector_store_db = Chroma(
             persist_directory=vector_store_directory,
             embedding_function=self.embedding_model,
@@ -114,7 +117,7 @@ class LocalRag:
         # Set vector store loaded
         self.vector_store_db = vector_store_db
 
-    def update_vector_store(self):
+    def update_vector_store(self, persist_directory=CHROMA_DB_PERSIST_PATH.as_posix()):
         print("Updating Chroma vector store...")
         persisted_ids = self.vector_store_db.get()["ids"]
         new_documents_to_embed_df = pd.DataFrame(
@@ -131,6 +134,12 @@ class LocalRag:
         new_documents_to_embed_df.drop_duplicates(subset="single_id", inplace=True)
 
         # Keep only documents not already embedded
+        print("length persisted ids : ", len(persisted_ids))
+        print(
+            "length new df single ids : ",
+            new_documents_to_embed_df.single_id.nunique(),
+        )
+
         new_documents_to_embed_df.query(
             f"single_id not in {persisted_ids}", inplace=True
         )
@@ -141,12 +150,13 @@ class LocalRag:
             )
         else:
             print("Embedding documents...")
+            print(new_documents_to_embed_df.shape)
             print(new_documents_to_embed_df.head())
             self.vector_store_db.add_documents(
                 documents=new_documents_to_embed_df.document.tolist(),
                 embedding=self.embedding_model,
                 ids=new_documents_to_embed_df.single_id.tolist(),
-                persist_directory=CHROMA_DB_PERSIST_PATH.as_posix(),
+                persist_directory=persist_directory,
             )
 
     def delete_from_vector_store(self):

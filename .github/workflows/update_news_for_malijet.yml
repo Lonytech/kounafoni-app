@@ -3,7 +3,7 @@ name: Upload CSV to GCS
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '37 12 * * *'
+    - cron: '00 05 * * *'
 
 jobs:
   upload:
@@ -26,6 +26,9 @@ jobs:
     - name: Install dependencies with poetry
       run: poetry install --no-root --no-cache --only main,news_processing
 
+    - name: Scrap articles from malijet and store in csv
+      run: poetry run python src/malijet_news_updater.py
+
     - name: Google Cloud Auth
       uses: 'google-github-actions/auth@v2'
       with:
@@ -38,4 +41,3 @@ jobs:
         path: 'data/malijet'
         destination: 'kounafonia-news/data/articles'
         process_gcloudignore: false #no .gcloudignore file in the repo
-    
