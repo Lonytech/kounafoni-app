@@ -28,6 +28,13 @@ EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
 if os.environ.get("CHATBOT_ENV") == "production":
     print("🔵 Using cloud run volume directory to load vector store.")
+    print(
+        Path(__file__).parents[2]
+        / "external_volume"
+        / "data"
+        / "vector_stores"
+        / "chroma_db_1024"
+    )
     CHROMA_DB_PERSIST_PATH = (
         Path(__file__).parents[2]
         / "external_volume"
@@ -37,6 +44,11 @@ if os.environ.get("CHATBOT_ENV") == "production":
     )
 else:
     print("🔴 something wrong happened")
+
+
+class TabSeparatorCSVLoader(CSVLoader):
+    def __init__(self, file_path: str):
+        super().__init__(file_path, csv_args={"delimiter": "\t"})
 
 
 class LocalRag:
@@ -72,7 +84,9 @@ class LocalRag:
         print("Loading documents...")
         if is_directory:
             loader = DirectoryLoader(
-                file_path.as_posix(), glob="**/*.csv", loader_cls=CSVLoader
+                file_path.as_posix(),
+                glob="**/*.csv",
+                loader_cls=TabSeparatorCSVLoader,
             )
         else:
             loader = CSVLoader(file_path=file_path, csv_args={"delimiter": "\t"})
