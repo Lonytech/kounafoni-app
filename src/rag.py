@@ -1,5 +1,6 @@
 import time
 import uuid
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -25,6 +26,11 @@ CHROMA_DB_PERSIST_PATH = (
 # EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
 EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
+if os.environ.get("CHATBOT_ENV") == "production":
+    print("🔵 Using cloud run volume directory to load vector store.")
+    CHROMA_DB_PERSIST_PATH = (
+            Path(__file__).parents[2] / "external_volume" / "data" / "vector_stores" / "chroma_db_1024"
+    )
 
 class LocalRag:
     def __init__(self, data_source_path: Path):
