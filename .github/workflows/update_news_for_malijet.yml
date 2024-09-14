@@ -27,7 +27,7 @@ jobs:
       run: poetry install --no-root --no-cache --only main,news_processing
 
     - name: Scrap articles from malijet and store in csv
-      run: poetry run python src/chroma_db_updater.py
+      run: poetry run python src/malijet_news_updater.py
 
     - name: Google Cloud Auth
       uses: 'google-github-actions/auth@v2'
