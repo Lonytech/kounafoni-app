@@ -12,7 +12,7 @@ ARTICLE_DIRECTORY_PATH = Path(__file__).parents[1] / "data" / "articles"
 
 if os.environ.get("CHATBOT_ENV") == "production":
     ARTICLE_DIRECTORY_PATH = (
-        Path(__file__).parents[2] / "external_volume" / "data" / "articles"
+        Path(__file__).parents[1] / "external_volume" / "data" / "articles"
     )
 
 # Get the API KEY from ENV variables
