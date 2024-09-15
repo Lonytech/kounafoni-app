@@ -79,7 +79,7 @@ class LocalRag:
             loader = DirectoryLoader(
                 file_path.as_posix(),
                 glob="**/*.csv",
-                loader_cls=TabSeparatorCSVLoader,
+                loader_cls=CSVLoader,
                 loader_kwargs={"autodetect_encoding": True, "delimiter": "\t"},
             )
         else:
