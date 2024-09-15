@@ -26,6 +26,7 @@ rag = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
 # get list of models from Ollama API in logs
 os.system("curl http://localhost:11434/api/tags")
 
+os.system("cat ../external_volume/data/articles/malijet/2024/01/01/00.csv")
 os.system("echo 'current dir'")
 os.system("ls")
 os.system("echo 'parent dir'")
