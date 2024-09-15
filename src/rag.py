@@ -41,7 +41,7 @@ else:
 
 class TabSeparatorCSVLoader(CSVLoader):
     def __init__(self, file_path: str):
-        super().__init__(file_path, encoding="cp1252", csv_args={"delimiter": "\t"})
+        super().__init__(file_path, csv_args={"delimiter": "\t"})
 
 
 class LocalRag:
@@ -80,6 +80,7 @@ class LocalRag:
                 file_path.as_posix(),
                 glob="**/*.csv",
                 loader_cls=TabSeparatorCSVLoader,
+                loader_kwargs={"autodetect_encoding": True},
             )
         else:
             loader = CSVLoader(file_path=file_path, csv_args={"delimiter": "\t"})
