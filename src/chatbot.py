@@ -61,11 +61,11 @@ else:
 def main():
 
     # Build the entire RAG pipeline chain
-    # rag.build_rag_pipeline_chain()
+    rag.build_rag_pipeline_chain()
     # read vector store (no update needed here)
-    rag.embed_documents_and_update_vector_store()
-    rag.set_retriever()
-    rag.build_llm_chain()
+    # rag.embed_documents_and_update_vector_store()
+    # rag.set_retriever()
+    # rag.build_llm_chain()
 
     # Store the chain in the user session
     cl.user_session.set("runnable_sequence_llm_chain", rag.chain)
