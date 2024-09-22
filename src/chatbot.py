@@ -30,7 +30,6 @@ os.system("curl http://localhost:11434/api/tags")
 df = pd.read_csv(
     ARTICLE_DIRECTORY_PATH / "malijet" / "2024" / "01" / "01.csv",
     delimiter="\t",
-    encoding="latin-1",
 )
 print("🔵🔵 df writing 🔵🔵")
 print(df)
