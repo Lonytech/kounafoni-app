@@ -48,10 +48,11 @@ with gzip.open(
 ) as gz_file:
     content = gz_file.read()
 
+output_file = ARTICLE_DIRECTORY_PATH / "malijet_unzipped" / "2024" / "01" / "01.csv"
+output_file.parent.mkdir(parents=True, exist_ok=True)
+
 # Write the decompressed content to the output file
-with (ARTICLE_DIRECTORY_PATH / "malijet_unzipped" / "2024" / "01" / "01.csv").open(
-    "w"
-) as out_file:
+with open(output_file, "w") as out_file:
     out_file.write(content)
 
 os.system("echo 'current dir'")
