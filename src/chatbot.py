@@ -30,11 +30,12 @@ os.system("echo 'ext dir content'")
 os.system("ls external_volume")
 os.system("echo 'inner ext dir'")
 os.system("ls -la external_volume/data/articles/malijet/2024/01")
+os.system("cat external_volume/data/articles/malijet/2024/01/01.csv")
 
 df = pd.read_csv(
     ARTICLE_DIRECTORY_PATH / "malijet" / "2024" / "01" / "01.csv",
     delimiter="\t",
-    encoding="cp1252",
+    compression="gzip",
 )
 print("🔵🔵 df writing 🔵🔵")
 print(df)
