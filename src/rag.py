@@ -23,7 +23,7 @@ ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "sou
 CHROMA_DB_PERSIST_PATH = (
     Path(__file__).parents[1] / "data" / "vector_stores" / "chroma_db_1024"
 )
-# EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
+
 EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
 if os.environ.get("CHATBOT_ENV") == "production":
@@ -35,8 +35,6 @@ if os.environ.get("CHATBOT_ENV") == "production":
         / "vector_stores"
         / "chroma_db_1024"
     )
-else:
-    print("🔴 something wrong happened")
 
 
 class TabSeparatorCSVLoader(CSVLoader):
