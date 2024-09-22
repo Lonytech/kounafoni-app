@@ -28,10 +28,13 @@ rag = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
 os.system("curl http://localhost:11434/api/tags")
 
 df = pd.read_csv(
-    ARTICLE_DIRECTORY_PATH / "malijet" / "2024" / "01" / "01.csv", delimiter="\t"
+    ARTICLE_DIRECTORY_PATH / "malijet" / "2024" / "01" / "01.csv",
+    delimiter="\t",
+    encoding="ISO-8859-1",
 )
 print("🔵🔵 df writing 🔵🔵")
 print(df)
+print(df.title.tolist())
 
 os.system("echo 'current dir'")
 os.system("ls")
