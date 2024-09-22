@@ -132,6 +132,7 @@ class LocalRag:
     ):
         print("Loading Chroma vector store...")
         print("new embedding model is : ", self.embedding_model)
+        print("vector_store_directory path : ", vector_store_directory)
         vector_store_db = Chroma(
             persist_directory=vector_store_directory,
             embedding_function=self.embedding_model,
