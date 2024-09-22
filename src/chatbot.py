@@ -55,6 +55,8 @@ output_file.parent.mkdir(parents=True, exist_ok=True)
 with open(output_file, "w") as out_file:
     out_file.write(content)
 
+os.system("ls -la external_volume/data/articles/malijet/2024/01")
+
 os.system("echo 'current dir'")
 os.system("ls")
 os.system("echo 'parent dir'")

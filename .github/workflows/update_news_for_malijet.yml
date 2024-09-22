@@ -1,9 +1,14 @@
 name: Upload CSV to GCS
 
+#on:
+#  schedule:
+#    # Set execution hour and minutes in UTC (a.k.a GMT)
+#    - cron: '15 23 * * *'
+
 on:
-  schedule:
-    # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '15 23 * * *'
+  push:
+    branches:
+      - '**'
 
 jobs:
   upload:
@@ -34,6 +39,7 @@ jobs:
       with:
         workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
         service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+        gzip: false # disable gzip compression on upload
 
     - id: 'upload-file'
       uses: 'google-github-actions/upload-cloud-storage@v2'
