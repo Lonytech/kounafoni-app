@@ -26,14 +26,6 @@ rag = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
 # get list of models from Ollama API in logs
 os.system("curl http://localhost:11434/api/tags")
 
-os.system("cat ../external_volume/data/articles/malijet/2024/01/01/00.csv")
-os.system("echo 'current dir'")
-os.system("ls")
-os.system("echo 'parent dir'")
-os.system("ls ..")
-os.system("echo 'grand parent dir'")
-os.system("ls ../..")
-
 if os.environ.get("CHATBOT_ENV") == "production" and SECOND_API_KEY:
     print("🔵 Using Groq for production mode (fast inference)...")
     rag.llm = LLMModelName.GROQ_LLAMA3
@@ -47,10 +39,17 @@ else:
 def main():
 
     # Build the entire RAG pipeline chain
-    rag.build_rag_pipeline_chain()
+    # rag.build_rag_pipeline_chain()
+    # read vector store (no update needed here)
+    rag.embed_documents_and_update_vector_store()
+    rag.set_retriever()
+    rag.build_llm_chain()
 
     # Store the chain in the user session
     cl.user_session.set("runnable_sequence_llm_chain", rag.chain)
+
+
+# memory = ConversationSummaryBufferMemory(llm=llm, input_key='question', output_key='answer')
 
 
 @cl.on_message
