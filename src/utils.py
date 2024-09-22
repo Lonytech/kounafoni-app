@@ -52,3 +52,57 @@ def format_docs(docs):
     :return:
     """
     return "\n\n".join([d.page_content for d in docs])
+
+
+#
+# import gzip
+# from pathlib import Path
+#
+# # Path to the mounted volume (e.g., /mnt/gcs)
+# volume_mount_path = Path('/mnt/gcs')
+#
+# # Output folder for decompressed files
+# output_folder = Path('/mnt/gcs_decompressed')
+#
+#
+#
+#
+# # Function to decompress a single GZIP file
+# def decompress_gzip(input_file: Path, output_file: Path):
+#     with gzip.open(input_file, 'rt') as gz_file:
+#         content = gz_file.read()
+#
+#     # Write the decompressed content to the output file
+#     with output_file.open('w') as out_file:
+#         out_file.write(content)
+#
+#
+# # Function to iterate over all files in the mounted volume and decompress GZIP files
+# def decompress_all_files(volume_path: Path, output_dir: Path):
+#     # Create the output folder if it doesn't exist
+#     output_folder.mkdir(parents=True, exist_ok=True)
+#
+#     for file_path in volume_path.rglob('*'):  # rglob('*') to recursively find all files
+#         if file_path.is_file():  # If it's a file
+#             # Calculate the output path for the decompressed file
+#             relative_path = file_path.relative_to(volume_path)
+#             output_file_path = output_dir / relative_path.with_suffix('')  # Remove .gz extension
+#
+#             # Check if the decompressed file already exists
+#             if output_file_path.exists():
+#                 print(f"File already decompressed, skipping: {output_file_path}")
+#                 continue
+#
+#             # Create parent directories for the output file if they don't exist
+#             output_file_path.parent.mkdir(parents=True, exist_ok=True)
+#
+#             # Decompress the GZIP file
+#             try:
+#                 decompress_gzip(file_path, output_file_path)
+#                 print(f"Decompressed: {file_path} -> {output_file_path}")
+#             except Exception as e:
+#                 print(f"Error decompressing {file_path}: {e}")
+#
+#
+# # Call the function to decompress all files
+# decompress_all_files(volume_mount_path, output_folder)

@@ -1,3 +1,4 @@
+import gzip
 import os
 import time
 from pathlib import Path
@@ -40,6 +41,18 @@ df = pd.read_csv(
 print("🔵🔵 df writing 🔵🔵")
 print(df)
 print(df.title.tolist())
+
+print("🔵 simple gzip 🔵")
+with gzip.open(
+    ARTICLE_DIRECTORY_PATH / "malijet" / "2024" / "01" / "01.csv", "rt"
+) as gz_file:
+    content = gz_file.read()
+
+# Write the decompressed content to the output file
+with (ARTICLE_DIRECTORY_PATH / "malijet_unzipped" / "2024" / "01" / "01.csv").open(
+    "w"
+) as out_file:
+    out_file.write(content)
 
 os.system("echo 'current dir'")
 os.system("ls")
