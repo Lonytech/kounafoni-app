@@ -80,7 +80,8 @@ class LocalRag:
                 file_path.as_posix(),
                 glob="**/*.csv",
                 loader_cls=CSVLoader,
-                loader_kwargs={"csv_args": {"delimiter": "\t", "compression": "gzip"}},
+                show_progress=True,
+                loader_kwargs={"csv_args": {"delimiter": "\t"}},
             )
         else:
             loader = CSVLoader(file_path=file_path, csv_args={"delimiter": "\t"})

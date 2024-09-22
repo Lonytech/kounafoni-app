@@ -69,4 +69,5 @@ jobs:
       with:
         path: 'data/vector_stores'
         destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
         process_gcloudignore: false #no .gcloudignore file in the repo
