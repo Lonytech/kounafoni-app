@@ -1,6 +1,6 @@
+import os
 import time
 import uuid
-import os
 from pathlib import Path
 
 import pandas as pd
@@ -23,14 +23,24 @@ ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "sou
 CHROMA_DB_PERSIST_PATH = (
     Path(__file__).parents[1] / "data" / "vector_stores" / "chroma_db_1024"
 )
-# EMBEDDING_MODEL_NAME = "sammcj/sfr-embedding-mistral:Q4_K_M"
+
 EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
 if os.environ.get("CHATBOT_ENV") == "production":
     print("🔵 Using cloud run volume directory to load vector store.")
     CHROMA_DB_PERSIST_PATH = (
-            Path(__file__).parents[2] / "external_volume" / "data" / "vector_stores" / "chroma_db_1024"
+        Path(__file__).parents[1]
+        / "external_volume"
+        / "data"
+        / "vector_stores"
+        / "chroma_db_1024"
     )
+
+
+class TabSeparatorCSVLoader(CSVLoader):
+    def __init__(self, file_path: str):
+        super().__init__(file_path, csv_args={"delimiter": "\t"})
+
 
 class LocalRag:
     def __init__(self, data_source_path: Path):
@@ -65,10 +75,21 @@ class LocalRag:
         print("Loading documents...")
         if is_directory:
             loader = DirectoryLoader(
-                file_path.as_posix(), glob="**/*.csv", loader_cls=CSVLoader
+                file_path.as_posix(),
+                glob="**/*.csv",
+                loader_cls=CSVLoader,
+                show_progress=True,
+                loader_kwargs={
+                    "csv_args": {"delimiter": "\t"},
+                    "metadata_columns": ["title", "source_paper", "date", "link"],
+                },
             )
         else:
-            loader = CSVLoader(file_path=file_path, csv_args={"delimiter": "\t"})
+            loader = CSVLoader(
+                file_path=file_path,
+                csv_args={"delimiter": "\t"},
+                metadata_columns=["title", "source_paper", "date", "link"],
+            )
         self.documents = loader.load()
 
     def split_documents(self):
@@ -115,6 +136,7 @@ class LocalRag:
     ):
         print("Loading Chroma vector store...")
         print("new embedding model is : ", self.embedding_model)
+        print("vector_store_directory path : ", vector_store_directory)
         vector_store_db = Chroma(
             persist_directory=vector_store_directory,
             embedding_function=self.embedding_model,
@@ -185,11 +207,19 @@ class LocalRag:
         self.retriever = retriever
 
     def build_llm_chain(self):
-        template = """Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
-        N'hésites pas à détailler ta réponse. 
-        A la fin de ta réponse, mets en bas la source de média qui t'as permis d'avoir ces réponses.
-        Si tu n'as pas de réponse explicite dans le contexte, réponds "Je n'ai pas assez d'informations pour répondre 
-        correctement à votre question.".
+        template = """
+        Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
+        Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
+        mets en bas la source de média 'source_paper' qui t'as permis d'avoir ces réponses 
+        ainsi que le lien associé (en lien hyperlink markdown sous le format [Doc source_paper : Doc title](Doc link)) >>
+        où 'source_paper', 'title' et 'link' sont bien renseignés dans le contexte. 
+        S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
+        Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
+        réponds directement à la question.
+        
+        Si tu n'as pas de réponse explicite dans le contexte, 
+        réponds que tu n'as pas assez d'informations pour répondre correctement à votre question 
+        et uniquement dans ce cas là, ne donne pas de source.
 
         Contexte : {context}
 

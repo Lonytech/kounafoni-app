@@ -1,14 +1,21 @@
+import gzip
 import os
 import time
 from pathlib import Path
 
 import chainlit as cl
+import pandas as pd
 from langchain.schema.runnable.config import RunnableConfig
 
 from models import LLMModelName
 from rag import LocalRag
 
 ARTICLE_DIRECTORY_PATH = Path(__file__).parents[1] / "data" / "articles"
+
+if os.environ.get("CHATBOT_ENV") == "production":
+    ARTICLE_DIRECTORY_PATH = (
+        Path(__file__).parents[1] / "external_volume" / "data" / "articles"
+    )
 
 # Get the API KEY from ENV variables
 SECOND_API_KEY = os.environ.get("SECOND_API_KEY")
@@ -38,6 +45,9 @@ def main():
 
     # Store the chain in the user session
     cl.user_session.set("runnable_sequence_llm_chain", rag.chain)
+
+
+# memory = ConversationSummaryBufferMemory(llm=llm, input_key='question', output_key='answer')
 
 
 @cl.on_message

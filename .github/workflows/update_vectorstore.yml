@@ -3,7 +3,7 @@ name: Update Vector Store
 on:
  schedule:
    # Set execution hour and minutes in UTC (a.k.a GMT)
-   - cron: '30 05 * * *'
+   - cron: '45 23 * * *'
 
 jobs:
   compute_new_vectors:
@@ -69,4 +69,5 @@ jobs:
       with:
         path: 'data/vector_stores'
         destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
         process_gcloudignore: false #no .gcloudignore file in the repo

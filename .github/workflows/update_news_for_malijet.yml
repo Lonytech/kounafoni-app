@@ -3,7 +3,7 @@ name: Upload CSV to GCS
 on:
   schedule:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '00 05 * * *'
+    - cron: '30 23 * * *'
 
 jobs:
   upload:
@@ -40,4 +40,5 @@ jobs:
       with:
         path: 'data/malijet'
         destination: 'kounafonia-news/data/articles'
+        gzip: false # disable gzip compression on upload
         process_gcloudignore: false #no .gcloudignore file in the repo

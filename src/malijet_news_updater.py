@@ -6,7 +6,7 @@ if __name__ == "__main__":
 
     # Set the range to [yesterday - today] to not forget any article
     today_date = date.today()
-    yesterday_date = today_date - timedelta(days=1)
+    yesterday_date = today_date - timedelta(days=4)
 
     scraper = MaliJetDataScraper(
         date_range=ScrapDate(end_date=today_date, begin_date=yesterday_date)
