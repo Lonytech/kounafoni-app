@@ -212,12 +212,14 @@ class LocalRag:
         Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
         mets en bas la source de média 'source_paper' qui t'as permis d'avoir ces réponses 
         ainsi que le lien associé (en lien hyperlink markdown sous le format [Doc source_paper : Doc title](Doc link)) >>
-        pour permettre à l'utilisateur de cliquer sur le lien et aller vérifier l'information. 
+        où 'source_paper', 'title' et 'link' sont bien renseignés dans le contexte. 
         S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
         Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
         réponds directement à la question.
+        
         Si tu n'as pas de réponse explicite dans le contexte, 
-        réponds "Je n'ai pas assez d'informatio ns pour répondre correctement à votre question.".
+        réponds que tu n'as pas assez d'informations pour répondre correctement à votre question 
+        et uniquement dans ce cas là, ne donne pas de source.
 
         Contexte : {context}
 
