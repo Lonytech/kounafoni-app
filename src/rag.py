@@ -211,7 +211,7 @@ class LocalRag:
         Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
         Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
         mets en bas la source de média 'source_paper' qui t'as permis d'avoir ces réponses 
-        ainsi que le lien associé (en lien hyperlink markdown sous le format [Doc title](Doc link)) 
+        ainsi que le lien associé (en lien hyperlink markdown sous le format [Doc source_paper : Doc title](Doc link)) >>
         pour permettre à l'utilisateur de cliquer sur le lien et aller vérifier l'information. 
         S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
         Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
