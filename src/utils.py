@@ -51,7 +51,15 @@ def format_docs(docs):
     :param docs:
     :return:
     """
-    return "\n\n".join([d.page_content for d in docs])
+    docs_formatted = list()
+    for d in docs:
+        doc_presentation = f"Doc title : <<{d.metadata['title']}>>\n"
+        doc_presentation += f"Doc date : <<{d.metadata['date']}>>\n"
+        doc_presentation += f"Doc source_paper : <<{d.metadata['source_paper']}>>\n"
+        doc_presentation += f"Doc link : <<{d.metadata['link']}>>\n"
+        doc_presentation += f"Doc page_content : <<{d.page_content}>>\n"
+        docs_formatted.append(doc_presentation)
+    return f"\n\n{'-' * 50}\n".join(docs_formatted)
 
 
 #

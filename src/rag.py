@@ -79,10 +79,17 @@ class LocalRag:
                 glob="**/*.csv",
                 loader_cls=CSVLoader,
                 show_progress=True,
-                loader_kwargs={"csv_args": {"delimiter": "\t"}},
+                loader_kwargs={
+                    "csv_args": {"delimiter": "\t"},
+                    "metadata_columns": ["title", "source_paper", "date", "link"],
+                },
             )
         else:
-            loader = CSVLoader(file_path=file_path, csv_args={"delimiter": "\t"})
+            loader = CSVLoader(
+                file_path=file_path,
+                csv_args={"delimiter": "\t"},
+                metadata_columns=["title", "source_paper", "date", "link"],
+            )
         self.documents = loader.load()
 
     def split_documents(self):
@@ -200,11 +207,17 @@ class LocalRag:
         self.retriever = retriever
 
     def build_llm_chain(self):
-        template = """Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
-        N'hésites pas à détailler ta réponse. 
-        A la fin de ta réponse, mets en bas la source de média qui t'as permis d'avoir ces réponses.
-        Si tu n'as pas de réponse explicite dans le contexte, réponds "Je n'ai pas assez d'informations pour répondre 
-        correctement à votre question.".
+        template = """
+        Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
+        Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
+        mets en bas la source de média 'source_paper' qui t'as permis d'avoir ces réponses 
+        ainsi que le lien associé (en lien hyperlink markdown sous le format [Doc title](Doc link)) 
+        pour permettre à l'utilisateur de cliquer sur le lien et aller vérifier l'information. 
+        S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
+        Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
+        réponds directement à la question.
+        Si tu n'as pas de réponse explicite dans le contexte, 
+        réponds "Je n'ai pas assez d'informatio ns pour répondre correctement à votre question.".
 
         Contexte : {context}
 
