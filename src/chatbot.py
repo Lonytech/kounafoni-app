@@ -1,11 +1,12 @@
-import gzip
 import os
 import time
 from pathlib import Path
 
 import chainlit as cl
-import pandas as pd
 from langchain.schema.runnable.config import RunnableConfig
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
 
 from models import LLMModelName
 from rag import LocalRag
@@ -36,15 +37,32 @@ else:
     print("🔵 Using slow and free inference...")
     rag.llm = LLMModelName.OLLAMA_OCCIGLOT
 
+### Stateful manage chat history ###
+store = {}
+
+
+def get_session_history(session_id: str) -> BaseChatMessageHistory:
+    if session_id not in store:
+        store[session_id] = ChatMessageHistory()
+    return store[session_id]
+
 
 @cl.on_chat_start
 def main():
 
     # Build the entire RAG pipeline chain
-    rag.build_rag_pipeline_chain()
+    rag.build_rag_chain_with_memory()
+
+    conversational_rag_chain = RunnableWithMessageHistory(
+        rag.memory_retrieval_chain,
+        get_session_history,
+        input_messages_key="input",
+        history_messages_key="chat_history",
+        output_messages_key="answer",
+    )
 
     # Store the chain in the user session
-    cl.user_session.set("runnable_sequence_llm_chain", rag.chain)
+    cl.user_session.set("runnable_sequence_llm_chain", conversational_rag_chain)
 
 
 # memory = ConversationSummaryBufferMemory(llm=llm, input_key='question', output_key='answer')
@@ -53,15 +71,19 @@ def main():
 @cl.on_message
 async def on_message(message: cl.Message):
     # Retrieve the chain from the user session
-    agent = cl.user_session.get("runnable_sequence_llm_chain")  # type: Runnable
+    agent = cl.user_session.get("runnable_sequence_llm_chain")
 
     msg = cl.Message(content="")
 
     async for chunk in agent.astream(
-        {"question": message.content},
-        config=RunnableConfig(callbacks=[cl.LangchainCallbackHandler()]),
+        {"input": message.content},
+        config=RunnableConfig(
+            configurable={"session_id": "throwable_session_12345"},
+            callbacks=[cl.LangchainCallbackHandler()],
+        ),
     ):
-        await msg.stream_token(chunk)
-        time.sleep(0.07)  # slow down Groq inference only in production
+        if "answer" in chunk:  # check if the chunk has an answer key
+            await msg.stream_token(chunk["answer"])
+            time.sleep(0.03)  # slow down Groq inference only in production
 
     await msg.send()
