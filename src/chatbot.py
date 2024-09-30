@@ -13,7 +13,7 @@ from models import LLMModelName
 from rag import LocalRag
 
 ARTICLE_DIRECTORY_PATH = Path(__file__).parents[1] / "data" / "articles"
-CURRENT_SESSION_ID = uuid.uuid4()
+
 if os.environ.get("CHATBOT_ENV") == "production":
     ARTICLE_DIRECTORY_PATH = (
         Path(__file__).parents[1] / "external_volume" / "data" / "articles"
@@ -54,6 +54,9 @@ def main():
     # Build the entire RAG pipeline chain
     rag.build_rag_chain_with_memory()
 
+    # define new session id for this chat
+    rag.current_session_id = uuid.uuid4()
+
     conversational_rag_chain = RunnableWithMessageHistory(
         rag.memory_retrieval_chain,
         get_session_history,
@@ -79,7 +82,7 @@ async def on_message(message: cl.Message):
     async for chunk in agent.astream(
         {"input": message.content},
         config=RunnableConfig(
-            configurable={"session_id": CURRENT_SESSION_ID},
+            configurable={"session_id": rag.current_session_id},
             callbacks=[cl.LangchainCallbackHandler()],
         ),
     ):

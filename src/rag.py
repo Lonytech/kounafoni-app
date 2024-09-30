@@ -55,6 +55,7 @@ class LocalRag:
         self.retriever = None
         self.chain = None
         self.memory_retrieval_chain = None
+        self.current_session_id = None
 
     @property
     def llm(self):
