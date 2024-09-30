@@ -1,5 +1,6 @@
 import os
 import time
+import uuid
 from pathlib import Path
 
 import chainlit as cl
@@ -12,7 +13,7 @@ from models import LLMModelName
 from rag import LocalRag
 
 ARTICLE_DIRECTORY_PATH = Path(__file__).parents[1] / "data" / "articles"
-
+CURRENT_SESSION_ID = uuid.uuid4()
 if os.environ.get("CHATBOT_ENV") == "production":
     ARTICLE_DIRECTORY_PATH = (
         Path(__file__).parents[1] / "external_volume" / "data" / "articles"
@@ -78,7 +79,7 @@ async def on_message(message: cl.Message):
     async for chunk in agent.astream(
         {"input": message.content},
         config=RunnableConfig(
-            configurable={"session_id": "throwable_session_12345"},
+            configurable={"session_id": CURRENT_SESSION_ID},
             callbacks=[cl.LangchainCallbackHandler()],
         ),
     ):
