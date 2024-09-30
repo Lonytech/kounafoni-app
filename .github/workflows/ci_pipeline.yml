@@ -26,8 +26,8 @@ jobs:
       - name: Install dependencies with poetry
         run: poetry install --no-root --no-cache --only main
 
-      - name: Black file formatting
-        run: poetry run black --check .
-
       - name: Isort checking
         run: poetry run isort --check .
+
+      - name: Black file formatting
+        run: poetry run black --check .

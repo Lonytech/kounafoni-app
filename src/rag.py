@@ -5,19 +5,21 @@ from pathlib import Path
 
 import pandas as pd
 from dateutil.relativedelta import relativedelta
+from langchain.chains import create_history_aware_retriever, create_retrieval_chain
+from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.llms import Ollama
 from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough
 from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from models import LLMModelName
-from utils import format_docs, human_readable_time
+from utils import format_docs_to_docs, format_docs_to_string, human_readable_time
 
 ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
 CHROMA_DB_PERSIST_PATH = (
@@ -49,8 +51,11 @@ class LocalRag:
         self.embedding_model = None
         self.vector_store_db = None
         self._llm = None
+        self.system_role = str()
         self.retriever = None
         self.chain = None
+        self.memory_retrieval_chain = None
+        self.current_session_id = None
 
     @property
     def llm(self):
@@ -58,14 +63,25 @@ class LocalRag:
 
     @llm.setter
     def llm(self, model_name: LLMModelName):
-        system_role = (
-            "Tu es un expert sur les actualités du Mali et tu parles uniquement français (spécialisé en "
-            "langue française)."
-        )
+        self.system_role = """Tu es un expert sur les actualités du Mali et tu parles uniquement français 
+            spécialisé en langue française. Réponds à la question uniquement grâce au contexte suivant 
+            et uniquement en langue française. Il faudra clairement détailler ta réponse de manière assez verbeuse. 
+            Mets en bas la source de média 'source_paper' qui t'as permis d'avoir ces réponses 
+            ainsi que le lien associé (en lien hyperlink markdown 
+            sous le format [Doc source_paper : Doc title](Doc link)) >> où 'source_paper', 'title' et 'link' 
+            sont bien renseignés dans le contexte. S'il y a plusieurs link et plusieurs source_paper, 
+            cite les deux majoritaires !
+            
+            Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
+            réponds directement à la question.
+            
+            Si tu n'as pas de réponse explicite dans le contexte, 
+            réponds que tu n'as pas assez d'informations pour répondre correctement à votre question 
+            et uniquement dans ce cas là, ne donne pas de source."""
 
         if model_name == LLMModelName.OLLAMA_OCCIGLOT:
             # Launch from Ollama
-            self._llm = Ollama(model=model_name.value, system=system_role)
+            self._llm = Ollama(model=model_name.value, system=self.system_role)
 
         elif model_name == LLMModelName.GROQ_LLAMA3:
             # Get model from Groq LLM. Don't forget to set env variable "GROQ_API_KEY"
@@ -207,30 +223,21 @@ class LocalRag:
         self.retriever = retriever
 
     def build_llm_chain(self):
-        template = """
-        Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
-        Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
-        mets en bas la source de média 'source_paper' qui t'as permis d'avoir ces réponses 
-        ainsi que le lien associé (en lien hyperlink markdown sous le format [Doc source_paper : Doc title](Doc link)) >>
-        où 'source_paper', 'title' et 'link' sont bien renseignés dans le contexte. 
-        S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
-        Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
-        réponds directement à la question.
+        template = (
+            self.system_role
+            + """
         
-        Si tu n'as pas de réponse explicite dans le contexte, 
-        réponds que tu n'as pas assez d'informations pour répondre correctement à votre question 
-        et uniquement dans ce cas là, ne donne pas de source.
-
         Contexte : {context}
 
         Question : {question}
         """
+        )
 
         prompt = ChatPromptTemplate.from_template(template)
 
         self.chain = (
             {
-                "context": self.retriever | format_docs,
+                "context": self.retriever | format_docs_to_string,
                 "question": RunnablePassthrough(),
             }
             | prompt
@@ -244,6 +251,63 @@ class LocalRag:
         self.embed_documents_and_update_vector_store()
         self.set_retriever()
         self.build_llm_chain()
+
+    def build_rag_chain_with_memory(self):
+        self.load_documents(self.data_source_path)
+        self.split_documents()
+        self.embed_documents_and_update_vector_store()
+        self.set_retriever()
+
+        ### Contextualize question ###
+        contextualize_q_system_prompt = """Compte tenu de l'historique des discussions et de la dernière question 
+        d'un utilisateur qui peut faire référence au contexte de l'historique des discussions, 
+        formulez une question indépendante qui peut être comprise sans l'historique des discussions. 
+        Ne répondez PAS à la question, reformulez-la si nécessaire ou renvoyez-la telle quelle."""
+
+        contextualize_q_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", contextualize_q_system_prompt),
+                MessagesPlaceholder("chat_history"),
+                ("human", "{input}"),
+            ]
+        )
+
+        # create chat history context
+        history_aware_retriever = create_history_aware_retriever(
+            llm=ChatGroq(temperature=0, model="llama3-70b-8192"),
+            retriever=self.retriever | format_docs_to_docs,
+            prompt=contextualize_q_prompt,
+        )
+
+        ### Answer question ###
+        qa_system_prompt = """Tu es un assistant spécialisé sur les tâches de réponse aux questions. 
+        Utilisez les éléments de contexte suivants pour répondre à la question. 
+        Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
+        Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
+        mets en bas la source de média qui t'as permis d'avoir ces réponses, puis ':',
+        puis le lien associé (en lien hyperlink markdown sous le format [Doc title](Doc link)) pour permettre 
+        à l'utilisateur de cliquer sur le lien et aller vérifier l'information. 
+        S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
+        Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
+        réponds directement à la question. Si tu n'as pas de réponse explicite dans le contexte, 
+        réponds "Je n'ai pas assez d'informations pour répondre correctement à votre question."
+
+        Contexte : {context}"""
+
+        qa_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", qa_system_prompt),
+                MessagesPlaceholder("chat_history"),
+                ("human", "{input}"),
+            ]
+        )
+
+        question_answer_chain = create_stuff_documents_chain(
+            ChatGroq(temperature=0, model="llama3-70b-8192"), qa_prompt
+        )
+        self.memory_retrieval_chain = create_retrieval_chain(
+            history_aware_retriever, question_answer_chain
+        )
 
     def run_question_answer(self):
         input_question = str()
