@@ -1,0 +1,48 @@
+name: Process ORTM News to audio summary
+
+on:
+  push:
+    branches:
+      - '**'
+#on:
+#  schedule:
+#    # Set execution hour and minutes in UTC (a.k.a GMT)
+#    - cron: '30 23 * * *'
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout repository and code validity
+      uses: actions/checkout@v4
+
+    - name: Install poetry
+      run: |
+        sudo apt update -y
+        sudo apt install -y pipx
+        pipx install poetry==1.7.1
+        export PATH="/root/.local/bin:$PATH"
+
+    - name: Install dependencies with poetry
+      run: poetry install --no-root --no-cache --only main,news_processing
+
+    - name: Download JT audio, TTS, summarize, STT and upload summarized audio
+      run: poetry run python src/ortm_jt_audio_updater.py
+
+    - name: Google Cloud Auth
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+    - id: 'upload-file'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'data/whisper'
+        destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
+        process_gcloudignore: false #no .gcloudignore file in the repo
