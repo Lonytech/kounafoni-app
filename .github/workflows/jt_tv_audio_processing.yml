@@ -10,7 +10,7 @@ on:
 #    - cron: '30 23 * * *'
 
 jobs:
-  upload:
+  process_audio:
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'

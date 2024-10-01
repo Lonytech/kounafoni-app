@@ -28,16 +28,18 @@ class TVNewsSpeechToText:
         print("getting JT 20h...")
         playlist = Playlist(JT_20H_PLAYLIST_URL)
         for link in reversed(playlist.video_urls):
-            print(link)
-            print(YouTube(link).publish_date)
-            print(type(YouTube(link)))
-            print(type(YouTube(link).publish_date))
+            try:
+                print(link)
+                print(YouTube(link).publish_date.date())
+            except Exception as e:
+                print("Error found while getting the youtube video.")
+                pass
             if YouTube(link).publish_date.date() == publish_date:
                 self.youtube_link = link
                 self.yt = YouTube(url=link)
                 print("Video found")
                 return "JT 20h video Found"
-        print("Video not found")
+            print("Video not found")
         return "No video match the specified date."
 
     def get_last_jt_20h(self):
