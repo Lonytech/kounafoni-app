@@ -33,7 +33,7 @@ class TVNewsSpeechToText:
                 print(YouTube(link).publish_date.date())
             except Exception as e:
                 print("Error found while getting the youtube video.")
-                pass
+                continue
             if YouTube(link).publish_date.date() == publish_date:
                 self.youtube_link = link
                 self.yt = YouTube(url=link)
