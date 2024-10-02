@@ -41,7 +41,7 @@ class TVNewsSpeechToText:
 
             try:
                 # Initialisation de l'objet YouTube
-                yt = YouTube(link)
+                yt = YouTube(link, "MWEB")
                 print(f"Vidéo trouvée : {yt.title}")
 
                 try:
@@ -82,8 +82,8 @@ class TVNewsSpeechToText:
                 print(f"Erreur inattendue lors de la lecture de {link}: {str(e)}")
 
             print(link)
-            print(YouTube(link))
-            print(YouTube(link).publish_date)
+            print(YouTube(link, "MWEB"))
+            print(YouTube(link, "MWEB").publish_date)
             print(type(YouTube(link)))
             print(type(YouTube(link).publish_date))
             if YouTube(link) and YouTube(link).publish_date.date() == publish_date:
