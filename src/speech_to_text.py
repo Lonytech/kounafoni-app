@@ -5,7 +5,12 @@ from pathlib import Path
 import moviepy.editor as mp
 import whisper  # From OpenAI: see https://github.com/openai/whisper?tab=readme-ov-file
 from pytubefix import Playlist, YouTube
-from pytubefix.exceptions import PytubeFixError, VideoUnavailable
+from pytubefix.exceptions import (
+    ExtractError,
+    LiveStreamError,
+    RegexMatchError,
+    VideoUnavailable,
+)
 
 from utils import timeit
 
@@ -30,12 +35,51 @@ class TVNewsSpeechToText:
         playlist = Playlist(JT_20H_PLAYLIST_URL)
 
         for link in reversed(playlist.video_urls):
+
+            # URL de la vidéo YouTube
+            video_url = "https://www.youtube.com/watch?v=XXXX"
+
             try:
-                yt_test = YouTube(link)
-            except PytubeFixError as e:
-                print("PytubeFixError --> ", e)
-            else:
-                pass
+                # Initialisation de l'objet YouTube
+                yt = YouTube(link)
+                print(f"Vidéo trouvée : {yt.title}")
+
+                try:
+                    # Tentative de récupération des streams (formats de la vidéo)
+                    streams = yt.streams.filter(progressive=True, file_extension="mp4")
+                    if not streams:
+                        raise ValueError("Aucun flux vidéo MP4 trouvé.")
+
+                    # Téléchargement du premier flux
+                    stream = streams.first()
+                    stream.download(output_path="./downloads")
+                    print(f"Téléchargement réussi : {yt.title}")
+
+                except LiveStreamError:
+                    print(
+                        f"Erreur : La vidéo {yt.title} est un live stream et ne peut pas être téléchargée."
+                    )
+                except RegexMatchError:
+                    print(
+                        f"Erreur : Le format de la vidéo {yt.title} ne correspond pas."
+                    )
+                except ExtractError:
+                    print(
+                        f"Erreur : Problème d'extraction des données pour la vidéo {yt.title}."
+                    )
+                except Exception as e:
+                    print(
+                        f"Erreur inattendue lors du téléchargement de {yt.title}: {str(e)}"
+                    )
+
+            except VideoUnavailable:
+                print(f"Erreur : La vidéo {video_url} n'est pas disponible.")
+            except RegexMatchError:
+                print(
+                    f"Erreur : L'URL de la vidéo {video_url} ne correspond pas au format attendu."
+                )
+            except Exception as e:
+                print(f"Erreur inattendue lors de la lecture de {video_url}: {str(e)}")
 
             print(link)
             print(YouTube(link))
