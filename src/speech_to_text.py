@@ -27,6 +27,7 @@ class TVNewsSpeechToText:
     def get_jt_20h_by_date(self, publish_date: date):
         print("getting JT 20h...")
         playlist = Playlist(JT_20H_PLAYLIST_URL)
+        print(reversed(playlist.video_urls))
         for link in reversed(playlist.video_urls):
             print(link)
             print(YouTube(link))
@@ -101,7 +102,7 @@ if __name__ == "__main__":
     stt = TVNewsSpeechToText()
 
     # get ORTM specific news for one date
-    JT_PUBLISH_DATE = datetime.strptime("2024-09-30", "%Y-%m-%d").date()
+    JT_PUBLISH_DATE = datetime.strptime("2024-10-02", "%Y-%m-%d").date()
     # JT_PUBLISH_DATE = datetime.today().date() - timedelta(days=1)
     print(JT_PUBLISH_DATE)
     stt.get_jt_20h_by_date(publish_date=JT_PUBLISH_DATE)
