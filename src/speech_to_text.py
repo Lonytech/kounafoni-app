@@ -37,7 +37,7 @@ class TVNewsSpeechToText:
         for link in reversed(playlist.video_urls):
 
             # URL de la vidéo YouTube
-            video_url = "https://www.youtube.com/watch?v=XXXX"
+            # video_url = "https://www.youtube.com/watch?v=XXXX"
 
             try:
                 # Initialisation de l'objet YouTube
@@ -73,13 +73,13 @@ class TVNewsSpeechToText:
                     )
 
             except VideoUnavailable:
-                print(f"Erreur : La vidéo {video_url} n'est pas disponible.")
+                print(f"Erreur : La vidéo {link} n'est pas disponible.")
             except RegexMatchError:
                 print(
-                    f"Erreur : L'URL de la vidéo {video_url} ne correspond pas au format attendu."
+                    f"Erreur : L'URL de la vidéo {link} ne correspond pas au format attendu."
                 )
             except Exception as e:
-                print(f"Erreur inattendue lors de la lecture de {video_url}: {str(e)}")
+                print(f"Erreur inattendue lors de la lecture de {link}: {str(e)}")
 
             print(link)
             print(YouTube(link))
