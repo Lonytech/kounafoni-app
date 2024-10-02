@@ -5,6 +5,7 @@ from pathlib import Path
 import moviepy.editor as mp
 import whisper  # From OpenAI: see https://github.com/openai/whisper?tab=readme-ov-file
 from pytubefix import Playlist, YouTube
+from pytubefix.exceptions import PytubeFixError, VideoUnavailable
 
 from utils import timeit
 
@@ -27,8 +28,15 @@ class TVNewsSpeechToText:
     def get_jt_20h_by_date(self, publish_date: date):
         print("getting JT 20h...")
         playlist = Playlist(JT_20H_PLAYLIST_URL)
-        print(reversed(playlist.video_urls))
+
         for link in reversed(playlist.video_urls):
+            try:
+                yt_test = YouTube(link)
+            except PytubeFixError as e:
+                print("PytubeFixError --> ", e)
+            else:
+                pass
+
             print(link)
             print(YouTube(link))
             print(YouTube(link).publish_date)
