@@ -29,10 +29,11 @@ class TVNewsSpeechToText:
         playlist = Playlist(JT_20H_PLAYLIST_URL)
         for link in reversed(playlist.video_urls):
             print(link)
+            print(YouTube(link))
             print(YouTube(link).publish_date)
             print(type(YouTube(link)))
             print(type(YouTube(link).publish_date))
-            if YouTube(link).publish_date.date() == publish_date:
+            if YouTube(link) and YouTube(link).publish_date.date() == publish_date:
                 self.youtube_link = link
                 self.yt = YouTube(url=link)
                 print("Video found")
