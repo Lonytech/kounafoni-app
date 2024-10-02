@@ -4,7 +4,7 @@ from pathlib import Path
 
 import moviepy.editor as mp
 import whisper  # From OpenAI: see https://github.com/openai/whisper?tab=readme-ov-file
-from pytube import Playlist, YouTube
+from pytubefix import Playlist, YouTube
 
 from utils import timeit
 
@@ -28,18 +28,16 @@ class TVNewsSpeechToText:
         print("getting JT 20h...")
         playlist = Playlist(JT_20H_PLAYLIST_URL)
         for link in reversed(playlist.video_urls):
-            try:
-                print(link)
-                print(YouTube(link).publish_date.date())
-            except Exception as e:
-                print("Error found while getting the youtube video.")
-                continue
+            print(link)
+            print(YouTube(link).publish_date)
+            print(type(YouTube(link)))
+            print(type(YouTube(link).publish_date))
             if YouTube(link).publish_date.date() == publish_date:
                 self.youtube_link = link
                 self.yt = YouTube(url=link)
                 print("Video found")
                 return "JT 20h video Found"
-            print("Video not found")
+        print("Video not found")
         return "No video match the specified date."
 
     def get_last_jt_20h(self):
@@ -102,8 +100,8 @@ if __name__ == "__main__":
     stt = TVNewsSpeechToText()
 
     # get ORTM specific news for one date
-    # JT_PUBLISH_DATE = datetime.strptime("2024-09-16", "%Y-%m-%d").date()
-    JT_PUBLISH_DATE = datetime.today().date() - timedelta(days=1)
+    JT_PUBLISH_DATE = datetime.strptime("2024-09-30", "%Y-%m-%d").date()
+    # JT_PUBLISH_DATE = datetime.today().date() - timedelta(days=1)
     print(JT_PUBLISH_DATE)
     stt.get_jt_20h_by_date(publish_date=JT_PUBLISH_DATE)
     stt.download_youtube_audio(

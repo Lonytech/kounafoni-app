@@ -31,7 +31,6 @@ gunicorn = "^22.0.0"
 optional = true
 
 [tool.poetry.group.news_processing.dependencies]
-pytube = "^15.0.0"
 moviepy = "^1.0.3"
 pydub = "^0.25.1"
 openai-whisper = "^20231117"
