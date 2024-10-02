@@ -16,6 +16,7 @@ from utils import timeit
 
 STT_PATH = Path(__file__).parents[1] / "data" / "whisper"
 JT_20H_PLAYLIST_URL = "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
+PYTUBE_CLIENT = "ANDROID_MUSIC"
 
 
 class TVNewsSpeechToText:
@@ -33,87 +34,8 @@ class TVNewsSpeechToText:
     def get_jt_20h_by_date(self, publish_date: date):
         print("getting JT 20h...")
         playlist = Playlist(JT_20H_PLAYLIST_URL)
-
         for link in reversed(playlist.video_urls):
-
-            # URL de la vidéo YouTube
-            # video_url = "https://www.youtube.com/watch?v=XXXX"
-            for client_type in [
-                "WEB",
-                "WEB_EMBED",
-                "WEB_MUSIC",
-                "WEB_CREATOR",
-                "WEB_SAFARI",
-                "ANDROID",
-                "ANDROID_MUSIC",
-                "ANDROID_CREATOR",
-                "ANDROID_VR",
-                "ANDROID_PRODUCER",
-                "ANDROID_TESTSUITE",
-                "IOS",
-                "IOS_MUSIC",
-                "IOS_CREATOR",
-                "MWEB",
-                "TV_EMBED",
-                "MEDIA_CONNECT",
-            ]:
-                print("This is the client type --> ", client_type)
-                try:
-                    # Initialisation de l'objet YouTube
-                    yt = YouTube(link, client_type)
-                    print(f"Vidéo trouvée : {yt.title}")
-                except VideoUnavailable as e:
-                    print("Error for client type --> ", client_type)
-                    print(e)
-
-            try:
-                # Initialisation de l'objet YouTube
-                yt = YouTube(link, "WEB")
-                print(f"Vidéo trouvée : {yt.title}")
-
-                try:
-                    # Tentative de récupération des streams (formats de la vidéo)
-                    streams = yt.streams.filter(progressive=True, file_extension="mp4")
-                    if not streams:
-                        raise ValueError("Aucun flux vidéo MP4 trouvé.")
-
-                    # Téléchargement du premier flux
-                    stream = streams.first()
-                    stream.download(output_path="./downloads")
-                    print(f"Téléchargement réussi : {yt.title}")
-
-                except LiveStreamError:
-                    print(
-                        f"Erreur : La vidéo {yt.title} est un live stream et ne peut pas être téléchargée."
-                    )
-                except RegexMatchError:
-                    print(
-                        f"Erreur : Le format de la vidéo {yt.title} ne correspond pas."
-                    )
-                except ExtractError:
-                    print(
-                        f"Erreur : Problème d'extraction des données pour la vidéo {yt.title}."
-                    )
-                except Exception as e:
-                    print(
-                        f"Erreur inattendue lors du téléchargement de {yt.title}: {str(e)}"
-                    )
-
-            except VideoUnavailable:
-                print(f"Erreur : La vidéo {link} n'est pas disponible.")
-            except RegexMatchError:
-                print(
-                    f"Erreur : L'URL de la vidéo {link} ne correspond pas au format attendu."
-                )
-            except Exception as e:
-                print(f"Erreur inattendue lors de la lecture de {link}: {str(e)}")
-
-            print(link)
-            print(YouTube(link, "WEB"))
-            print(YouTube(link, "WEB").publish_date)
-            print(type(YouTube(link)))
-            print(type(YouTube(link).publish_date))
-            if YouTube(link) and YouTube(link).publish_date.date() == publish_date:
+            if YouTube(link, client=PYTUBE_CLIENT).publish_date.date() == publish_date:
                 self.youtube_link = link
                 self.yt = YouTube(url=link)
                 print("Video found")
