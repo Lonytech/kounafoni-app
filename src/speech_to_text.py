@@ -38,6 +38,33 @@ class TVNewsSpeechToText:
 
             # URL de la vidéo YouTube
             # video_url = "https://www.youtube.com/watch?v=XXXX"
+            for client_type in [
+                "WEB",
+                "WEB_EMBED",
+                "WEB_MUSIC",
+                "WEB_CREATOR",
+                "WEB_SAFARI",
+                "ANDROID",
+                "ANDROID_MUSIC",
+                "ANDROID_CREATOR",
+                "ANDROID_VR",
+                "ANDROID_PRODUCER",
+                "ANDROID_TESTSUITE",
+                "IOS",
+                "IOS_MUSIC",
+                "IOS_CREATOR",
+                "MWEB",
+                "TV_EMBED",
+                "MEDIA_CONNECT",
+            ]:
+                print("This is the client type --> ", client_type)
+                try:
+                    # Initialisation de l'objet YouTube
+                    yt = YouTube(link, "WEB")
+                    print(f"Vidéo trouvée : {yt.title}")
+                except VideoUnavailable as e:
+                    print("Error for client type --> ", client_type)
+                    print(e)
 
             try:
                 # Initialisation de l'objet YouTube
