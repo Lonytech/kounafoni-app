@@ -41,7 +41,9 @@ class TVNewsSpeechToText:
 
             try:
                 # Initialisation de l'objet YouTube
-                yt = YouTube(link, "WEB_CREATOR")
+                yt = YouTube(
+                    link, "WEB_CREATOR", use_oauth=True, allow_oauth_cache=True
+                )
                 print(f"Vidéo trouvée : {yt.title}")
 
                 try:
