@@ -60,7 +60,7 @@ class TVNewsSpeechToText:
                 print("This is the client type --> ", client_type)
                 try:
                     # Initialisation de l'objet YouTube
-                    yt = YouTube(link, "WEB")
+                    yt = YouTube(link, client_type)
                     print(f"Vidéo trouvée : {yt.title}")
                 except VideoUnavailable as e:
                     print("Error for client type --> ", client_type)
