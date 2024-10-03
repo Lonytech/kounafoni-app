@@ -43,9 +43,9 @@ class TVNewsSpeechToText:
 
             for client_type in reversed(
                 [
-                    "WEB",
+                    # "WEB",
                     # "WEB_EMBED",
-                    # "WEB_MUSIC",
+                    "WEB_MUSIC",
                     # "WEB_CREATOR",
                     # "WEB_SAFARI",
                     # "ANDROID",
