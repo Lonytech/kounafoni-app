@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # get ORTM news for a specific date (today)
     # JT_PUBLISH_DATE = datetime.strptime("2024-06-20", "%Y-%m-%d").date()
-    JT_PUBLISH_DATE = datetime.today().date() - timedelta(days=2)  # one day before
+    JT_PUBLISH_DATE = datetime.today().date() - timedelta(days=1)  # one day before
     print(JT_PUBLISH_DATE)
 
     # Get the audio from YouTube

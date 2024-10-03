@@ -16,7 +16,7 @@ from utils import timeit
 
 STT_PATH = Path(__file__).parents[1] / "data" / "whisper"
 JT_20H_PLAYLIST_URL = "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
-PYTUBE_CLIENT = "ANDROID_MUSIC"
+PYTUBE_CLIENT = "WEB_MUSIC"
 
 
 class TVNewsSpeechToText:
