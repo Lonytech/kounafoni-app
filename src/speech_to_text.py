@@ -65,7 +65,9 @@ class TVNewsSpeechToText:
                 print("This is the client type --> ", client_type)
                 try:
                     # Initialisation de l'objet YouTube
-                    yt = YouTube(link, client=client_type)
+                    yt = YouTube(
+                        link, client=client_type, proxies={"https": "344444:444"}
+                    )
                     print(f"Vidéo trouvée : {yt.title}")
                     ys = yt.streams.get_audio_only()
                     ys.download(f"{yt.title}_test_bouba.mp3")
