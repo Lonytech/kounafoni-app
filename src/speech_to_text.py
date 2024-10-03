@@ -17,7 +17,7 @@ from utils import timeit
 
 STT_PATH = Path(__file__).parents[1] / "data" / "whisper"
 JT_20H_PLAYLIST_URL = "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
-PYTUBE_CLIENT = "WEB_MUSIC"
+PYTUBE_CLIENT = "ANDROID_MUSIC"
 
 
 class TVNewsSpeechToText:
@@ -40,6 +40,36 @@ class TVNewsSpeechToText:
 
             # URL de la vidéo YouTube
             # video_url = "https://www.youtube.com/watch?v=XXXX"
+
+            for client_type in reversed(
+                [
+                    "WEB",
+                    "WEB_EMBED",
+                    "WEB_MUSIC",
+                    "WEB_CREATOR",
+                    "WEB_SAFARI",
+                    "ANDROID",
+                    "ANDROID_MUSIC",
+                    "ANDROID_CREATOR",
+                    "ANDROID_VR",
+                    "ANDROID_PRODUCER",
+                    "ANDROID_TESTSUITE",
+                    "IOS",
+                    "IOS_MUSIC",
+                    "IOS_CREATOR",
+                    "MWEB",
+                    "TV_EMBED",
+                    "MEDIA_CONNECT",
+                ]
+            ):
+                print("This is the client type --> ", client_type)
+                try:
+                    # Initialisation de l'objet YouTube
+                    yt = YouTube(link, client=client_type)
+                    print(f"Vidéo trouvée : {yt.title}")
+                except VideoUnavailable as e:
+                    print("Error for client type --> ", client_type)
+                    print(e)
 
             try:
                 # Initialisation de l'objet YouTube
