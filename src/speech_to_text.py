@@ -5,6 +5,7 @@ from pathlib import Path
 import moviepy.editor as mp
 import whisper  # From OpenAI: see https://github.com/openai/whisper?tab=readme-ov-file
 from pytubefix import Playlist, YouTube
+from pytubefix.cli import on_progress
 from pytubefix.exceptions import (
     ExtractError,
     LiveStreamError,
@@ -42,19 +43,14 @@ class TVNewsSpeechToText:
 
             try:
                 # Initialisation de l'objet YouTube
-                yt = YouTube(link, client=PYTUBE_CLIENT)
+                yt = YouTube(
+                    link, client=PYTUBE_CLIENT, on_progress_callback=on_progress
+                )
                 print(f"Vidéo trouvée : {yt.title}")
 
                 try:
-                    # Tentative de récupération des streams (formats de la vidéo)
-                    streams = yt.streams.filter(progressive=True, file_extension="mp4")
-                    if not streams:
-                        raise ValueError("Aucun flux vidéo MP4 trouvé.")
-
-                    # Téléchargement du premier flux
-                    stream = streams.first()
-                    stream.download(output_path="./downloads")
-                    print(f"Téléchargement réussi : {yt.title}")
+                    ys = yt.streams.get_audio_only()
+                    ys.download(mp3=True)
 
                 except LiveStreamError:
                     print(
