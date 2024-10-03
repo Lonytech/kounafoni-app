@@ -67,7 +67,13 @@ class TVNewsSpeechToText:
                     # Initialisation de l'objet YouTube
                     yt = YouTube(link, client=client_type)
                     print(f"Vidéo trouvée : {yt.title}")
+                    ys = yt.streams.get_audio_only()
+                    ys.download(f"{yt.title}_test_bouba.mp3")
+                    print(f"Vidéo téléchargée comme mp3 : {yt.title}")
                 except VideoUnavailable as e:
+                    print("Error for client type --> ", client_type)
+                    print(e)
+                except Exception as e:
                     print("Error for client type --> ", client_type)
                     print(e)
 
