@@ -25,8 +25,8 @@ if __name__ == "__main__":
     stt.download_youtube_audio(
         output_path=STT_PATH
         / "stt_audio"
-        / f"{stt.yt.publish_date.date()}"
-        / f"{stt.yt.title}.wav"
+        / f"{stt.yt_info['upload_date']}"
+        / f"{stt.yt_info['title']}.mp3"
     )
 
     # transcribe audio to text and save
@@ -46,8 +46,8 @@ if __name__ == "__main__":
     summarized_text_path = (
         STT_PATH
         / "summarized_texts"
-        / f"{stt.yt.publish_date.date()}"
-        / f"{stt.yt.title}.txt"
+        / f"{stt.yt_info['upload_date']}"
+        / f"{stt.yt_info['title']}.txt"
     )
     tts = NewsTextToSpeech(input_text_path=summarized_text_path)
     tts.generate_and_save_audio_from_text()

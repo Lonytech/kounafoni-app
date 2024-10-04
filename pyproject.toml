@@ -31,14 +31,14 @@ gunicorn = "^22.0.0"
 optional = true
 
 [tool.poetry.group.news_processing.dependencies]
-moviepy = "^1.0.3"
 pydub = "^0.25.1"
 openai-whisper = "^20231117"
 beautifulsoup4 = "^4.12.3"
 torch = {version = "^2.3.1+cpu", source = "pytorch_cpu"}
-pytubefix = "7.1rc1"
+yt-dlp = "^2024.9.27"
 
 # Install rag dendencies only for chainlit chatbot
+
 [tool.poetry.group.rag]
 optional = true
 

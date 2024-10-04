@@ -23,7 +23,7 @@ jobs:
     - name: Install poetry
       run: |
         sudo apt update -y
-        sudo apt install -y pipx
+        sudo apt install -y pipx ffmpeg
         pipx install poetry==1.7.1
         export PATH="/root/.local/bin:$PATH"
 
@@ -39,10 +39,18 @@ jobs:
         workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
         service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
-    - id: 'upload-file'
+    - id: 'upload extracted texts from audio'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
-        path: 'data/whisper'
+        path: 'data/whisper/stt_texts'
+        destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
+        process_gcloudignore: false #no .gcloudignore file in the repo
+
+    - id: 'upload summarized texts from stt_texts'
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'data/whisper/summarized_texts'
         destination: 'kounafonia-news/data'
         gzip: false # disable gzip compression on upload
         process_gcloudignore: false #no .gcloudignore file in the repo
