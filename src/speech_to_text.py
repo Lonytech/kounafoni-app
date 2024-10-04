@@ -1,10 +1,9 @@
 import textwrap
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 
 import whisper  # From OpenAI: see https://github.com/openai/whisper?tab=readme-ov-file
 import yt_dlp
-from pytubefix import Playlist, YouTube
 
 from utils import timeit
 
@@ -20,10 +19,6 @@ class TVNewsSpeechToText:
         self.yt_info = None
         self.text_transcript_path = None
         self.transcript = None
-
-    def set_youtube_video(self):
-        if self.youtube_link:
-            self.yt = YouTube(url=self.youtube_link)
 
     def get_jt_20h_by_date(self, publish_date: date):
         print("getting JT 20h...")
