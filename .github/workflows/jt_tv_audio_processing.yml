@@ -47,7 +47,7 @@ jobs:
         gzip: false # disable gzip compression on upload
         process_gcloudignore: false #no .gcloudignore file in the repo
 
-    - id: 'upload summarized texts from stt_texts'
+    - id: 'upload summarized texts from stt texts'
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: 'data/whisper/summarized_texts'
