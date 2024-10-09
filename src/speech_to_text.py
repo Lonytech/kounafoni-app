@@ -156,7 +156,10 @@
 #         self.text_transcript_path = write_path
 
 
+import base64
+import json
 import logging
+import os
 import random
 import time
 from pathlib import Path
@@ -165,30 +168,42 @@ from typing import Optional
 import yt_dlp
 from fake_useragent import UserAgent
 
-# Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class YouTubeDownloader:
+class AdvancedYouTubeDownloader:
     def __init__(self, output_dir: str = "./downloads"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.ua = UserAgent()
 
-    def _get_random_headers(self) -> dict:
-        """Génère des en-têtes HTTP aléatoires"""
+    def _generate_consent_cookie(self):
+        """Génère un cookie de consentement YouTube"""
+        return {"CONSENT": f"YES+cb.20210328-17-p0.fr+FX+{random.randint(100, 999)}"}
+
+    def _get_advanced_headers(self):
+        """Génère des en-têtes HTTP plus sophistiqués"""
+        chrome_version = f"{random.randint(70, 108)}.0.{random.randint(1000, 9999)}.0"
         return {
-            "User-Agent": self.ua.random,
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "User-Agent": f"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{chrome_version} Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.5",
             "Accept-Encoding": "gzip, deflate, br",
             "DNT": "1",
             "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Sec-Fetch-User": "?1",
+            "sec-ch-ua": f'"Google Chrome";v="{chrome_version}", "Chromium";v="{chrome_version}", "Not=A?Brand";v="24"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
         }
 
-    def _get_ydl_opts(self, output_template: str) -> dict:
-        """Configure les options pour yt-dlp"""
+    def _get_advanced_ydl_opts(self, output_template: str) -> dict:
+        """Configure les options avancées pour yt-dlp"""
         return {
             "format": "bestaudio/best",
             "postprocessors": [
@@ -199,46 +214,86 @@ class YouTubeDownloader:
                 }
             ],
             "outtmpl": str(self.output_dir / output_template),
-            "quiet": True,
+            "quiet": False,
             "no_warnings": True,
             "extract_flat": False,
-            "http_headers": self._get_random_headers(),
+            "http_headers": self._get_advanced_headers(),
             "noprogress": True,
+            "cookiesfrombrowser": (
+                "chrome",
+            ),  # Utilise les cookies de Chrome si disponibles
+            "cookies": "/tmp/cookies.txt",  # Fichier de cookies
+            "nocheckcertificate": True,
+            "ignoreerrors": True,
+            "no_color": True,
+            "geo_bypass": True,
+            "geo_bypass_country": "FR",
+            "extractor_retries": 5,
+            "fragment_retries": 5,
+            "retry_sleep_functions": {"http": lambda n: 5 * (n + 1)},
+            "socket_timeout": 30,
+            "extractor_args": {
+                "youtube": {
+                    "player_client": ["android"],
+                    "player_skip": ["webpage", "configs"],
+                    "skip": ["dash", "hls"],
+                }
+            },
         }
+
+    def _create_cookies_file(self):
+        """Crée un fichier de cookies YouTube"""
+        cookies = [
+            {
+                "domain": ".youtube.com",
+                "expirationDate": 1735689600,
+                "name": "CONSENT",
+                "value": f"YES+cb.20210328-17-p0.fr+FX+{random.randint(100, 999)}",
+                "path": "/",
+            },
+            {
+                "domain": ".youtube.com",
+                "name": "VISITOR_INFO1_LIVE",
+                "value": base64.b64encode(os.urandom(8)).decode("utf-8"),
+                "path": "/",
+            },
+        ]
+
+        with open("/tmp/cookies.txt", "w") as f:
+            for cookie in cookies:
+                f.write(
+                    f".youtube.com\tTRUE\t/\tFALSE\t{int(time.time()) + 3600 * 24 * 365}\t{cookie['name']}\t{cookie['value']}\n"
+                )
 
     def download_audio(
         self, url: str, retries: int = 3, output_template: str = "%(title)s.%(ext)s"
     ) -> Optional[Path]:
         """
-        Télécharge l'audio d'une vidéo YouTube
-
-        Args:
-            url: URL de la vidéo YouTube
-            retries: Nombre de tentatives en cas d'échec
-            output_template: Template pour le nom du fichier de sortie
-
-        Returns:
-            Path: Chemin vers le fichier téléchargé ou None en cas d'échec
+        Télécharge l'audio d'une vidéo YouTube avec des paramètres avancés
         """
+        self._create_cookies_file()
+
         for attempt in range(retries):
             try:
-                # Ajout d'un délai aléatoire entre les tentatives
                 if attempt > 0:
-                    delay = random.uniform(1, 5)
+                    delay = random.uniform(3, 8)
                     logger.info(
                         f"Tentative {attempt + 1}/{retries} après {delay:.2f} secondes..."
                     )
                     time.sleep(delay)
 
-                with yt_dlp.YoutubeDL(self._get_ydl_opts(output_template)) as ydl:
-                    # Extraction des informations de la vidéo
+                ydl_opts = self._get_advanced_ydl_opts(output_template)
+
+                # Ajout d'un délai aléatoire avant chaque requête
+                time.sleep(random.uniform(1, 3))
+
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(url, download=False)
                     video_title = info["title"]
 
                     logger.info(f"Début du téléchargement : {video_title}")
                     ydl.download([url])
 
-                    # Construction du chemin du fichier téléchargé
                     output_file = self.output_dir / f"{video_title}.mp3"
                     logger.info(f"Téléchargement terminé : {output_file}")
                     return output_file
@@ -252,10 +307,10 @@ class YouTubeDownloader:
                     return None
 
 
-# Exemple d'utilisation
 if __name__ == "__main__":
-    downloader = YouTubeDownloader()
-    result = downloader.download_audio("https://www.youtube.com/watch?v=wy7vxd61uwg")
+    downloader = AdvancedYouTubeDownloader()
+    url = "VOTRE_URL_YOUTUBE"
+    result = downloader.download_audio(url)
     if result:
         logger.info(f"Fichier téléchargé avec succès: {result}")
     else:
