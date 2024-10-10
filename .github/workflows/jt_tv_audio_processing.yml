@@ -27,30 +27,45 @@ jobs:
         pipx install poetry==1.7.1
         export PATH="/root/.local/bin:$PATH"
 
-    - name: Install dependencies with poetry
-      run: poetry install --no-root --no-cache --only main,news_processing
+#    - name: Install dependencies with poetry
+#      run: poetry install --no-root --no-cache --only main,news_processing
 
-    - name: Download JT audio, TTS, summarize, STT and upload summarized audio
-      run: poetry run python src/ortm_jt_audio_updater.py
-
-    - name: Google Cloud Auth
-      uses: 'google-github-actions/auth@v2'
+    - name: Setup yt-dlp
+      uses: AnimMouse/setup-yt-dlp@v1
       with:
-        workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
-        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+        with-ffmpeg: true
+        nightly: true
 
-    - name: Upload extracted texts from audio
-      uses: 'google-github-actions/upload-cloud-storage@v2'
+    - name: Setup yt-dlp-youtube-oauth2 plugin
+      uses: AnimMouse/setup-yt-dlp/oauth2@v1
       with:
-        path: 'data/whisper/stt_texts'
-        destination: 'kounafonia-news/data'
-        gzip: false # disable gzip compression on upload
-        process_gcloudignore: false #no .gcloudignore file in the repo
+        token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
 
-    - name: Upload summarized texts from stt texts
-      uses: 'google-github-actions/upload-cloud-storage@v2'
-      with:
-        path: 'data/whisper/summarized_texts'
-        destination: 'kounafonia-news/data'
-        gzip: false # disable gzip compression on upload
-        process_gcloudignore: false #no .gcloudignore file in the repo
+    - run: VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "<PLAYLIST_URL>" | jq -r '.entries[] | select(.upload_date == "20241005") | .id')
+    - run: yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=$VIDEO_ID" -o "first_ortm_TJ.mp3"
+    - run: ls -ll
+
+#    - name: Download JT audio, TTS, summarize, STT and upload summarized audio
+#      run: poetry run python src/ortm_jt_audio_updater.py
+#
+#    - name: Google Cloud Auth
+#      uses: 'google-github-actions/auth@v2'
+#      with:
+#        workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
+#        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+#
+#    - name: Upload extracted texts from audio
+#      uses: 'google-github-actions/upload-cloud-storage@v2'
+#      with:
+#        path: 'data/whisper/stt_texts'
+#        destination: 'kounafonia-news/data'
+#        gzip: false # disable gzip compression on upload
+#        process_gcloudignore: false #no .gcloudignore file in the repo
+#
+#    - name: Upload summarized texts from stt texts
+#      uses: 'google-github-actions/upload-cloud-storage@v2'
+#      with:
+#        path: 'data/whisper/summarized_texts'
+#        destination: 'kounafonia-news/data'
+#        gzip: false # disable gzip compression on upload
+#        process_gcloudignore: false #no .gcloudignore file in the repo
