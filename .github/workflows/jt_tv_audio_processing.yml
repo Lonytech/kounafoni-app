@@ -50,21 +50,24 @@ jobs:
       id: get_video
       run: |
        PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
-       # Extract the ID of the most recent video in the playlist
-       VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-1].id')
+       TARGET_DATE="20241005"  # Replace this with the specific date you want (format: YYYYMMDD)
+       
+       # Search for the video with the specified upload date
+       VIDEO_ID=$(yt-dlp --flat-playlist -J "$PLAYLIST_URL" | jq -r --arg target_date "$TARGET_DATE" '.entries[] | select(.upload_date == $target_date) | .id')
        
        if [ -z "$VIDEO_ID" ]; then
          echo "No video found in the playlist."
          exit 1
        fi
        
-       echo "::set-output name=video_id::$VIDEO_ID"
+       # Save VIDEO_ID to environment file instead of using set-output
+       echo "VIDEO_ID=$VIDEO_ID" >> $GITHUB_ENV
 
     # Step 5: Download the audio in MP3 format
     - name: Download audio
       run: |
        VIDEO_ID="${{ steps.get_video.outputs.video_id }}"
-       yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=$VIDEO_ID" -o "audio_files/jt_20h_${VIDEO_ID}.mp3"
+       yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "jt_20h_${{ env.VIDEO_ID }}.mp3"
 
     - run: ls -ll
 
