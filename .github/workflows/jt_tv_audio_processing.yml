@@ -27,8 +27,8 @@ jobs:
         pipx install poetry==1.7.1
         export PATH="/root/.local/bin:$PATH"
 
-#    - name: Install dependencies with poetry
-#      run: poetry install --no-root --no-cache --only main,news_processing
+    - name: Install dependencies with poetry
+      run: poetry install --no-root --no-cache --only main,news_processing
 
     - name: Setup yt-dlp
       uses: AnimMouse/setup-yt-dlp@v1
@@ -41,11 +41,7 @@ jobs:
       with:
         token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
 
-#    - run: VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N" | jq -r '.entries[] | select(.upload_date == "20241005") | .id')
-#    - run: yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=$VIDEO_ID" -o "first_ortm_TJ.mp3"
-    - run: ls -ll
-
-    # Step 4: Get the last video in the playlist
+    # Get the last video in the playlist
     - name: Get the latest video id in the playlist
       id: get_video
       run: |
@@ -62,13 +58,16 @@ jobs:
        # Save VIDEO_ID to environment file instead of using set-output
        echo "VIDEO_ID=$VIDEO_ID" >> $GITHUB_ENV
 
-    # Step 5: Download the audio in MP3 format
+    # Download the audio in MP3 format
     - name: Download audio
       run: |
        VIDEO_ID="${{ steps.get_video.outputs.video_id }}"
        UPLOAD_DATE=$(date -d "(yt-dlp --username oauth2 --password '' --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
        TITLE=$(yt-dlp --username oauth2 --password '' --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
-       yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/${{ env.UPLOAD_DATE}}/${{ env.TITLE }}.mp3"
+       echo $VIDEO_ID
+       echo $UPLOAD_DATE
+       echo $TITLE
+       yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
     - run: ls -ll && ls -ll data/whisper/stt_audio
 
     - name: Make TTS, summarize and STT
