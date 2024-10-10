@@ -2,12 +2,12 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
+from langchain_community.llms.ollama import Ollama
+
+from models import LLMModelName
 from speech_to_text import TVNewsSpeechToText
 from summarizer import Summarizer
 from text_to_speech import NewsTextToSpeech
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 STT_PATH = Path(__file__).parents[1] / "data" / "whisper"
 SUMMARIZED_TEXTS_PATH = STT_PATH / "summarized_texts"
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     stt.transcribe_and_save(transcript_saving_path)
 
     ## 2nd step: Summarize the transcribed text ###
-    summary = Summarizer()
+    summary = Summarizer(llm=Ollama(model=LLMModelName.OLLAMA_LLAMA3, num_thread=16))
 
     # summarize the text
     summary.auto_detect_duration_and_summarize(input_text_path=transcript_saving_path)

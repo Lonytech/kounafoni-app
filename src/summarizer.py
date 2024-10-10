@@ -19,8 +19,8 @@ SHORT_TEXT_MAXI_LENGTH = 5_000
 
 
 class Summarizer:
-    def __init__(self):
-        self.llm = Ollama(model=LLM_MODEL_NAME, num_thread=10)
+    def __init__(self, llm=Ollama(model=LLM_MODEL_NAME, num_thread=10)):
+        self.llm = llm
         self.input_text_path = None
         self.text_to_summarize = None
         self.summarized_text = None
@@ -67,7 +67,7 @@ class Summarizer:
             # Summarize each part of the text,
             # TODO:the first split is considered as "table of content" and we should
             #  make semantic context aware split to determine which part is "toc" and which part is content using an
-            #  specialized llm to
+            #  specialized llm
             summarized_text += texts[0] + "."
             summarized_text += "\n-------\n"
 
