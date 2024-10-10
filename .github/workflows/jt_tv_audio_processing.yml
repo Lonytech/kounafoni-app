@@ -46,15 +46,14 @@ jobs:
     - run: ls -ll
 
     # Step 4: Get the last video in the playlist
-    - name: Get latest video in the playlist
+    - name: Get the latest video id in the playlist
       id: get_video
       run: |
+       # playlist url
        PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
-       TARGET_DATE="20241005"  # Replace this with the specific date you want (format: YYYYMMDD)
        
        # Search for the video with the specified upload date
-       VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --date "$TARGET_DATE" -J "$PLAYLIST_URL" | jq -r '.entries[0].id')
-       
+       VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-1].id')
        if [ -z "$VIDEO_ID" ]; then
          echo "No video found in the playlist."
          exit 1
@@ -67,31 +66,32 @@ jobs:
     - name: Download audio
       run: |
        VIDEO_ID="${{ steps.get_video.outputs.video_id }}"
-       yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "jt_20h_${{ env.VIDEO_ID }}.mp3"
+       UPLOAD_DATE=$(date -d "(yt-dlp --username oauth2 --password '' --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
+       TITLE=$(yt-dlp --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
+       yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/${{ env.UPLOAD_DATE}}/${{ env.TITLE }}.mp3"
+    - run: ls -ll && ls -ll data/whisper/stt_audio
 
-    - run: ls -ll
+    - name: Make TTS, summarize and STT
+      run: poetry run python src/ortm_jt_audio_updater.py
+#
+    - name: Google Cloud Auth
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
+        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
 
-#    - name: Download JT audio, TTS, summarize, STT and upload summarized audio
-#      run: poetry run python src/ortm_jt_audio_updater.py
-#
-#    - name: Google Cloud Auth
-#      uses: 'google-github-actions/auth@v2'
-#      with:
-#        workload_identity_provider: 'projects/${{ secrets.GCP_PROJECT_NUMBER }}/locations/global/workloadIdentityPools/${{ secrets.GCP_WORKLOAD_IDENTITY_POOL }}/providers/${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
-#        service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
-#
-#    - name: Upload extracted texts from audio
-#      uses: 'google-github-actions/upload-cloud-storage@v2'
-#      with:
-#        path: 'data/whisper/stt_texts'
-#        destination: 'kounafonia-news/data'
-#        gzip: false # disable gzip compression on upload
-#        process_gcloudignore: false #no .gcloudignore file in the repo
-#
-#    - name: Upload summarized texts from stt texts
-#      uses: 'google-github-actions/upload-cloud-storage@v2'
-#      with:
-#        path: 'data/whisper/summarized_texts'
-#        destination: 'kounafonia-news/data'
-#        gzip: false # disable gzip compression on upload
-#        process_gcloudignore: false #no .gcloudignore file in the repo
+    - name: Upload extracted texts from audio
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'data/whisper/stt_texts'
+        destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
+        process_gcloudignore: false #no .gcloudignore file in the repo
+
+    - name: Upload summarized texts from stt texts
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'data/whisper/summarized_texts'
+        destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
+        process_gcloudignore: false #no .gcloudignore file in the repo
