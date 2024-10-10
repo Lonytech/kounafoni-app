@@ -122,23 +122,28 @@ class Summarizer:
 
             # TODO: Do not suppose all articles are named 'source.csv'.
             #  At this time, all of them (malijet, bamada net, etc.) have their own folder with 'source.csv' inside.
-            if "source" in input_text_path.name:
-                # get a random article to summarize
-                self.text_to_summarize = random.choice(
-                    self.text_to_summarize.split("\n")[1:-1]
-                )
-
-                self.text_to_summarize = self.text_to_summarize.replace("\n", " ")
-                print(f"Article chosen : {self.text_to_summarize[:100]}")
-                print("Getting the medium summary...")
-                self.get_medium_summary()
+            # if "source" in input_text_path.name:
+            #     # get a random article to summarize
+            #     self.text_to_summarize = random.choice(
+            #         self.text_to_summarize.split("\n")[1:-1]
+            #     )
+            #
+            #     self.text_to_summarize = self.text_to_summarize.replace("\n", " ")
+            #     print(f"Article chosen : {self.text_to_summarize[:100]}")
+            #     print("Getting the medium summary...")
+            #     self.get_medium_summary()
 
             # Youtube videos transcripts are usually long texts
-            elif len(self.text_to_summarize) > SHORT_TEXT_MAXI_LENGTH:
+            if len(self.text_to_summarize) > SHORT_TEXT_MAXI_LENGTH:
                 self.text_to_summarize = input_text_path.read_text().replace("\n", " ")
                 print(f"JT chosen : {self.text_to_summarize[:100]}")
                 print("Getting the long summary...")
                 self.get_long_summary()
+            else:
+                self.text_to_summarize = self.text_to_summarize.replace("\n", " ")
+                print(f"Article chosen : {self.text_to_summarize[:100]}")
+                print("Getting the medium summary...")
+                self.get_medium_summary()
         else:
             sys.exit(
                 "Error, input text file does not exist or summarization already exists. Skipping..."
