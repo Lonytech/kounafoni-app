@@ -41,7 +41,7 @@ jobs:
       with:
         token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
 
-    - run: VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "<PLAYLIST_URL>" | jq -r '.entries[] | select(.upload_date == "20241005") | .id')
+    - run: VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N" | jq -r '.entries[] | select(.upload_date == "20241005") | .id')
     - run: yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=$VIDEO_ID" -o "first_ortm_TJ.mp3"
     - run: ls -ll
 
