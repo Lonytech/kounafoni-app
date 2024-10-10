@@ -53,7 +53,7 @@ jobs:
        TARGET_DATE="20241005"  # Replace this with the specific date you want (format: YYYYMMDD)
        
        # Search for the video with the specified upload date
-       VIDEO_ID=$(yt-dlp --date "$TARGET_DATE" -J "$PLAYLIST_URL" | jq -r '.entries[0].id')
+       VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --date "$TARGET_DATE" -J "$PLAYLIST_URL" | jq -r '.entries[0].id')
        
        if [ -z "$VIDEO_ID" ]; then
          echo "No video found in the playlist."
