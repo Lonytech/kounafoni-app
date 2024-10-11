@@ -80,7 +80,10 @@ jobs:
        yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
     - run: ls -ll && ls -ll data/whisper/stt_audio
 
-    - name: Make TTS, summarize and STT
+    - name: Build Text To Speech (TTS), summarize and Speech To Text (STT)
+      env: # Or as an environment variable
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
       run: poetry run python src/ortm_jt_audio_updater.py
 #
     - name: Google Cloud Auth

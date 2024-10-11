@@ -1,8 +1,7 @@
-import logging
 from datetime import datetime
 from pathlib import Path
 
-from langchain_community.llms.ollama import Ollama
+from langchain_groq import ChatGroq
 
 from models import LLMModelName
 from speech_to_text import TVNewsSpeechToText
@@ -56,7 +55,9 @@ if __name__ == "__main__":
     stt.transcribe_and_save(transcript_saving_path)
 
     ## 2nd step: Summarize the transcribed text ###
-    summary = Summarizer(llm=Ollama(model=LLMModelName.OLLAMA_LLAMA3, num_thread=16))
+    summary = Summarizer(
+        llm=ChatGroq(temperature=0, model=LLMModelName.GROQ_LLAMA3.value)
+    )
 
     # summarize the text
     summary.auto_detect_duration_and_summarize(input_text_path=transcript_saving_path)
