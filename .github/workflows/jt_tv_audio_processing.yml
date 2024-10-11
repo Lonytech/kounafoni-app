@@ -55,8 +55,8 @@ jobs:
       id: get_video
       run: |
        # playlist url
-       # PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
-       PLAYLIST_URL="https://youtube.com/playlist?list=PLK8Uo5BxRRzITbq80ipSQbH2aoiwE3C_9&si=RiG5-aeUgkfw4Ycs"
+       PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
+       # PLAYLIST_URL="https://youtube.com/playlist?list=PLK8Uo5BxRRzITbq80ipSQbH2aoiwE3C_9&si=RiG5-aeUgkfw4Ycs"
        
        # Search for the video with the specified upload date
        VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-1].id')
