@@ -84,12 +84,16 @@ class Summarizer:
             )
             texts = content_text_splitter.split_text("".join(texts[1:]))
             for text in tqdm(texts[1:]):
-                summarized_text += self.llm.invoke(
+                new_summary = self.llm.invoke(
                     prompt_template.format(
                         SummaryDuration.SHORT_DURATION.value,
                         SummaryDuration.SHORT_DURATION.value,
                         text,
                     )
+                )
+
+                summarized_text += (
+                    new_summary if type(new_summary) == str else new_summary.content
                 )
         self.summarized_text = summarized_text
         return summarized_text

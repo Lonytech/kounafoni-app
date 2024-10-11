@@ -59,6 +59,10 @@ if __name__ == "__main__":
         llm=ChatGroq(temperature=0, model=LLMModelName.GROQ_LLAMA3.value)
     )
 
+    new_llm = ChatGroq(temperature=0, model=LLMModelName.GROQ_LLAMA3.value)
+    new_llm.invoke()
+    summary.llm.invoke()
+
     # summarize the text
     summary.auto_detect_duration_and_summarize(input_text_path=transcript_saving_path)
     summary.save_summary()
