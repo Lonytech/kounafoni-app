@@ -27,7 +27,7 @@ jobs:
     - name: Serve and pull ollama model
       run: |
         ollama serve &
-        ollama pull llama3:8b-instruct-q4_0
+        ollama pull llama3:8b-instruct-q2_K
 
     - name: Install poetry
       run: |
