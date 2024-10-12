@@ -21,7 +21,6 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from models import LLMModelName
 from utils import format_docs_to_docs, format_docs_to_string, human_readable_time
 
-ARTICLE_SOURCE_FILE_PATH = Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
 CHROMA_DB_PERSIST_PATH = (
     Path(__file__).parents[1] / "data" / "vector_stores" / "chroma_db_1024"
 )
@@ -323,8 +322,12 @@ class LocalRag:
 
 
 if __name__ == "__main__":
+
+    # Local test of RAG for all article published in malijet on August 2024
+    ARTICLE_SOURCE_FILE_PATH = (
+        Path(__file__).parents[1] / "data" / "malijet" / "2024" / "08"
+    )
     rag = LocalRag(data_source_path=ARTICLE_SOURCE_FILE_PATH)
-    rag.llm = LLMModelName.GROQ_LLAMA3
-    # rag.llm = LLMModelName.OLLAMA_OCCIGLOT
+    rag.llm = LLMModelName.OLLAMA_OCCIGLOT
     rag.build_rag_pipeline_chain()
     rag.run_question_answer()

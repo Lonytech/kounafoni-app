@@ -3,7 +3,9 @@ Utils function used throughout the project!
 """
 
 import time
+from datetime import datetime
 from functools import wraps
+from pathlib import Path
 
 from dateutil.relativedelta import relativedelta
 
@@ -75,3 +77,29 @@ def format_docs_to_docs(docs):
         d.page_content = doc_presentation
         docs_formatted.append(d)
     return docs_formatted
+
+
+def get_most_recent_folder(directory_path):
+
+    # Convert the input to a Path object if it's a string
+    base_path = Path(directory_path)
+
+    # Get all directories and filter those that match date format
+    # Assuming folders are named in the format "YYYY-MM-DD"
+    date_folders = []
+    for folder in base_path.iterdir():
+        if folder.is_dir():
+            try:
+                # Try to parse the folder name as a date
+                date = datetime.strptime(folder.name, "%Y-%m-%d")
+                date_folders.append((date, folder))
+            except ValueError:
+                # Skip folders that don't match the date format
+                continue
+
+    if not date_folders:
+        return None
+
+    # Sort by date and get the most recent one
+    most_recent = max(date_folders, key=lambda x: x[0])
+    return most_recent[1]

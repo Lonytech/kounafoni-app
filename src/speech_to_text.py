@@ -38,16 +38,20 @@ class TVNewsSpeechToText:
             video_url = f"https://www.youtube.com/watch?v={video['id']}"
             print(video_url)
 
-            # Get metadata for each video
-            with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
-                video_info = ydl.extract_info(video_url, download=False)
+            try:
+                # Get metadata for each video
+                with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+                    video_info = ydl.extract_info(video_url, download=False)
 
-            # Compare the publication date with the specified date
-            video_publish_date = date(
-                year=int(video_info["upload_date"][:4]),
-                month=int(video_info["upload_date"][4:6]),
-                day=int(video_info["upload_date"][6:]),
-            )
+                # Compare the publication date with the specified date
+                video_publish_date = date(
+                    year=int(video_info["upload_date"][:4]),
+                    month=int(video_info["upload_date"][4:6]),
+                    day=int(video_info["upload_date"][6:]),
+                )
+            except Exception as e:
+                print(e)
+                continue
 
             if video_publish_date == publish_date:
                 self.youtube_link = video_url
@@ -75,18 +79,20 @@ class TVNewsSpeechToText:
         # Get the last video URL in the playlist
         last_video = playlist_info["entries"][-1]
         last_video_url = f"https://www.youtube.com/watch?v={last_video['id']}"
+        try:
 
-        # Get metadata for each video
-        with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
-            video_info = ydl.extract_info(last_video_url, download=False)
+            # Get metadata for each video
+            with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+                video_info = ydl.extract_info(last_video_url, download=False)
 
-        # get video publish date in iso format
-        video_publish_date = date(
-            year=int(video_info["upload_date"][:4]),
-            month=int(video_info["upload_date"][4:6]),
-            day=int(video_info["upload_date"][6:]),
-        )
-
+            # get video publish date in iso format
+            video_publish_date = date(
+                year=int(video_info["upload_date"][:4]),
+                month=int(video_info["upload_date"][4:6]),
+                day=int(video_info["upload_date"][6:]),
+            )
+        except Exception as e:
+            print(e)
         # Store the last video link for further processing
         self.youtube_link = last_video_url
         self.yt_info = last_video  # Store video info if needed
@@ -156,14 +162,19 @@ class TVNewsSpeechToText:
 if __name__ == "__main__":
 
     # get ORTM specific news for one date
-    JT_PUBLISH_DATE = datetime.strptime("2024-09-28", "%Y-%m-%d").date()
+    JT_PUBLISH_DATE = datetime.strptime("2024-09-30", "%Y-%m-%d").date()
 
     # get the speech to a text object
     stt = TVNewsSpeechToText()
 
     # JT_PUBLISH_DATE = datetime.today().date() - timedelta(days=1)
-    print(JT_PUBLISH_DATE)
-    stt.get_jt_20h_by_date(publish_date=JT_PUBLISH_DATE)
+    # print(JT_PUBLISH_DATE)
+    # stt.get_jt_20h_by_date(publish_date=JT_PUBLISH_DATE)
+
+    # or just get the last one
+    stt.get_last_jt_20h()
+
+    # now download
     stt.download_youtube_audio(
         output_path=STT_PATH
         / "stt_audio"
@@ -176,18 +187,3 @@ if __name__ == "__main__":
         / f"{stt.yt_info['upload_date']}"
         / f"{stt.yt_info['title']}.txt"
     )
-
-    # get last TV news
-    # stt.get_last_jt_20h()
-    # stt.download_youtube_audio(
-    #     output_path=STT_PATH
-    #     / "stt_audio"
-    #     / f"{stt.yt.publish_date.date()}"
-    #     / f"{stt.yt.title}.wav"
-    # )
-    # stt.transcribe_and_save(
-    #     write_path=STT_PATH
-    #     / "stt_texts"
-    #     / f"{stt.yt.publish_date.date()}"
-    #     / f"{stt.yt.title}.txt"
-    # )

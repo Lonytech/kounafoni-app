@@ -11,7 +11,6 @@ from pydub.playback import play
 from pydub.utils import ratio_to_db
 
 from models import LLMModelName
-from src.models import LLMModelName
 from utils import timeit
 
 LLM_MODEL_NAME = LLMModelName.OLLAMA_OCCIGLOT

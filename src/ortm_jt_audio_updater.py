@@ -1,4 +1,3 @@
-from datetime import datetime
 from pathlib import Path
 
 from langchain_groq import ChatGroq
@@ -7,36 +6,11 @@ from models import LLMModelName
 from speech_to_text import TVNewsSpeechToText
 from summarizer import Summarizer
 from text_to_speech import NewsTextToSpeech
+from utils import get_most_recent_folder
 
 STT_PATH = Path(__file__).parents[1] / "data" / "whisper"
 SUMMARIZED_TEXTS_PATH = STT_PATH / "summarized_texts"
 JT_20H_PLAYLIST_URL = "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
-
-
-def get_most_recent_folder(directory_path):
-
-    # Convert the input to a Path object if it's a string
-    base_path = Path(directory_path)
-
-    # Get all directories and filter those that match date format
-    # Assuming folders are named in the format "YYYY-MM-DD"
-    date_folders = []
-    for folder in base_path.iterdir():
-        if folder.is_dir():
-            try:
-                # Try to parse the folder name as a date
-                date = datetime.strptime(folder.name, "%Y-%m-%d")
-                date_folders.append((date, folder))
-            except ValueError:
-                # Skip folders that don't match the date format
-                continue
-
-    if not date_folders:
-        return None
-
-    # Sort by date and get the most recent one
-    most_recent = max(date_folders, key=lambda x: x[0])
-    return most_recent[1]
 
 
 if __name__ == "__main__":

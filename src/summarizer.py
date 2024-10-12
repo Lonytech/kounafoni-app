@@ -8,7 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tqdm import tqdm
 
 from models import SummaryDuration
-from utils import timeit
+from utils import get_most_recent_folder, timeit
 
 SUMMARIZED_TEXTS_PATH = (
     Path(__file__).parents[1] / "data" / "whisper" / "summarized_texts"
@@ -173,35 +173,22 @@ class Summarizer:
 
 
 if __name__ == "__main__":
+
+    # get the main object
     summary = Summarizer()
 
-    # From articles
-    malijet_articles_path = (
-        Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
+    # From JT specific extract text
+    # jt_text_path = (
+    #     Path(__file__).parents[1] / "data" / "whisper" / "2024-09-30" / "🔴 Direct  JT 20H de ORTM1 du 30 Septembre 2024..txt"
+    # )
+
+    # Or latest transcribed text
+    jt_text_folder = get_most_recent_folder(
+        Path(__file__).parents[1] / "data" / "whisper" / "stt_texts"
     )
-    summary.auto_detect_duration_and_summarize(input_text_path=malijet_articles_path)
+    print(jt_text_folder)
+    jt_text_path = next(jt_text_folder.glob("*"))
+
+    summary.auto_detect_duration_and_summarize(input_text_path=jt_text_path)
     print(summary.summarized_text)
     summary.save_summary()
-
-    # From jt_20h
-    # jt_20h_transcript_path = (
-    #     Path(__file__).parents[1]
-    #     / "data"
-    #     / "whisper"
-    #     / "stt_texts"
-    #     / "2024-05-24"
-    #     / "🔴 Direct | JT 20H de ORTM1 du 24 mai 2024.txt"
-    # )
-
-    # jt_20h_transcript_path = (
-    #     Path(__file__).parents[1]
-    #     / "data"
-    #     / "whisper"
-    #     / "stt_texts"
-    #     / "2024-05-16"
-    #     / "Le 20heures de ORTM1 du 16 mai 2024.txt"
-    # )
-    #
-    # summary.auto_detect_duration_and_summarize(input_text_path=jt_20h_transcript_path)
-    # print(summary.summarized_text)
-    # summary.save_summary()
