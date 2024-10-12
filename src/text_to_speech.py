@@ -130,7 +130,10 @@ class NewsTextToSpeech:
 
             # Introduction table of content and content retriever
             self.intro_toc_text = news_texts[0]
-            self.jt_20h_content_text = news_texts[1]
+            if len(news_texts) > 1:
+                self.jt_20h_content_text = news_texts[1]
+            else:
+                self.jt_20h_content_text = news_texts[0]
             self.save_split_jt_20h_texts(split_texts_path)
 
     def generate_and_run_speech_command(self, speaker_reading_text):
