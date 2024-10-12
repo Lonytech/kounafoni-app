@@ -20,15 +20,6 @@ jobs:
     - name: Checkout repository and code validity
       uses: actions/checkout@v4
 
-    - name: Install ollama
-      run: curl -fsSL https://ollama.com/install.sh | sh
-
-
-    - name: Serve and pull ollama model
-      run: |
-        ollama serve &
-        ollama pull llama3:8b-instruct-q2_K
-
     - name: Install poetry
       run: |
         sudo apt update -y
@@ -56,36 +47,35 @@ jobs:
       run: |
        # playlist url
        PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
-       # PLAYLIST_URL="https://youtube.com/playlist?list=PLK8Uo5BxRRzITbq80ipSQbH2aoiwE3C_9&si=RiG5-aeUgkfw4Ycs"
        
-       # Search for the video with the specified upload date
+       # Search for the latest video inside the playlist
        VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-2].id')
        if [ -z "$VIDEO_ID" ]; then
          echo "No video found in the playlist."
          exit 1
        fi
        
-       # Save VIDEO_ID to environment file instead of using set-output
+       # Save VIDEO_ID to environment file
        echo "VIDEO_ID=$VIDEO_ID" >> $GITHUB_ENV
 
     # Download the audio in MP3 format
     - name: Download audio
       run: |
+       # Get relevant attributes (id, upload_date and title) of the video
        VIDEO_ID="${{ steps.get_video.outputs.video_id }}"
        UPLOAD_DATE=$(date -d "(yt-dlp --username oauth2 --password '' --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
        TITLE=$(yt-dlp --username oauth2 --password '' --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
-       echo $VIDEO_ID
-       echo $UPLOAD_DATE
-       echo $TITLE
+        
+       # Donwload video as mp3 file
        yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
-    - run: ls -ll && ls -ll data/whisper/stt_audio
 
     - name: Build Text To Speech (TTS), summarize and Speech To Text (STT)
-      env: # Or as an environment variable
+      env:
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
+      # Launch the script to build the new summary audio
       run: poetry run python src/ortm_jt_audio_updater.py
-#
+
     - name: Google Cloud Auth
       uses: 'google-github-actions/auth@v2'
       with:
@@ -104,6 +94,14 @@ jobs:
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: 'data/whisper/summarized_texts'
+        destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
+        process_gcloudignore: false #no .gcloudignore file in the repo
+
+    - name: Upload summarized audio
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'data/piper/exports'
         destination: 'kounafonia-news/data'
         gzip: false # disable gzip compression on upload
         process_gcloudignore: false #no .gcloudignore file in the repo

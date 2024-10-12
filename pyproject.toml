@@ -38,8 +38,6 @@ torch = {version = "^2.3.1+cpu", source = "pytorch_cpu"}
 yt-dlp = "^2024.9.27"
 
 # Install rag dendencies only for chainlit chatbot
-fake-useragent = "^1.5.1"
-
 [tool.poetry.group.rag]
 optional = true
 

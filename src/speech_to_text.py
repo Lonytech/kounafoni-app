@@ -154,7 +154,7 @@ class TVNewsSpeechToText:
 
 
 if __name__ == "__main__":
-    # Usage example
+
     # get ORTM specific news for one date
     JT_PUBLISH_DATE = datetime.strptime("2024-09-28", "%Y-%m-%d").date()
 
