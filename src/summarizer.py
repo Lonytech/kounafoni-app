@@ -1,4 +1,3 @@
-import random
 import sys
 import textwrap
 from functools import partial
@@ -9,7 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tqdm import tqdm
 
 from models import SummaryDuration
-from utils import timeit
+from utils import get_most_recent_folder, timeit
 
 SUMMARIZED_TEXTS_PATH = (
     Path(__file__).parents[1] / "data" / "whisper" / "summarized_texts"
@@ -19,8 +18,8 @@ SHORT_TEXT_MAXI_LENGTH = 5_000
 
 
 class Summarizer:
-    def __init__(self):
-        self.llm = Ollama(model=LLM_MODEL_NAME, num_thread=10)
+    def __init__(self, llm=Ollama(model=LLM_MODEL_NAME, num_thread=10)):
+        self.llm = llm
         self.input_text_path = None
         self.text_to_summarize = None
         self.summarized_text = None
@@ -41,12 +40,17 @@ class Summarizer:
             speech_duration == SummaryDuration.SHORT_DURATION
             or speech_duration == SummaryDuration.MEDIUM_DURATION
         ):
-            summarized_text = self.llm.invoke(
+            new_summary = self.llm.invoke(
                 prompt_template.format(
-                    speech_duration.value,
-                    speech_duration.value,
+                    SummaryDuration.SHORT_DURATION.value,
+                    SummaryDuration.SHORT_DURATION.value,
                     self.text_to_summarize,
                 )
+            )
+
+            # .content is for AI_Message in GROQ
+            summarized_text = (
+                new_summary if type(new_summary) == str else new_summary.content
             )
 
         elif speech_duration == SummaryDuration.LONG_DURATION:
@@ -67,7 +71,7 @@ class Summarizer:
             # Summarize each part of the text,
             # TODO:the first split is considered as "table of content" and we should
             #  make semantic context aware split to determine which part is "toc" and which part is content using an
-            #  specialized llm to
+            #  specialized llm
             summarized_text += texts[0] + "."
             summarized_text += "\n-------\n"
 
@@ -84,12 +88,16 @@ class Summarizer:
             )
             texts = content_text_splitter.split_text("".join(texts[1:]))
             for text in tqdm(texts[1:]):
-                summarized_text += self.llm.invoke(
+                new_summary = self.llm.invoke(
                     prompt_template.format(
                         SummaryDuration.SHORT_DURATION.value,
                         SummaryDuration.SHORT_DURATION.value,
                         text,
                     )
+                )
+
+                summarized_text += (
+                    new_summary if type(new_summary) == str else new_summary.content
                 )
         self.summarized_text = summarized_text
         return summarized_text
@@ -122,23 +130,28 @@ class Summarizer:
 
             # TODO: Do not suppose all articles are named 'source.csv'.
             #  At this time, all of them (malijet, bamada net, etc.) have their own folder with 'source.csv' inside.
-            if "source" in input_text_path.name:
-                # get a random article to summarize
-                self.text_to_summarize = random.choice(
-                    self.text_to_summarize.split("\n")[1:-1]
-                )
-
-                self.text_to_summarize = self.text_to_summarize.replace("\n", " ")
-                print(f"Article chosen : {self.text_to_summarize[:100]}")
-                print("Getting the medium summary...")
-                self.get_medium_summary()
+            # if "source" in input_text_path.name:
+            #     # get a random article to summarize
+            #     self.text_to_summarize = random.choice(
+            #         self.text_to_summarize.split("\n")[1:-1]
+            #     )
+            #
+            #     self.text_to_summarize = self.text_to_summarize.replace("\n", " ")
+            #     print(f"Article chosen : {self.text_to_summarize[:100]}")
+            #     print("Getting the medium summary...")
+            #     self.get_medium_summary()
 
             # Youtube videos transcripts are usually long texts
-            elif len(self.text_to_summarize) > SHORT_TEXT_MAXI_LENGTH:
+            if len(self.text_to_summarize) > SHORT_TEXT_MAXI_LENGTH:
                 self.text_to_summarize = input_text_path.read_text().replace("\n", " ")
                 print(f"JT chosen : {self.text_to_summarize[:100]}")
                 print("Getting the long summary...")
                 self.get_long_summary()
+            else:
+                self.text_to_summarize = self.text_to_summarize.replace("\n", " ")
+                print(f"Article chosen : {self.text_to_summarize[:100]}")
+                print("Getting the medium summary...")
+                self.get_medium_summary()
         else:
             sys.exit(
                 "Error, input text file does not exist or summarization already exists. Skipping..."
@@ -160,35 +173,22 @@ class Summarizer:
 
 
 if __name__ == "__main__":
+
+    # get the main object
     summary = Summarizer()
 
-    # From articles
-    malijet_articles_path = (
-        Path(__file__).parents[1] / "data" / "malijet" / "source.csv"
+    # From JT specific extract text
+    # jt_text_path = (
+    #     Path(__file__).parents[1] / "data" / "whisper" / "2024-09-30" / "🔴 Direct  JT 20H de ORTM1 du 30 Septembre 2024..txt"
+    # )
+
+    # Or latest transcribed text
+    jt_text_folder = get_most_recent_folder(
+        Path(__file__).parents[1] / "data" / "whisper" / "stt_texts"
     )
-    summary.auto_detect_duration_and_summarize(input_text_path=malijet_articles_path)
+    print(jt_text_folder)
+    jt_text_path = next(jt_text_folder.glob("*"))
+
+    summary.auto_detect_duration_and_summarize(input_text_path=jt_text_path)
     print(summary.summarized_text)
     summary.save_summary()
-
-    # From jt_20h
-    # jt_20h_transcript_path = (
-    #     Path(__file__).parents[1]
-    #     / "data"
-    #     / "whisper"
-    #     / "stt_texts"
-    #     / "2024-05-24"
-    #     / "🔴 Direct | JT 20H de ORTM1 du 24 mai 2024.txt"
-    # )
-
-    # jt_20h_transcript_path = (
-    #     Path(__file__).parents[1]
-    #     / "data"
-    #     / "whisper"
-    #     / "stt_texts"
-    #     / "2024-05-16"
-    #     / "Le 20heures de ORTM1 du 16 mai 2024.txt"
-    # )
-    #
-    # summary.auto_detect_duration_and_summarize(input_text_path=jt_20h_transcript_path)
-    # print(summary.summarized_text)
-    # summary.save_summary()

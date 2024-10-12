@@ -2,9 +2,8 @@ import textwrap
 from datetime import date, datetime
 from pathlib import Path
 
-import moviepy.editor as mp
 import whisper  # From OpenAI: see https://github.com/openai/whisper?tab=readme-ov-file
-from pytube import Playlist, YouTube
+import yt_dlp
 
 from utils import timeit
 
@@ -17,54 +16,121 @@ class TVNewsSpeechToText:
         self.youtube_link = youtube_link
         self.youtube_audio_path = None
         self.yt = None
+        self.yt_info = None
         self.text_transcript_path = None
         self.transcript = None
 
-    def set_youtube_video(self):
-        if self.youtube_link:
-            self.yt = YouTube(url=self.youtube_link)
-
     def get_jt_20h_by_date(self, publish_date: date):
         print("getting JT 20h...")
-        playlist = Playlist(JT_20H_PLAYLIST_URL)
-        for link in reversed(playlist.video_urls):
-            print(link)
-            if YouTube(link).publish_date.date() == publish_date:
-                self.youtube_link = link
-                self.yt = YouTube(url=link)
+
+        # yt-dlp options to only extract metadata without downloading the video
+        ydl_opts = {
+            "quiet": True,  # Disable verbose logs
+            "extract_flat": "in_playlist",  # Extract only metadata from the playlist, no download
+        }
+
+        # Extract metadata from the playlist
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            playlist_info = ydl.extract_info(JT_20H_PLAYLIST_URL, download=False)
+
+        # Loop through the videos in the playlist
+        for video in reversed(playlist_info["entries"]):
+            video_url = f"https://www.youtube.com/watch?v={video['id']}"
+            print(video_url)
+
+            try:
+                # Get metadata for each video
+                with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+                    video_info = ydl.extract_info(video_url, download=False)
+
+                # Compare the publication date with the specified date
+                video_publish_date = date(
+                    year=int(video_info["upload_date"][:4]),
+                    month=int(video_info["upload_date"][4:6]),
+                    day=int(video_info["upload_date"][6:]),
+                )
+            except Exception as e:
+                print(e)
+                continue
+
+            if video_publish_date == publish_date:
+                self.youtube_link = video_url
+                self.yt_info = video_info
+                self.yt_info["upload_date"] = (
+                    video_publish_date  # set the iso-format for date
+                )
                 print("Video found")
                 return "JT 20h video Found"
+
         print("Video not found")
-        return "No video match the specified date."
+        return "No video matches the specified date."
 
     def get_last_jt_20h(self):
-        playlist = Playlist(JT_20H_PLAYLIST_URL)
-        last_video_url = list(playlist.video_urls)[-1]
+        # yt-dlp options to extract metadata without downloading
+        ydl_opts = {
+            "quiet": True,  # Disable verbose logs
+            "extract_flat": "in_playlist",  # Extract only metadata, no download
+        }
+
+        # Extract metadata from the playlist
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            playlist_info = ydl.extract_info(JT_20H_PLAYLIST_URL, download=False)
+
+        # Get the last video URL in the playlist
+        last_video = playlist_info["entries"][-1]
+        last_video_url = f"https://www.youtube.com/watch?v={last_video['id']}"
+        try:
+
+            # Get metadata for each video
+            with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+                video_info = ydl.extract_info(last_video_url, download=False)
+
+            # get video publish date in iso format
+            video_publish_date = date(
+                year=int(video_info["upload_date"][:4]),
+                month=int(video_info["upload_date"][4:6]),
+                day=int(video_info["upload_date"][6:]),
+            )
+        except Exception as e:
+            print(e)
+        # Store the last video link for further processing
         self.youtube_link = last_video_url
-        self.yt = YouTube(last_video_url)
+        self.yt_info = last_video  # Store video info if needed
+        self.yt_info["upload_date"] = video_publish_date
 
     @timeit
     def download_youtube_audio(self, output_path: Path):
-        # set the output path
+        # Set the output path
         self.youtube_audio_path = output_path
 
         if not output_path.exists():
-            # build directory
+            # Create parent directories if needed
             output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            # Select the best audio stream
-            audio_stream = self.yt.streams.filter(only_audio=True).first()
+            # yt-dlp options to download the best audio and convert it to MP3
+            ydl_opts = {
+                "format": "bestaudio/best",  # Select the best available audio
+                "postprocessors": [
+                    {
+                        "key": "FFmpegExtractAudio",  # Use FFmpeg to extract audio
+                        "preferredcodec": "mp3",  # Convert audio to MP3
+                        "preferredquality": "192",  # Set MP3 quality to 192 kbps
+                    }
+                ],
+                "outtmpl": str(output_path).split(".mp3")[
+                    0
+                ],  # Specify the output path for the MP3 file
+                "quiet": False,  # Show logs during the download
+            }
 
-            # Download the audio stream
+            # Download and convert the audio to MP3
             print("Downloading and storing audio file...")
-            audio_stream.download(filename=f"_temp_file.mp4")
-
-            # Convert the downloaded file to MP3
-            with mp.AudioFileClip("_temp_file.mp4") as clip:
-                clip.write_audiofile(output_path)
-
-            # delete the mp4 file
-            Path("_temp_file.mp4").unlink()
+            try:
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.download([self.youtube_link])
+                print(f"Audio file saved at {output_path}")
+            except Exception as e:
+                print(f"Error downloading the audio: {str(e)}")
         else:
             print("Audio file already downloaded. Skipping...")
 
@@ -94,35 +160,30 @@ class TVNewsSpeechToText:
 
 
 if __name__ == "__main__":
-    stt = TVNewsSpeechToText()
 
     # get ORTM specific news for one date
-    JT_PUBLISH_DATE = datetime.strptime("2024-06-20", "%Y-%m-%d").date()
-    stt.get_jt_20h_by_date(publish_date=JT_PUBLISH_DATE)
+    JT_PUBLISH_DATE = datetime.strptime("2024-09-30", "%Y-%m-%d").date()
+
+    # get the speech to a text object
+    stt = TVNewsSpeechToText()
+
+    # JT_PUBLISH_DATE = datetime.today().date() - timedelta(days=1)
+    # print(JT_PUBLISH_DATE)
+    # stt.get_jt_20h_by_date(publish_date=JT_PUBLISH_DATE)
+
+    # or just get the last one
+    stt.get_last_jt_20h()
+
+    # now download
     stt.download_youtube_audio(
         output_path=STT_PATH
         / "stt_audio"
-        / f"{stt.yt.publish_date.date()}"
-        / f"{stt.yt.title}.wav"
+        / f"{stt.yt_info['upload_date']}"
+        / f"{stt.yt_info['title']}.mp3"
     )
     stt.transcribe_and_save(
         write_path=STT_PATH
         / "stt_texts"
-        / f"{stt.yt.publish_date.date()}"
-        / f"{stt.yt.title}.txt"
+        / f"{stt.yt_info['upload_date']}"
+        / f"{stt.yt_info['title']}.txt"
     )
-
-    # get last TV news
-    # stt.get_last_jt_20h()
-    # stt.download_youtube_audio(
-    #     output_path=STT_PATH
-    #     / "stt_audio"
-    #     / f"{stt.yt.publish_date.date()}"
-    #     / f"{stt.yt.title}.wav"
-    # )
-    # stt.transcribe_and_save(
-    #     write_path=STT_PATH
-    #     / "stt_texts"
-    #     / f"{stt.yt.publish_date.date()}"
-    #     / f"{stt.yt.title}.txt"
-    # )

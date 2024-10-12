@@ -183,17 +183,15 @@ class MaliJetDataScraper:
                 )
         if new_titles:
             print(
-                f"\n --- {len(new_titles)} new articles successfully written to files... ---"
+                f"\n --- {len(new_titles)} new articles successfully written to files in 'data' directory... ---"
             )
         else:
             print("\n --- No new articles found. ---")
 
 
 if __name__ == "__main__":
-    START_DATE = "2024-08-24"
+    START_DATE = "2024-09-24"
     END_DATE = date.today()
-
-    print(Path().resolve().parent / "data")
 
     scraper = MaliJetDataScraper(
         date_range=ScrapDate(end_date=END_DATE, begin_date=START_DATE)

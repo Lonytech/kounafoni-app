@@ -12,6 +12,7 @@ class SummaryDuration(str, Enum):
 
 class LLMModelName(str, Enum):
     OLLAMA_OCCIGLOT: str = "mayflowergmbh/occiglot-7b-fr-en-instruct:latest"
+    OLLAMA_LLAMA3: str = "llama3:8b-instruct-q2_K"
     GROQ_LLAMA3: str = "llama3-70b-8192"
 
 

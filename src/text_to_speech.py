@@ -10,9 +10,10 @@ from pydub import AudioSegment
 from pydub.playback import play
 from pydub.utils import ratio_to_db
 
+from models import LLMModelName
 from utils import timeit
 
-LLM_MODEL_NAME = "mayflowergmbh/occiglot-7b-fr-en-instruct"
+LLM_MODEL_NAME = LLMModelName.OLLAMA_OCCIGLOT
 TMP_AUDIO_FILE_PATH = (
     Path(__file__).parents[1] / "data" / "piper" / "tts_audio" / "tmp.wav"
 )
@@ -40,6 +41,7 @@ MAP_VOICES_AND_SPEAKERS_AVAILABLE = {
     },
 }
 
+# Month number converter to french month
 MONTH_NAMES_FR = {
     1: "Janvier",
     2: "Février",
@@ -82,6 +84,7 @@ class NewsTextToSpeech:
 
     def save_split_jt_20h_texts(self, split_texts_path):
         print(f"Saving split files into {split_texts_path}  ...")
+
         # create the dedicated directory
         split_texts_path.mkdir(parents=True, exist_ok=True)
 
@@ -109,33 +112,21 @@ class NewsTextToSpeech:
                 .replace("\n", " ")
             )
         else:
-            # print("Using LLM to semantically divide text in two parts...") news_text: str = self.llm.invoke(
-            # f""" Tu es expert en découpage de texte.
-            # Découpe-moi ce texte en deux parties en utilisant ce
-            # délimiteur.
-            # La première partie, plus courte, est le sommaire qui se trouve au début.
-            # La seconde partie
-            # est le contenu qui est le reste du texte.
-            # Le texte original doit rester intact !
-            #
-            #     Texte original :
-            #     '''{self.input_text}'''
-            #     """
-            # )
-
-            # news_text = " ".join(news_text.split("Première partie")[1:])
-
             print("Using predefined split pattern to split text in two parts...")
             news_texts = self.input_text.split("-------")
 
             # Introduction table of content and content retriever
             self.intro_toc_text = news_texts[0]
-            self.jt_20h_content_text = news_texts[1]
+            if len(news_texts) > 1:
+                self.jt_20h_content_text = news_texts[1]
+            else:
+                self.jt_20h_content_text = news_texts[0]
             self.save_split_jt_20h_texts(split_texts_path)
 
     def generate_and_run_speech_command(self, speaker_reading_text):
         print(f"Generating speech from text...")
-        os.system(f"""echo Hello World and {speaker_reading_text}""")
+        os.system(f"""echo Text : {speaker_reading_text}""")
+
         # Generation
         generated_speech_command = f"""echo {speaker_reading_text} | piper \
         --model {self.tts_model_name} \
@@ -153,6 +144,7 @@ class NewsTextToSpeech:
     @timeit
     def build_jt_20h_intro_audio(self):
         print("Building JT 20h intro audio...")
+
         # get complete intro text
         introduction_sentence = f"""Bonjour, vous êtes sur Kounafôni et vous écoutez le résumé de l'actualité malienne \
         du {self.publish_date.day} {MONTH_NAMES_FR[self.publish_date.month]} {self.publish_date.year} \
@@ -179,7 +171,6 @@ class NewsTextToSpeech:
         self.generate_and_run_speech_command(
             speaker_reading_text=content_text.replace("'", r"\'")
         )
-        # time.sleep(5)  # take time before reading from tmp_file
 
         return AudioSegment.from_wav(TMP_AUDIO_FILE_PATH)
 
@@ -224,6 +215,7 @@ class NewsTextToSpeech:
 
             # TODO: Do not suppose all articles are named 'source.csv'.
             #  At this time, all of them (malijet, bamada net, etc.) have their own folder with 'source.csv' inside.
+            #  This behaviour is different when dealing with production files.
             if "source" in self.input_text_path.name:
 
                 # get a random article to speak loud
@@ -232,8 +224,8 @@ class NewsTextToSpeech:
 
                 self.process_build_and_save_article_audio()
 
-            # YouTube TV texts
             else:
+                # YouTube TV texts only
                 print(f"JT chosen : {self.input_text[:100]}...")
 
                 self.split_jt_20h_text_to_intro_and_content()
@@ -246,16 +238,8 @@ class NewsTextToSpeech:
 
 
 if __name__ == "__main__":
-    # from ORTM speech to text example
-    # summarized_text = (
-    #     Path(__file__).parents[1]
-    #     / "data"
-    #     / "whisper"
-    #     / "summarized_texts"
-    #     / "2024-05-24"
-    #     / "🔴 Direct | JT 20H de ORTM1 du 24 mai 2024.txt"
-    # )
 
+    # select specific text to test the TTS
     summarized_text = (
         Path(__file__).parents[1]
         / "data"
