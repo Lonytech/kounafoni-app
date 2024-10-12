@@ -40,10 +40,10 @@ def get_most_recent_folder(directory_path):
 
 if __name__ == "__main__":
 
+    # get variables
     previous_downloaded_audio_folder = get_most_recent_folder(STT_PATH / "stt_audio")
     upload_date = previous_downloaded_audio_folder.name
     audio_path = next(previous_downloaded_audio_folder.glob("*"))
-    print(audio_path)
     video_title = audio_path.stem
 
     ### 1st step: Speech To Text from ORTM audio (Journal TV 20h) ###
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     stt.youtube_audio_path = audio_path
 
     # transcribe audio downloaded from github-actions [AnimMouse/setup-yt-dlp@v1] to text and save
-    transcript_saving_path = previous_downloaded_audio_folder / f"{video_title}.txt"
+    transcript_saving_path = STT_PATH / "stt_texts" / upload_date / f"{video_title}.txt"
     stt.transcribe_and_save(transcript_saving_path)
 
     ## 2nd step: Summarize the transcribed text ###
