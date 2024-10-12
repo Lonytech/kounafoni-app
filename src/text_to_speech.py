@@ -2,7 +2,7 @@ import os
 import random
 import sys
 import textwrap
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from langchain_community.llms import Ollama
@@ -26,7 +26,7 @@ BACKGROUND_AUDIO_PATH = (
 
 
 # Get always the best quality available for now!
-MAP_VOICES_AND_SPEAKERS_AVAILABLE = {
+MAP_VOICES_AND_SPEAKERS_AVAILABLE: dict[str, dict[str, str | int]] = {
     "gilles": {
         "quality": "low",
         "nb_speakers": 1,
@@ -58,31 +58,33 @@ MONTH_NAMES_FR = {
 }
 
 
-def choose_random_voice():
+def choose_random_voice() -> tuple[str, int | None]:
     voice = random.choice(list(MAP_VOICES_AND_SPEAKERS_AVAILABLE.keys()))
-    nb_speakers = MAP_VOICES_AND_SPEAKERS_AVAILABLE[voice]["nb_speakers"]
+    nb_speakers = int(MAP_VOICES_AND_SPEAKERS_AVAILABLE[voice]["nb_speakers"])
     speaker_id = random.randint(0, nb_speakers - 1) if nb_speakers > 0 else None
     return voice, speaker_id
 
 
 class NewsTextToSpeech:
     def __init__(self, input_text_path: Path):
-        self.input_text_path = input_text_path
-        self.input_text = None
-        self.publish_date = datetime.strptime(
+        self.input_text_path: Path = input_text_path
+        self.input_text: str = str()
+        self.publish_date: date = datetime.strptime(
             self.input_text_path.parent.name, "%Y-%m-%d"
         ).date()
         self.llm = Ollama(model=LLM_MODEL_NAME)
         self.voice, self.speaker_id = choose_random_voice()
-        self.tts_model_name = f'fr_FR-{self.voice}-{MAP_VOICES_AND_SPEAKERS_AVAILABLE[self.voice]["quality"]}'
-        self.text_to_speak_loud = None
-        self.intro_toc_text = None
-        self.intro_toc_text_path = None
-        self.jt_20h_content_text = None
-        self.jt_20h_content_text_path = None
+        self.tts_model_name: str = (
+            f'fr_FR-{self.voice}-{MAP_VOICES_AND_SPEAKERS_AVAILABLE[self.voice]["quality"]}'
+        )
+        self.text_to_speak_loud: str = ""
+        self.intro_toc_text: str = ""
+        self.intro_toc_text_path: Path | None = None
+        self.jt_20h_content_text: str = ""
+        self.jt_20h_content_text_path: Path | None = None
         self.daily_voice_summary = None
 
-    def save_split_jt_20h_texts(self, split_texts_path):
+    def save_split_jt_20h_texts(self, split_texts_path: Path) -> None:
         print(f"Saving split files into {split_texts_path}  ...")
 
         # create the dedicated directory
@@ -98,7 +100,7 @@ class NewsTextToSpeech:
         content_file.write_text(textwrap.fill(self.jt_20h_content_text, width=150))
         self.jt_20h_content_text_path = content_file
 
-    def split_jt_20h_text_to_intro_and_content(self):
+    def split_jt_20h_text_to_intro_and_content(self) -> None:
         split_texts_path = SPLIT_TEXTS_PATH / self.input_text_path.name
         if split_texts_path.exists():
             print("Document have already been split and stored. Skipping...")
@@ -123,7 +125,7 @@ class NewsTextToSpeech:
                 self.jt_20h_content_text = news_texts[0]
             self.save_split_jt_20h_texts(split_texts_path)
 
-    def generate_and_run_speech_command(self, speaker_reading_text):
+    def generate_and_run_speech_command(self, speaker_reading_text: str) -> None:
         print(f"Generating speech from text...")
         os.system(f"""echo Text : {speaker_reading_text}""")
 
@@ -142,7 +144,7 @@ class NewsTextToSpeech:
         os.system(generated_speech_command)
 
     @timeit
-    def build_jt_20h_intro_audio(self):
+    def build_jt_20h_intro_audio(self) -> AudioSegment:
         print("Building JT 20h intro audio...")
 
         # get complete intro text
@@ -164,7 +166,7 @@ class NewsTextToSpeech:
         mixed_sound.export(TMP_AUDIO_FILE_PATH, format="wav")
         return mixed_sound
 
-    def build_full_content_audio(self, content_text):
+    def build_full_content_audio(self, content_text: str) -> AudioSegment:
         print("Building full content audio...")
 
         # get audio from content
@@ -174,13 +176,13 @@ class NewsTextToSpeech:
 
         return AudioSegment.from_wav(TMP_AUDIO_FILE_PATH)
 
-    def save_audio(self, voice_summary, export_path: Path):
+    def save_audio(self, voice_summary: AudioSegment, export_path: Path) -> None:
         print("Saving audio...")
         export_path.parent.mkdir(parents=True, exist_ok=True)
         voice_summary.export(export_path, format="mp3")
         self.daily_voice_summary = voice_summary
 
-    def process_build_and_save_jt_20h_audio(self):
+    def process_build_and_save_jt_20h_audio(self) -> None:
         print("Processing JT 20h audio...")
         mixed_intro = self.build_jt_20h_intro_audio()
         full_content_audio = self.build_full_content_audio(self.jt_20h_content_text)
@@ -192,7 +194,7 @@ class NewsTextToSpeech:
         )
         self.save_audio(voice_summary=daily_voice_summary, export_path=saving_path)
 
-    def process_build_and_save_article_audio(self):
+    def process_build_and_save_article_audio(self) -> None:
         print("Processing article audio...")
         full_content_audio = self.build_full_content_audio(self.input_text)
         saving_path = (
@@ -202,7 +204,7 @@ class NewsTextToSpeech:
         )
         self.save_audio(voice_summary=full_content_audio, export_path=saving_path)
 
-    def generate_and_save_audio_from_text(self):
+    def generate_and_save_audio_from_text(self) -> None:
         print(self.input_text_path)
         print("Starting the audio generation process...")
         if self.input_text_path.exists():
@@ -233,7 +235,7 @@ class NewsTextToSpeech:
         else:
             sys.exit("Error, input text file does not exist. Skipping...")
 
-    def play_generated_audio(self):
+    def play_generated_audio(self) -> None:
         play(self.daily_voice_summary)
 
 

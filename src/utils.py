@@ -6,8 +6,12 @@ import time
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
+from typing import Callable, TypeVar
 
 from dateutil.relativedelta import relativedelta
+
+# any function type
+F = TypeVar("F", bound=Callable[..., None])
 
 
 def human_readable_time(delta):
@@ -28,7 +32,7 @@ def human_readable_time(delta):
     ]
 
 
-def timeit(func):
+def timeit(func: F) -> F:
     """
     Decorator that prints the execution time of a function
     :param func:
@@ -47,7 +51,7 @@ def timeit(func):
     return time_wrapper
 
 
-def format_docs_to_string(docs):
+def format_docs_to_string(docs) -> str:
     """
     Simple Doc formatter for langchain template
     :param docs:
@@ -79,7 +83,7 @@ def format_docs_to_docs(docs):
     return docs_formatted
 
 
-def get_most_recent_folder(directory_path):
+def get_most_recent_folder(directory_path: Path) -> Path | None:
 
     # Convert the input to a Path object if it's a string
     base_path = Path(directory_path)

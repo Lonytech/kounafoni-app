@@ -10,11 +10,8 @@ VECTOR_STORE_DIRECTORY_PATH = (
 )
 EMBEDDING_MODEL_NAME = "bge-m3:567m-fp16"
 
-# def pull_scraped_articles_from_gcs():
-#     pass
 
-
-def update_vectorstore():
+def update_vectorstore() -> None:
     rag_vectorizer = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
     rag_vectorizer.load_documents(rag_vectorizer.data_source_path, is_directory=True)
     rag_vectorizer.split_documents()
@@ -32,10 +29,5 @@ def update_vectorstore():
     )
 
 
-# def push_updated_vectorstore_to_gcs():
-#     pass
-
 if __name__ == "__main__":
-    # pull_scraped_articles_from_gcs()
     update_vectorstore()
-    # push_updated_vectorstore_to_gcs()
