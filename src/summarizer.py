@@ -41,12 +41,17 @@ class Summarizer:
             speech_duration == SummaryDuration.SHORT_DURATION
             or speech_duration == SummaryDuration.MEDIUM_DURATION
         ):
-            summarized_text = self.llm.invoke(
+            new_summary = self.llm.invoke(
                 prompt_template.format(
-                    speech_duration.value,
-                    speech_duration.value,
+                    SummaryDuration.SHORT_DURATION.value,
+                    SummaryDuration.SHORT_DURATION.value,
                     self.text_to_summarize,
                 )
+            )
+
+            # .content is for AI_Message in GROQ
+            summarized_text = (
+                new_summary if type(new_summary) == str else new_summary.content
             )
 
         elif speech_duration == SummaryDuration.LONG_DURATION:
