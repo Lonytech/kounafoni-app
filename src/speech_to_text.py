@@ -12,15 +12,15 @@ JT_20H_PLAYLIST_URL = "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXT
 
 
 class TVNewsSpeechToText:
-    def __init__(self, youtube_link=None):
+    def __init__(self, youtube_link: str = ""):
         self.youtube_link = youtube_link
-        self.youtube_audio_path = None
+        self.youtube_audio_path: Path | None = None
         self.yt = None
-        self.yt_info = None
-        self.text_transcript_path = None
-        self.transcript = None
+        self.yt_info: dict[str, str | date] = {}
+        self.text_transcript_path: Path | None = None
+        self.transcript: str = ""
 
-    def get_jt_20h_by_date(self, publish_date: date):
+    def get_jt_20h_by_date(self, publish_date: date) -> str:
         print("getting JT 20h...")
 
         # yt-dlp options to only extract metadata without downloading the video
@@ -65,7 +65,7 @@ class TVNewsSpeechToText:
         print("Video not found")
         return "No video matches the specified date."
 
-    def get_last_jt_20h(self):
+    def get_last_jt_20h(self) -> str:
         # yt-dlp options to extract metadata without downloading
         ydl_opts = {
             "quiet": True,  # Disable verbose logs
@@ -93,13 +93,17 @@ class TVNewsSpeechToText:
             )
         except Exception as e:
             print(e)
+            print("Error fetching video informations")
+            return "Error while getting video from Youtube"
         # Store the last video link for further processing
         self.youtube_link = last_video_url
         self.yt_info = last_video  # Store video info if needed
         self.yt_info["upload_date"] = video_publish_date
+        print("Video found")
+        return "JT 20h video Found"
 
     @timeit
-    def download_youtube_audio(self, output_path: Path):
+    def download_youtube_audio(self, output_path: Path) -> None:
         # Set the output path
         self.youtube_audio_path = output_path
 
@@ -135,28 +139,31 @@ class TVNewsSpeechToText:
             print("Audio file already downloaded. Skipping...")
 
     @timeit
-    def transcribe_and_save(self, write_path: Path):
+    def transcribe_and_save(self, write_path: Path) -> None:
         model_type = "small"
         model = whisper.load_model(model_type)
         print("Starting transcription...")
         print(self.youtube_audio_path)
-        result = model.transcribe(
-            self.youtube_audio_path.as_posix(), language="fr", verbose=False
-        )
-        print("Transcription Done")
+        if self.youtube_audio_path:
+            result = model.transcribe(
+                self.youtube_audio_path.as_posix(), language="fr", verbose=False
+            )
+            print("Transcription Done")
 
-        # Write the wrapped string to the file
-        wrapped_text_result = textwrap.fill(result["text"], width=150)
-        if not write_path.exists():
-            print("Writing transcription from audio...")
-            write_path.parent.mkdir(parents=True, exist_ok=True)
-            write_path.write_text(wrapped_text_result)
+            # Write the wrapped string to the file
+            wrapped_text_result = textwrap.fill(result["text"], width=150)
+            if not write_path.exists():
+                print("Writing transcription from audio...")
+                write_path.parent.mkdir(parents=True, exist_ok=True)
+                write_path.write_text(wrapped_text_result)
+            else:
+                print("Transcription already exists. Skipping write")
+
+            # update object
+            self.transcript = result["text"]
+            self.text_transcript_path = write_path
         else:
-            print("Transcription already exists. Skipping write")
-
-        # update object
-        self.transcript = result["text"]
-        self.text_transcript_path = write_path
+            print("Incorrect path for downloading and saving audio.")
 
 
 if __name__ == "__main__":
