@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
-from scraper import MaliJetDataScraper, ScrapDate
+from models import ScrapDate
+from scraper import MaliJetDataScraper
 
 if __name__ == "__main__":
 
