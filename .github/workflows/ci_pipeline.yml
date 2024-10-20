@@ -51,5 +51,6 @@ jobs:
 
       - name: Run mypy type checking
         run: |
+          cat pyproject.toml
           poetry run mypy --version
           poetry run mypy .
