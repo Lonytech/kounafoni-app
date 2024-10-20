@@ -2,6 +2,7 @@ import os
 import time
 import uuid
 from pathlib import Path
+from typing import Any
 
 import chainlit as cl
 from langchain.schema.runnable.config import RunnableConfig
@@ -48,17 +49,17 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
     return store[session_id]
 
 
-@cl.on_chat_start
-def main():
+@cl.on_chat_start  # type: ignore
+def main() -> None:
 
     # Build the entire RAG pipeline chain
     rag.build_rag_chain_with_memory()
 
     # define new session id for this chat
-    rag.current_session_id = uuid.uuid4()
+    rag.current_session_id = str(uuid.uuid4())
 
     conversational_rag_chain = RunnableWithMessageHistory(
-        rag.memory_retrieval_chain,
+        rag.memory_retrieval_chain,  # type: ignore
         get_session_history,
         input_messages_key="input",
         history_messages_key="chat_history",
@@ -66,16 +67,16 @@ def main():
     )
 
     # Store the chain in the user session
-    cl.user_session.set("runnable_sequence_llm_chain", conversational_rag_chain)
+    cl.user_session.set("runnable_sequence_llm_chain", conversational_rag_chain)  # type: ignore
 
 
 # memory = ConversationSummaryBufferMemory(llm=llm, input_key='question', output_key='answer')
 
 
-@cl.on_message
-async def on_message(message: cl.Message):
+@cl.on_message  # type: ignore
+async def on_message(message: cl.Message) -> None:
     # Retrieve the chain from the user session
-    agent = cl.user_session.get("runnable_sequence_llm_chain")
+    agent = cl.user_session.get("runnable_sequence_llm_chain")  # type: ignore
 
     msg = cl.Message(content="")
 
@@ -90,4 +91,4 @@ async def on_message(message: cl.Message):
             await msg.stream_token(chunk["answer"])
             time.sleep(0.03)  # slow down Groq inference only in production
 
-    await msg.send()
+    await msg.send()  # type: ignore

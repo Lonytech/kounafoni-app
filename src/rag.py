@@ -51,8 +51,7 @@ class LocalRag:
         )
         self._llm: Ollama | ChatGroq = Ollama(model=LLMModelName.OLLAMA_LLAMA3.value)
         self.system_role: str = ""
-        # self.chain: RunnableSerializable[str, str] = RunnablePassthrough[Never, str]()
-        self.chain: Runnable[str, str]
+        self.chain: RunnableSerializable[str, str] = RunnablePassthrough[str]()
         self.memory_retrieval_chain = None
         self.current_session_id: str = ""
         self.vector_store_db: Chroma = Chroma(
@@ -247,7 +246,7 @@ class LocalRag:
             {
                 "context": self.retriever | format_docs_to_string,
                 "question": RunnablePassthrough[str](),
-            }
+            }  # type: ignore
             | prompt
             | self.llm
             | StrOutputParser()
