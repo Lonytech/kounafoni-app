@@ -49,7 +49,7 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
     return store[session_id]
 
 
-@cl.on_chat_start  # type: ignore
+@cl.on_chat_start
 def main() -> None:
 
     # Build the entire RAG pipeline chain
@@ -73,7 +73,7 @@ def main() -> None:
 # memory = ConversationSummaryBufferMemory(llm=llm, input_key='question', output_key='answer')
 
 
-@cl.on_message  # type: ignore
+@cl.on_message
 async def on_message(message: cl.Message) -> None:
     # Retrieve the chain from the user session
     agent = cl.user_session.get("runnable_sequence_llm_chain")  # type: ignore

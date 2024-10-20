@@ -50,4 +50,6 @@ jobs:
         run: poetry install --no-root --no-cache --only main
 
       - name: Run mypy type checking
-        run: poetry run mypy .
+        run: |
+          poetry run mypy --version
+          poetry run mypy .
