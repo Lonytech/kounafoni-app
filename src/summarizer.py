@@ -4,6 +4,7 @@ from functools import partial
 from pathlib import Path
 
 from langchain_community.llms import Ollama
+from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from tqdm import tqdm
 
@@ -18,14 +19,16 @@ SHORT_TEXT_MAXI_LENGTH = 5_000
 
 
 class Summarizer:
-    def __init__(self, llm=Ollama(model=LLM_MODEL_NAME, num_thread=10)):
+    def __init__(
+        self, llm: Ollama | ChatGroq = Ollama(model=LLM_MODEL_NAME, num_thread=10)
+    ):
         self.llm = llm
-        self.input_text_path = None
-        self.text_to_summarize = None
-        self.summarized_text = None
+        self.input_text_path: Path | None = None
+        self.text_to_summarize: str = ""
+        self.summarized_text: str = ""
 
     @timeit
-    def summarize(self, speech_duration: SummaryDuration):
+    def summarize(self, speech_duration: SummaryDuration) -> None:
         prompt_template = """
                 Résume moi ce texte dans un format spécifique. Tu joues le rôle d'un journaliste TV et tu es chargé de 
                 résumer l'actualité en {0}. Le texte résumé doit être lisible en {1}.
@@ -50,7 +53,9 @@ class Summarizer:
 
             # .content is for AI_Message in GROQ
             summarized_text = (
-                new_summary if type(new_summary) == str else new_summary.content
+                str(new_summary)
+                if type(new_summary) == str
+                else str(new_summary.content)
             )
 
         elif speech_duration == SummaryDuration.LONG_DURATION:
@@ -97,25 +102,26 @@ class Summarizer:
                 )
 
                 summarized_text += (
-                    new_summary if type(new_summary) == str else new_summary.content
+                    str(new_summary)
+                    if type(new_summary) == str
+                    else str(new_summary.content)
                 )
         self.summarized_text = summarized_text
-        return summarized_text
 
     # define partial functions
     # TODO: Make short_summary imbrication within "summarize" method like other partial functions
     # def get_short_summary(self):
     #     return partial(self.summarize, speech_duration=SummaryDuration.SHORT_DURATION)
 
-    def get_medium_summary(self):
+    def get_medium_summary(self) -> None:
         return partial(
             self.summarize, speech_duration=SummaryDuration.MEDIUM_DURATION
         )()
 
-    def get_long_summary(self):
+    def get_long_summary(self) -> None:
         return partial(self.summarize, speech_duration=SummaryDuration.LONG_DURATION)()
 
-    def auto_detect_duration_and_summarize(self, input_text_path: Path):
+    def auto_detect_duration_and_summarize(self, input_text_path: Path) -> None:
         print(input_text_path)
         if (
             input_text_path.exists()
@@ -157,7 +163,10 @@ class Summarizer:
                 "Error, input text file does not exist or summarization already exists. Skipping..."
             )
 
-    def save_summary(self):
+    def save_summary(self) -> None:
+        assert (
+            self.input_text_path is not None
+        ), "input_text_path must be initialized as Path object"
         summarized_text_path = (
             SUMMARIZED_TEXTS_PATH
             / self.input_text_path.parent.name
@@ -187,8 +196,11 @@ if __name__ == "__main__":
         Path(__file__).parents[1] / "data" / "whisper" / "stt_texts"
     )
     print(jt_text_folder)
-    jt_text_path = next(jt_text_folder.glob("*"))
+    if jt_text_folder:
+        jt_text_path = next(jt_text_folder.glob("*"))
 
-    summary.auto_detect_duration_and_summarize(input_text_path=jt_text_path)
-    print(summary.summarized_text)
-    summary.save_summary()
+        summary.auto_detect_duration_and_summarize(input_text_path=jt_text_path)
+        print(summary.summarized_text)
+        summary.save_summary()
+    else:
+        print("Incorrect path submitted. Try again.")

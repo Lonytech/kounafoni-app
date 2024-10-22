@@ -1,6 +1,9 @@
 import os
+from typing import Any
 
-from flask import Flask, redirect, render_template
+from flask import Flask, Response, redirect, render_template
+
+# from flask.wrappers import Response
 
 app = Flask(__name__)
 
@@ -88,18 +91,18 @@ audios = {
 
 
 @app.route("/")
-def home():
+def home() -> Any:
     return render_template("index.html")
 
 
 @app.route("/news")
-def news():
+def news() -> Any:
     sorted_audio = sorted(audios.items(), key=lambda x: x[0], reverse=True)
     return render_template("news.html", audio_files=sorted_audio)
 
 
 @app.route("/chat")
-def chat():
+def chat() -> Any:
     if os.environ.get("FLASK_ENV") == "production":
         return redirect("https://chat.kounafonia.lonytech.com/")
     else:

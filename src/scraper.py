@@ -1,11 +1,12 @@
 import unicodedata
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 
 import dateparser
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from sqlalchemy.sql.functions import current_date
 from tqdm import tqdm
 
 from models import ScrapDate
@@ -19,12 +20,12 @@ class MaliJetDataScraper:
         self.columns = ["title", "source_paper", "date", "link", "content"]
 
     @staticmethod
-    def get_soup_parser(url):
+    def get_soup_parser(url: str) -> BeautifulSoup:
         response = requests.get(url)
         return BeautifulSoup(response.text, "html.parser")
 
     @staticmethod
-    def date_encoding_replacer(date_text):
+    def date_encoding_replacer(date_text: str) -> str:
         replace_map = replace_map = {
             "ao�t": "août",
             "f�vrier": "février",
@@ -35,7 +36,7 @@ class MaliJetDataScraper:
         return date_text
 
     @staticmethod
-    def find_associated_path(list_of_dates: list[date]):
+    def find_associated_path(list_of_dates: list[date]) -> dict[date, Path]:
         date_path_map = dict()
         for d in set(list_of_dates):
             date_path_map[d] = (
@@ -48,12 +49,17 @@ class MaliJetDataScraper:
             )
         return date_path_map
 
-    def get_mali_jet_page_list_of_articles(self, num_page):
+    def get_mali_jet_page_list_of_articles(self, num_page: int) -> pd.DataFrame:
         soup = self.get_soup_parser(
             url=f"https://malijet.com/a_la_une_du_mali/?page={num_page}"
         )
         articles = soup.find("div", id="v_container").find_all("div", class_="card")
-        titles, source_papers, dates, links = [], [], [], []
+
+        # init necessary variables
+        titles: list[str | None] = []
+        source_papers: list[str | None] = []
+        dates: list[date | None] = []
+        links: list[str] = []
         print("Getting list of articles...")
         for article in tqdm(articles[:-1]):
             header = article.find("div", class_="card-header")
@@ -68,14 +74,12 @@ class MaliJetDataScraper:
 
             titles.append(title)
             source_papers.append(None if not infos else infos[0])
-            dates.append(
-                None
-                if not infos
-                or not dateparser.parse(self.date_encoding_replacer(infos[1]))
-                else dateparser.parse(self.date_encoding_replacer(infos[1])).date()
-            )
-            links.append(unicodedata.normalize("NFKD", link["href"]))
-            # print("*"*100)
+            if not infos or not dateparser.parse(self.date_encoding_replacer(infos[1])):
+                dates.append(None)
+            else:
+                found_date = dateparser.parse(self.date_encoding_replacer(infos[1]))
+                if found_date:
+                    dates.append(found_date.date())
         return pd.DataFrame(
             {
                 "title": titles,
@@ -85,7 +89,7 @@ class MaliJetDataScraper:
             }
         )
 
-    def fetch_article_content(self, article_link):
+    def fetch_article_content(self, article_link: str) -> str:
         soup = self.get_soup_parser(url=article_link)
 
         # get content
@@ -117,7 +121,7 @@ class MaliJetDataScraper:
                 .replace("     ", " ")
             )
 
-    def get_new_articles(self):
+    def get_new_articles(self) -> None:
         # Collecting a list of articles
         page_number = 1
         articles_to_fetch_df = pd.DataFrame(columns=self.columns)
@@ -190,7 +194,7 @@ class MaliJetDataScraper:
 
 
 if __name__ == "__main__":
-    START_DATE = "2024-09-24"
+    START_DATE = datetime.strptime("2024-09-24", "%Y-%m-%d").date()
     END_DATE = date.today()
 
     scraper = MaliJetDataScraper(

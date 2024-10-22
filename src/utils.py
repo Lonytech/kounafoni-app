@@ -6,11 +6,16 @@ import time
 from datetime import datetime
 from functools import wraps
 from pathlib import Path
+from typing import Any, Callable, TypeVar
 
 from dateutil.relativedelta import relativedelta
+from langchain_core.documents.base import Document
+
+# any function type
+F = TypeVar("F", bound=Callable[..., Any])
 
 
-def human_readable_time(delta):
+def human_readable_time(delta: relativedelta) -> list[str]:
     """
     Converts a timedelta to a human-readable list of strings.
     :param delta:
@@ -28,7 +33,7 @@ def human_readable_time(delta):
     ]
 
 
-def timeit(func):
+def timeit(func: F) -> F:
     """
     Decorator that prints the execution time of a function
     :param func:
@@ -36,7 +41,7 @@ def timeit(func):
     """
 
     @wraps(func)
-    def time_wrapper(*args, **kwargs):
+    def time_wrapper(*args: Any, **kwargs: Any) -> Any:
         start = time.perf_counter()
         result = func(*args, **kwargs)
         end = time.perf_counter()
@@ -44,10 +49,10 @@ def timeit(func):
         print(f"{func.__name__} took {', '.join(elapsed_time)} to execute")
         return result
 
-    return time_wrapper
+    return time_wrapper  # type: ignore
 
 
-def format_docs_to_string(docs):
+def format_docs_to_string(docs: list[Document]) -> str:
     """
     Simple Doc formatter for langchain template
     :param docs:
@@ -64,7 +69,7 @@ def format_docs_to_string(docs):
     return f"\n\n{'-' * 50}\n".join(docs_formatted)
 
 
-def format_docs_to_docs(docs):
+def format_docs_to_docs(docs: list[Document]) -> list[Document]:
     docs_formatted = list()
     for d in docs:
         doc_presentation = f"Doc title : <<{d.metadata['title']}>>\n"
@@ -79,7 +84,7 @@ def format_docs_to_docs(docs):
     return docs_formatted
 
 
-def get_most_recent_folder(directory_path):
+def get_most_recent_folder(directory_path: Path) -> Path | None:
 
     # Convert the input to a Path object if it's a string
     base_path = Path(directory_path)

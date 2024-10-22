@@ -31,3 +31,23 @@ jobs:
 
       - name: Black file formatting
         run: poetry run black --check .
+
+  mypy:
+    runs-on: ubuntu-22.04
+    needs: lint  # Ensure that the mypy job runs only after lint is successful
+    steps:
+      - name: Checking code availability
+        uses: actions/checkout@v2
+
+      - name: Install poetry and other external dependencies
+        run: |
+          sudo apt update -y
+          sudo apt install -y pipx
+          pipx install poetry==1.7.1
+          export PATH="/root/.local/bin:$PATH"
+
+      - name: Install dependencies with poetry
+        run: poetry install --no-root --no-cache --only main
+
+      - name: Run mypy type checking
+        run: poetry run mypy --allow-untyped-calls .
