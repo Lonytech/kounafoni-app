@@ -27,7 +27,7 @@ ignore_missing_imports = true
 disallow_untyped_decorators = false
 
 [[tool.mypy.overrides]]
-module = ["bs4", "pandas", "pydub.*", "tqdm", "whisper", "yt_dlp"]
+module = ["bs4", "dateutil.*", "pandas", "pydub.*", "requests", "tqdm", "whisper", "yt_dlp"]
 ignore_missing_imports = true
 
 # Install app_gui dependencies to render landing page GUI

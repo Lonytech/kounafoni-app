@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from flask import Flask, Response, redirect, render_template
 
@@ -90,22 +91,22 @@ audios = {
 
 
 @app.route("/")
-def home() -> str:
+def home() -> Any:
     return render_template("index.html")
 
 
 @app.route("/news")
-def news() -> str:
+def news() -> Any:
     sorted_audio = sorted(audios.items(), key=lambda x: x[0], reverse=True)
     return render_template("news.html", audio_files=sorted_audio)
 
 
 @app.route("/chat")
-def chat() -> Response:
+def chat() -> Any:
     if os.environ.get("FLASK_ENV") == "production":
-        return redirect("https://chat.kounafonia.lonytech.com/")  # type: ignore
+        return redirect("https://chat.kounafonia.lonytech.com/")
     else:
-        return redirect("http://127.0.0.1:8000")  # type: ignore
+        return redirect("http://127.0.0.1:8000")
 
 
 if __name__ == "__main__":

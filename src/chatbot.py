@@ -67,7 +67,7 @@ def main() -> None:
     )
 
     # Store the chain in the user session
-    cl.user_session.set("runnable_sequence_llm_chain", conversational_rag_chain)  # type: ignore
+    cl.user_session.set("runnable_sequence_llm_chain", conversational_rag_chain)
 
 
 # memory = ConversationSummaryBufferMemory(llm=llm, input_key='question', output_key='answer')
@@ -76,7 +76,7 @@ def main() -> None:
 @cl.on_message
 async def on_message(message: cl.Message) -> None:
     # Retrieve the chain from the user session
-    agent = cl.user_session.get("runnable_sequence_llm_chain")  # type: ignore
+    agent = cl.user_session.get("runnable_sequence_llm_chain")
 
     msg = cl.Message(content="")
 
@@ -91,4 +91,4 @@ async def on_message(message: cl.Message) -> None:
             await msg.stream_token(chunk["answer"])
             time.sleep(0.03)  # slow down Groq inference only in production
 
-    await msg.send()  # type: ignore
+    await msg.send()
