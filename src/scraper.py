@@ -6,7 +6,6 @@ import dateparser
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from sqlalchemy.sql.functions import current_date
 from tqdm import tqdm
 
 from models import ScrapDate
@@ -80,6 +79,7 @@ class MaliJetDataScraper:
                 found_date = dateparser.parse(self.date_encoding_replacer(infos[1]))
                 if found_date:
                     dates.append(found_date.date())
+            links.append(unicodedata.normalize("NFKD", link["href"]))
         return pd.DataFrame(
             {
                 "title": titles,
