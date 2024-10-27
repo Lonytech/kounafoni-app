@@ -6,7 +6,6 @@ import dateparser
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from sqlalchemy.sql.functions import current_date
 from tqdm import tqdm
 
 from models import ScrapDate
@@ -70,7 +69,11 @@ class MaliJetDataScraper:
                 else unicodedata.normalize("NFKD", header.text.strip().split("\n")[-1])
             )
             infos = article.find("div", class_="card-body")
-            infos = None if not infos else infos.text.strip().split("\n")
+            infos = (
+                None
+                if not infos
+                else [info for info in infos.text.strip().split("\n") if info != ""]
+            )
 
             titles.append(title)
             source_papers.append(None if not infos else infos[0])
@@ -80,6 +83,8 @@ class MaliJetDataScraper:
                 found_date = dateparser.parse(self.date_encoding_replacer(infos[1]))
                 if found_date:
                     dates.append(found_date.date())
+            links.append(unicodedata.normalize("NFKD", link["href"]))
+
         return pd.DataFrame(
             {
                 "title": titles,
@@ -125,7 +130,6 @@ class MaliJetDataScraper:
         # Collecting a list of articles
         page_number = 1
         articles_to_fetch_df = pd.DataFrame(columns=self.columns)
-
         current_date = self.end_date
         while self.begin_date <= current_date:
             print(f"fetching article from page {page_number} ...")
@@ -136,7 +140,11 @@ class MaliJetDataScraper:
                 ]
             )
             page_number += 1
-            current_date = articles_to_fetch_df.date.min()
+            articles_to_fetch_df["date"] = pd.to_datetime(
+                articles_to_fetch_df["date"]
+            ).dt.date
+
+            current_date = articles_to_fetch_df["date"].min()
 
         # Selecting new subset and scraping them
         subset_fetching_articles_df = articles_to_fetch_df.query(
