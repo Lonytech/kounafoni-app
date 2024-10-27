@@ -128,6 +128,8 @@ class MaliJetDataScraper:
         articles_to_fetch_df["date"] = pd.to_datetime(articles_to_fetch_df["date"])
 
         current_date = self.end_date
+        print("current date : ", current_date, type(current_date))
+        print("end date : ", self.end_date, type(self.end_date))
         while self.begin_date <= current_date:
             print(f"fetching article from page {page_number} ...")
             articles_to_fetch_df = pd.concat(
@@ -138,6 +140,8 @@ class MaliJetDataScraper:
             )
             page_number += 1
             current_date = articles_to_fetch_df.date.min()
+            print("current date : ", current_date, type(current_date))
+            print("end date : ", self.end_date, type(self.end_date))
 
         # Selecting new subset and scraping them
         subset_fetching_articles_df = articles_to_fetch_df.query(
