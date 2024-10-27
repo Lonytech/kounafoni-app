@@ -77,8 +77,6 @@ class MaliJetDataScraper:
 
             titles.append(title)
             source_papers.append(None if not infos else infos[0])
-            # print(infos)
-            # print(dateparser.parse(self.date_encoding_replacer(infos[1])))
             if not infos or not dateparser.parse(self.date_encoding_replacer(infos[1])):
                 dates.append(None)
             else:
@@ -87,17 +85,6 @@ class MaliJetDataScraper:
                     dates.append(found_date.date())
             links.append(unicodedata.normalize("NFKD", link["href"]))
 
-            # print(pd.Series([type(d) for d in dates]).value_counts(dropna=False))
-
-            # print("this is it :")
-        #     print(pd.DataFrame(
-        #     {
-        #         "title": titles,
-        #         "source_paper": source_papers,
-        #         "date": dates,
-        #         "link": links,
-        #     }
-        # ))
         return pd.DataFrame(
             {
                 "title": titles,
@@ -143,10 +130,7 @@ class MaliJetDataScraper:
         # Collecting a list of articles
         page_number = 1
         articles_to_fetch_df = pd.DataFrame(columns=self.columns)
-        print("columns : ", articles_to_fetch_df.columns)
         current_date = self.end_date
-        print("outside current date : ", current_date, type(current_date))
-        print("outside end date : ", self.end_date, type(self.end_date))
         while self.begin_date <= current_date:
             print(f"fetching article from page {page_number} ...")
             articles_to_fetch_df = pd.concat(
@@ -159,12 +143,8 @@ class MaliJetDataScraper:
             articles_to_fetch_df["date"] = pd.to_datetime(
                 articles_to_fetch_df["date"]
             ).dt.date
-            # print(articles_to_fetch_df.head(2))
+
             current_date = articles_to_fetch_df["date"].min()
-            # print(articles_to_fetch_df.shape)
-            print(articles_to_fetch_df.date)
-            print("inside current date : ", current_date, type(current_date))
-            print("inside end date : ", self.end_date, type(self.end_date))
 
         # Selecting new subset and scraping them
         subset_fetching_articles_df = articles_to_fetch_df.query(
