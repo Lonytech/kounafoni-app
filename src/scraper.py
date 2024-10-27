@@ -140,6 +140,7 @@ class MaliJetDataScraper:
             )
             page_number += 1
             current_date = articles_to_fetch_df.date.min()
+            print(articles_to_fetch_df.shape)
             print("inside current date : ", current_date, type(current_date))
             print("inside end date : ", self.end_date, type(self.end_date))
 
