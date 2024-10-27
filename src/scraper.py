@@ -125,7 +125,6 @@ class MaliJetDataScraper:
         # Collecting a list of articles
         page_number = 1
         articles_to_fetch_df = pd.DataFrame(columns=self.columns)
-        articles_to_fetch_df["date"] = pd.to_datetime(articles_to_fetch_df["date"])
 
         current_date = self.end_date
         print("outside current date : ", current_date, type(current_date))
@@ -139,6 +138,7 @@ class MaliJetDataScraper:
                 ]
             )
             page_number += 1
+            articles_to_fetch_df["date"] = pd.to_datetime(articles_to_fetch_df["date"])
             current_date = articles_to_fetch_df.date.min()
             print(articles_to_fetch_df.shape)
             print("inside current date : ", current_date, type(current_date))
