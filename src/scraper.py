@@ -125,6 +125,7 @@ class MaliJetDataScraper:
         # Collecting a list of articles
         page_number = 1
         articles_to_fetch_df = pd.DataFrame(columns=self.columns)
+        articles_to_fetch_df["date"] = pd.to_datetime(articles_to_fetch_df["date"])
 
         current_date = self.end_date
         while self.begin_date <= current_date:
