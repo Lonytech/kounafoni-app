@@ -65,18 +65,27 @@ def format_docs_to_string(docs: list[Document]) -> str:
         doc_presentation += f"Doc source_paper : <<{d.metadata['source_paper']}>>\n"
         doc_presentation += f"Doc link : <<{d.metadata['link']}>>\n"
         doc_presentation += f"Doc page_content : <<{d.page_content}>>\n"
+        doc_presentation += f"Question time : <<{datetime.now()}>>\n"
         docs_formatted.append(doc_presentation)
     return f"\n\n{'-' * 50}\n".join(docs_formatted)
 
 
 def format_docs_to_docs(docs: list[Document]) -> list[Document]:
     docs_formatted = list()
+    print(
+        docs[0].metadata["date"],
+        type(docs[0].metadata["date"]),
+        docs[0].metadata.get("date"),
+    )
+    print(docs[:3])
+
     for d in docs:
         doc_presentation = f"Doc title : <<{d.metadata['title']}>>\n"
         doc_presentation += f"Doc date : <<{d.metadata['date']}>>\n"
         doc_presentation += f"Doc source_paper : <<{d.metadata['source_paper']}>>\n"
         doc_presentation += f"Doc link : <<{d.metadata['link']}>>\n"
         doc_presentation += f"Doc page_content : <<{d.page_content}>>\n"
+        doc_presentation += f"Question time : <<{datetime.now()}>>\n"
 
         # saving doc
         d.page_content = doc_presentation

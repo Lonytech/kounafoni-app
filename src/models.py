@@ -2,7 +2,7 @@ from datetime import date
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class SummaryDuration(str, Enum):
@@ -15,6 +15,15 @@ class LLMModelName(str, Enum):
     OLLAMA_OCCIGLOT: str = "mayflowergmbh/occiglot-7b-fr-en-instruct:latest"
     OLLAMA_LLAMA3: str = "llama3:8b-instruct-q2_K"
     GROQ_LLAMA3: str = "llama3-70b-8192"
+
+
+class UserQuestionDateRange(BaseModel):
+    start_date: date | None = Field(
+        description="This is the start date of the time interval to which the user refers in his question."
+    )
+    end_date: date | None = Field(
+        description="This is the end date of the time interval to which the user refers in his question."
+    )
 
 
 class ScrapDate(BaseModel):

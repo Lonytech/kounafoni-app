@@ -2,7 +2,7 @@ import os
 import time
 import uuid
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 import pandas as pd
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
@@ -152,6 +152,13 @@ class LocalRag:
         # update documents split into chunks
         self.documents = text_splitter.split_documents(documents=self.documents)
 
+        # add date to content
+        for doc in self.documents:
+            doc.page_content = (
+                doc.page_content
+                + f"\n<<Document publié le : {doc.metadata['date']} (date en format anglais) >>"
+            )
+
     def read_vector_store(
         self, vector_store_directory: str = CHROMA_DB_PERSIST_PATH.as_posix()
     ) -> None:
@@ -219,9 +226,12 @@ class LocalRag:
         self.read_vector_store()
         self.update_vector_store()
 
-    def set_retriever(self) -> None:
+    def set_retriever(self, search_kwargs: Optional[dict] = None) -> None:
+        if search_kwargs is None:
+            search_kwargs = {"k": 10}
         if self.vector_store_db is not None:
-            retriever = self.vector_store_db.as_retriever(search_kwargs={"k": 10})
+            print("new retriever args : ", search_kwargs)
+            retriever = self.vector_store_db.as_retriever(search_kwargs=search_kwargs)
         else:
             retriever = None
         self.retriever = retriever
@@ -292,16 +302,16 @@ class LocalRag:
 
         ### Answer question ###
         qa_system_prompt = """Tu es un assistant spécialisé sur les tâches de réponse aux questions. 
-        Utilisez les éléments de contexte suivants pour répondre à la question. 
+        Utilise les éléments de contexte suivants pour répondre à la question. 
         Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
         Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
         mets en bas la source de média qui t'as permis d'avoir ces réponses, puis ':',
         puis le lien associé (en lien hyperlink markdown sous le format [Doc title](Doc link)) pour permettre 
         à l'utilisateur de cliquer sur le lien et aller vérifier l'information. 
-        S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
-        Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
-        réponds directement à la question. Si tu n'as pas de réponse explicite dans le contexte, 
-        réponds "Je n'ai pas assez d'informations pour répondre correctement à votre question."
+        Remarque 1: S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
+        Remarque 3 : Ne commence pas ta réponse par : "selon les informations ou contexte fournis" 
+        ou quelque chose de similaire, réponds directement à la question. Si tu n'as pas de réponse explicite 
+        dans le contexte, réponds "Je n'ai pas assez d'informations pour répondre correctement à votre question."
 
         Contexte : {context}"""
 
