@@ -9,7 +9,7 @@ on:
   push:
     branches:
       - '**'
-      -
+
 jobs:
   compute_new_vectors:
     runs-on: ubuntu-latest
