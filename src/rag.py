@@ -1,8 +1,7 @@
 import os
-import time
 import uuid
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import pandas as pd
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
@@ -19,7 +18,6 @@ from langchain_core.runnables import Runnable, RunnablePassthrough, RunnableSeri
 from langchain_core.vectorstores.base import VectorStoreRetriever
 from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from typing_extensions import Never
 
 from models import LLMModelName
 from utils import format_docs_to_docs, format_docs_to_string, timeit
@@ -152,12 +150,9 @@ class LocalRag:
         # update documents split into chunks
         self.documents = text_splitter.split_documents(documents=self.documents)
 
-        # add date to content
+        # add date metadata information as integer
         for doc in self.documents:
-            doc.page_content = (
-                doc.page_content
-                + f"\n<<Document publié le : {doc.metadata['date']} (date en format anglais) >>"
-            )
+            doc.metadata["integer_date"] = int(doc.metadata["date"].replace("-", ""))
 
     def read_vector_store(
         self, vector_store_directory: str = CHROMA_DB_PERSIST_PATH.as_posix()
@@ -226,7 +221,7 @@ class LocalRag:
         self.read_vector_store()
         self.update_vector_store()
 
-    def set_retriever(self, search_kwargs: Optional[dict] = None) -> None:
+    def set_retriever(self, search_kwargs: Optional[dict[str, Any]] = None) -> None:
         if search_kwargs is None:
             search_kwargs = {"k": 10}
         if self.vector_store_db is not None:
@@ -269,11 +264,13 @@ class LocalRag:
         self.set_retriever()
         self.build_llm_chain()
 
-    def build_rag_chain_with_memory(self) -> None:
+    def build_rag_chain_with_memory(
+        self, retriever_search_kwargs: Optional[dict[str, Any]] = None
+    ) -> None:
         self.load_documents(self.data_source_path)
         self.split_documents()
         self.embed_documents_and_update_vector_store()
-        self.set_retriever()
+        self.set_retriever(search_kwargs=retriever_search_kwargs)
 
         ### Contextualize question ###
         contextualize_q_system_prompt = """Compte tenu de l'historique des discussions et de la dernière question 

@@ -72,14 +72,21 @@ def format_docs_to_string(docs: list[Document]) -> str:
 
 def format_docs_to_docs(docs: list[Document]) -> list[Document]:
     docs_formatted = list()
-    print(
-        docs[0].metadata["date"],
-        type(docs[0].metadata["date"]),
-        docs[0].metadata.get("date"),
-    )
-    print(docs[:3])
+    # print(
+    #     docs[0].metadata["date"],
+    #     type(docs[0].metadata["date"]),
+    #     docs[0].metadata.get("date"),
+    # )
+    # print(docs[:3])
 
     for d in docs:
+        print(
+            # d.metadata["date"],
+            # type(d.metadata["date"]),
+            d.metadata.get("date"),
+            d.metadata.get("source_paper"),
+            d.page_content,
+        )
         doc_presentation = f"Doc title : <<{d.metadata['title']}>>\n"
         doc_presentation += f"Doc date : <<{d.metadata['date']}>>\n"
         doc_presentation += f"Doc source_paper : <<{d.metadata['source_paper']}>>\n"

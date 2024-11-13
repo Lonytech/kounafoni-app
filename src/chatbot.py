@@ -3,6 +3,7 @@ import time
 import uuid
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import chainlit as cl
 from langchain.schema.runnable.config import RunnableConfig
@@ -53,17 +54,25 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
 
 
 # Make LLM infer range date of user's question if needed
-def get_range_date_from_user_prompt(user_prompt: str) -> dict[str, str]:
+def get_range_date_from_user_prompt(user_prompt: str) -> Any:
 
     system = (
-        "Tu es un expert en extraction d'information temporelle à partir de la question de l'utilisateur."
-        "Voici les instructions sur le format : {format_instructions}"
+        "Tu es un expert en extraction d'information temporelle à partir de la question de l'utilisateur. "
+        "Si l'utilisateur n'indique pas d'année spécifique, prend l'année du question time."
+        "Voici les instructions sur le format : {format_instructions}."
+        ""
     )
     human = "{text}"
     prompt = ChatPromptTemplate.from_messages([("system", system), ("human", human)])
     parser = JsonOutputParser(pydantic_object=UserQuestionDateRange)
 
-    chain = prompt | qa_rag.llm | parser
+    if qa_rag.llm:
+        chain = prompt | qa_rag.llm | parser
+    else:
+        raise ValueError(
+            "qa_rag.llm is not available, cannot proceed with chain, initialize llm first."
+        )
+
     result = chain.invoke(
         {
             "format_instructions": parser.get_format_instructions(),
@@ -94,9 +103,6 @@ def main() -> None:
     cl.user_session.set("runnable_sequence_llm_chain", conversational_rag_chain)
 
 
-# memory = ConversationSummaryBufferMemory(llm=llm, input_key='question', output_key='answer')
-
-
 @cl.on_message
 async def on_message(message: cl.Message) -> None:
     # Retrieve the chain from the user session
@@ -109,16 +115,30 @@ async def on_message(message: cl.Message) -> None:
         ai_infer_range_date["start_date"],
         ai_infer_range_date["end_date"],
     )
-    # start_date = datetime.strptime(start_date, "%Y-%m-%d").isoformat()
-    # end_date = datetime.strptime(end_date, "%Y-%m-%d").isoformat()
-    print("start_date and end_date: ", (start_date, end_date))
+
     if start_date and end_date:
-        print("inside it")
+        start_date = int(start_date.replace("-", ""))
+        end_date = int(end_date.replace("-", ""))
+
         time_interval_filter_in_metadata = {
-            "date": {"$gte": start_date, "$lte": end_date}
+            "$and": [
+                {"integer_date": {"$gte": start_date}},
+                {"integer_date": {"$lte": end_date}},
+            ]
         }
-        search_kwargs = {"k": 10, "filter": time_interval_filter_in_metadata}
-        qa_rag.set_retriever(search_kwargs=search_kwargs)
+        search_kwargs = {"filter": time_interval_filter_in_metadata, "k": 4}
+
+        # Rebuild the entire RAG pipeline chain
+        qa_rag.build_rag_chain_with_memory(retriever_search_kwargs=search_kwargs)
+
+        # qa_rag.build_rag_chain_with_memory()
+        agent = RunnableWithMessageHistory(
+            qa_rag.memory_retrieval_chain,  # type: ignore
+            get_session_history,
+            input_messages_key="input",
+            history_messages_key="chat_history",
+            output_messages_key="answer",
+        )
 
     msg = cl.Message(content="")
 
