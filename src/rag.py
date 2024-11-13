@@ -302,7 +302,7 @@ class LocalRag:
         Utilise les éléments de contexte suivants pour répondre à la question. 
         Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
         Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
-        mets en bas la source de média qui t'as permis d'avoir ces réponses, puis ':',
+        mets en bas la surce de média qui t'as permis d'avoir ces réponses, puis ':',
         puis le lien associé (en lien hyperlink markdown sous le format [Doc title](Doc link)) pour permettre 
         à l'utilisateur de cliquer sur le lien et aller vérifier l'information. 
         Remarque 1: S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
