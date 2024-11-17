@@ -148,7 +148,7 @@ class LocalRag:
         )
 
         # update documents split into chunks
-        self.documents = text_splitter.split_documents(documents=self.documents)[:50]
+        self.documents = text_splitter.split_documents(documents=self.documents)[:400]
 
         # add date metadata information as integer
         for doc in self.documents:
