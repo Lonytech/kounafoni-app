@@ -14,7 +14,7 @@ from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.documents.base import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import Runnable, RunnablePassthrough, RunnableSerializable
+from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 from langchain_core.vectorstores.base import VectorStoreRetriever
 from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -148,7 +148,7 @@ class LocalRag:
         )
 
         # update documents split into chunks
-        self.documents = text_splitter.split_documents(documents=self.documents)
+        self.documents = text_splitter.split_documents(documents=self.documents)[:50]
 
         # add date metadata information as integer
         for doc in self.documents:
