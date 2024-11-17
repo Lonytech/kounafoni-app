@@ -8,7 +8,7 @@ from flask import Flask, Response, redirect, render_template, send_from_director
 AUDIOS_DIRECTORY_PATH = Path(__file__).parents[2] / "data" / "piper" / "exports"
 
 
-if os.environ.get("CHATBOT_ENV") == "production":
+if os.environ.get("FLASK_ENV") == "production":
     AUDIOS_DIRECTORY_PATH = (
         Path(__file__).parents[2] / "external_volume" / "data" / "exports"
     )
@@ -17,12 +17,11 @@ app = Flask(__name__)
 
 # get a complete list of audio from directory
 audio_dates_dirs = [d for d in AUDIOS_DIRECTORY_PATH.iterdir() if d.is_dir()]
+print(audio_dates_dirs)
 audios = defaultdict(list)
 for folder in audio_dates_dirs:
     for f in folder.iterdir():
-        print(f)
         if f.is_file():
-            print(f)
             audios[folder.name].append(
                 {
                     "media": "ORTM",
