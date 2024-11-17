@@ -1,8 +1,7 @@
 import os
-import time
 import uuid
 from pathlib import Path
-from typing import Union
+from typing import Any, Optional, Union
 
 import pandas as pd
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
@@ -15,11 +14,10 @@ from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.documents.base import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.runnables import Runnable, RunnablePassthrough, RunnableSerializable
+from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 from langchain_core.vectorstores.base import VectorStoreRetriever
 from langchain_groq import ChatGroq
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from typing_extensions import Never
 
 from models import LLMModelName
 from utils import format_docs_to_docs, format_docs_to_string, timeit
@@ -152,6 +150,10 @@ class LocalRag:
         # update documents split into chunks
         self.documents = text_splitter.split_documents(documents=self.documents)
 
+        # add date metadata information as integer
+        for doc in self.documents:
+            doc.metadata["integer_date"] = int(doc.metadata["date"].replace("-", ""))
+
     def read_vector_store(
         self, vector_store_directory: str = CHROMA_DB_PERSIST_PATH.as_posix()
     ) -> None:
@@ -219,9 +221,12 @@ class LocalRag:
         self.read_vector_store()
         self.update_vector_store()
 
-    def set_retriever(self) -> None:
+    def set_retriever(self, search_kwargs: Optional[dict[str, Any]] = None) -> None:
+        if search_kwargs is None:
+            search_kwargs = {"k": 10}
         if self.vector_store_db is not None:
-            retriever = self.vector_store_db.as_retriever(search_kwargs={"k": 10})
+            print("new retriever args : ", search_kwargs)
+            retriever = self.vector_store_db.as_retriever(search_kwargs=search_kwargs)
         else:
             retriever = None
         self.retriever = retriever
@@ -259,11 +264,13 @@ class LocalRag:
         self.set_retriever()
         self.build_llm_chain()
 
-    def build_rag_chain_with_memory(self) -> None:
+    def build_rag_chain_with_memory(
+        self, retriever_search_kwargs: Optional[dict[str, Any]] = None
+    ) -> None:
         self.load_documents(self.data_source_path)
         self.split_documents()
         self.embed_documents_and_update_vector_store()
-        self.set_retriever()
+        self.set_retriever(search_kwargs=retriever_search_kwargs)
 
         ### Contextualize question ###
         contextualize_q_system_prompt = """Compte tenu de l'historique des discussions et de la dernière question 
@@ -292,16 +299,16 @@ class LocalRag:
 
         ### Answer question ###
         qa_system_prompt = """Tu es un assistant spécialisé sur les tâches de réponse aux questions. 
-        Utilisez les éléments de contexte suivants pour répondre à la question. 
+        Utilise les éléments de contexte suivants pour répondre à la question. 
         Réponds à la question uniquement grâce au contexte suivant et uniquement en langue française. 
         Il faudra clairement détailler ta réponse. A la fin de ta réponse, 
         mets en bas la source de média qui t'as permis d'avoir ces réponses, puis ':',
         puis le lien associé (en lien hyperlink markdown sous le format [Doc title](Doc link)) pour permettre 
         à l'utilisateur de cliquer sur le lien et aller vérifier l'information. 
-        S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
-        Ne commence pas ta réponse par : "selon les informations ou contexte fournis" ou quelque chose de similaire, 
-        réponds directement à la question. Si tu n'as pas de réponse explicite dans le contexte, 
-        réponds "Je n'ai pas assez d'informations pour répondre correctement à votre question."
+        Remarque 1: S'il y a plusieurs link et plusieurs source_paper, cite les deux majoritaires !
+        Remarque 3 : Ne commence pas ta réponse par : "selon les informations ou contexte fournis" 
+        ou quelque chose de similaire, réponds directement à la question. Si tu n'as pas de réponse explicite 
+        dans le contexte, réponds "Je n'ai pas assez d'informations pour répondre correctement à votre question."
 
         Contexte : {context}"""
 

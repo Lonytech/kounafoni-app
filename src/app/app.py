@@ -3,8 +3,6 @@ from typing import Any
 
 from flask import Flask, Response, redirect, render_template
 
-# from flask.wrappers import Response
-
 app = Flask(__name__)
 
 # Test audio data
@@ -110,4 +108,5 @@ def chat() -> Any:
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    # app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True)
