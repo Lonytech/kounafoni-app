@@ -9,6 +9,7 @@ import chainlit as cl
 from langchain.schema.runnable.config import RunnableConfig
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.exceptions import OutputParserException
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -109,7 +110,15 @@ async def on_message(message: cl.Message) -> None:
     agent = cl.user_session.get("runnable_sequence_llm_chain")
 
     # update basic retriever if needed for time interval purpose
-    ai_infer_range_date = get_range_date_from_user_prompt(user_prompt=message.content)
+    try:
+        ai_infer_range_date = get_range_date_from_user_prompt(
+            user_prompt=message.content
+        )
+    except OutputParserException as e:
+        print(e)
+        ai_infer_range_date = dict()
+        ai_infer_range_date["start_date"] = ""
+        ai_infer_range_date["end_date"] = ""
 
     start_date, end_date = (
         ai_infer_range_date["start_date"],
@@ -126,7 +135,7 @@ async def on_message(message: cl.Message) -> None:
                 {"integer_date": {"$lte": end_date}},
             ]
         }
-        search_kwargs = {"filter": time_interval_filter_in_metadata, "k": 4}
+        search_kwargs = {"filter": time_interval_filter_in_metadata, "k": 10}
 
         # Rebuild the entire RAG pipeline chain
         qa_rag.build_rag_chain_with_memory(retriever_search_kwargs=search_kwargs)
