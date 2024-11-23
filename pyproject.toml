@@ -48,6 +48,7 @@ openai-whisper = "^20231117"
 beautifulsoup4 = "^4.12.3"
 torch = {version = "^2.3.1+cpu", source = "pytorch_cpu"}
 yt-dlp = "^2024.9.27"
+piper-tts = "^1.2.0"
 
 # Install rag dendencies only for chainlit chatbot
 [tool.poetry.group.rag]
