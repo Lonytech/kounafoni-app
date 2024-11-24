@@ -48,7 +48,7 @@ jobs:
       run: |
       
        # white cookie in a file
-       echo $YT_DLP_COOKIE_EXTRACT >> yt_dlp_cookie_extract.txt
+       echo  "${{ secrets.YT_DLP_COOKIE_EXTRACT }}" > yt_dlp_cookie_extract.txt
        
        # playlist url
        PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
