@@ -31,11 +31,11 @@ jobs:
     - name: Install dependencies with poetry
       run: poetry install --no-root --no-cache --only main,news_processing
 
-    - name: Setup yt-dlp
-      uses: AnimMouse/setup-yt-dlp@v1
-      with:
-        with-ffmpeg: true
-        nightly: true
+#    - name: Setup yt-dlp
+#      uses: AnimMouse/setup-yt-dlp@v1
+#      with:
+#        with-ffmpeg: true
+#        nightly: true
 
 #    - name: Setup yt-dlp-youtube-oauth2 plugin
 #      uses: AnimMouse/setup-yt-dlp/oauth@v2
