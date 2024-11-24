@@ -37,10 +37,10 @@ jobs:
         with-ffmpeg: true
         nightly: true
 
-    - name: Setup yt-dlp-youtube-oauth2 plugin
-      uses: AnimMouse/setup-yt-dlp/oauth@v2
-      with:
-        token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
+#    - name: Setup yt-dlp-youtube-oauth2 plugin
+#      uses: AnimMouse/setup-yt-dlp/oauth@v2
+#      with:
+#        token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
 
     # Get the last video in the playlist
     - name: Get the latest video id in the playlist
@@ -50,7 +50,7 @@ jobs:
        PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
        
        # Search for the latest video inside the playlist
-       VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-10].id')
+       VIDEO_ID=$(yt-dlp --cookies "$YT_DLP_COOKIE_EXTRACT" --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-10].id')
        if [ -z "$VIDEO_ID" ]; then
          echo "No video found in the playlist."
          exit 1
@@ -64,11 +64,11 @@ jobs:
       run: |
        # Get relevant attributes (id, upload_date and title) of the video
        VIDEO_ID="${{ steps.get_video.outputs.video_id }}"
-       UPLOAD_DATE=$(date -d "(yt-dlp --username oauth2 --password '' --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
-       TITLE=$(yt-dlp --username oauth2 --password '' --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
+       UPLOAD_DATE=$(date -d "(yt-dlp --cookies "$YT_DLP_COOKIE_EXTRACT" --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
+       TITLE=$(yt-dlp --cookies "$YT_DLP_COOKIE_EXTRACT" --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
         
        # Donwload video as mp3 file
-       yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
+       yt-dlp --cookies "$YT_DLP_COOKIE_EXTRACT" -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
 
     - name: Build Text To Speech (TTS), summarize and Speech To Text (STT)
       env:
