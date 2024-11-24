@@ -71,7 +71,9 @@ jobs:
        VIDEO_ID="${{ steps.get_video.outputs.video_id }}"
        echo $VIDEO_ID
        UPLOAD_DATE=$(date -d "(poetry run yt-dlp --cookies yt_dlp_cookie_extract.txt --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
+       echo $UPLOAD_DATE
        TITLE=$(poetry run yt-dlp --cookies yt_dlp_cookie_extract.txt --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
+        echo $TITLE
         
        # Donwload video as mp3 file
        poetry run yt-dlp --cookies yt_dlp_cookie_extract.txt -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
