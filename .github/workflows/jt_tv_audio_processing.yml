@@ -62,12 +62,14 @@ jobs:
        
        # Save VIDEO_ID to environment file
        echo "VIDEO_ID=$VIDEO_ID" >> $GITHUB_ENV
+       echo $VIDEO_ID
 
     # Download the audio in MP3 format
     - name: Download audio
       run: |
        # Get relevant attributes (id, upload_date and title) of the video
        VIDEO_ID="${{ steps.get_video.outputs.video_id }}"
+       echo $VIDEO_ID
        UPLOAD_DATE=$(date -d "(yt-dlp --cookies yt_dlp_cookie_extract.txt --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
        TITLE=$(yt-dlp --cookies yt_dlp_cookie_extract.txt --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
         
