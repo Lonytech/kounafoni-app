@@ -38,7 +38,7 @@ jobs:
         nightly: true
 
     - name: Setup yt-dlp-youtube-oauth2 plugin
-      uses: AnimMouse/setup-yt-dlp/oauth2@v1
+      uses: AnimMouse/setup-yt-dlp/oauth2@v2
       with:
         token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
 
