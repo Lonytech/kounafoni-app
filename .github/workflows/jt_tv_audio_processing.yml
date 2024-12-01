@@ -42,11 +42,19 @@ jobs:
 #      with:
 #        token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
 
+    - name: Install Chrome
+      run: sudo apt-get install -y google-chrome-stable
+
+    - name: Download video with yt-dlp
+      run: yt-dlp --cookies-from-browser chrome --flat-playlist -J "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N" | jq -r '.entries[-10].id'
+
     # Get the last video in the playlist
     - name: Get the latest video id in the playlist
       id: get_video
       run: |
        poetry run yt-dlp --version
+        
+      
       
        # white cookie in a file
        echo  "${{ secrets.YT_DLP_COOKIE_EXTRACT }}" > yt_dlp_cookie_extract.txt
