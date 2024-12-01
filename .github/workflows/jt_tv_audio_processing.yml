@@ -46,6 +46,7 @@ jobs:
     - name: Get the latest video id in the playlist
       id: get_video
       run: |
+       poetry run yt-dlp --version
       
        # white cookie in a file
        echo  "${{ secrets.YT_DLP_COOKIE_EXTRACT }}" > yt_dlp_cookie_extract.txt
