@@ -47,6 +47,9 @@ jobs:
       id: get_video
       run: |
        poetry run yt-dlp --version
+       
+       poetry run yt-dlp --cookies-from-browser chrome --flat-playlist -J "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N" | jq -r '.entries[-10].id'
+
       
        # white cookie in a file
        echo  "${{ secrets.YT_DLP_COOKIE_EXTRACT }}" > yt_dlp_cookie_extract.txt
