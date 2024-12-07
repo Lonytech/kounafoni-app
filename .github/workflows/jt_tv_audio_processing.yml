@@ -117,6 +117,14 @@ jobs:
         gzip: false # disable gzip compression on upload
         process_gcloudignore: false #no .gcloudignore file in the repo
 
+    - name: Upload intro and body text splits
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'data/piper/split_texts/'
+        destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
+        process_gcloudignore: false #no .gcloudignore file in the repo
+
     - name: Upload summarized texts from stt texts
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
