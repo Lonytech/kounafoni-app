@@ -1,14 +1,9 @@
 name: Process ORTM News to audio summary
 
-#on:
-#  schedule:
-#    # Set execution hour and minutes in UTC (a.k.a GMT)
-#    - cron: '30 05 * * *'
-
 on:
-  push:
-    branches:
-      - '**'
+  schedule:
+    # Set execution hour and minutes in UTC (a.k.a GMT)
+    - cron: '30 05 * * *'
 
 jobs:
   process_audio:
@@ -30,17 +25,6 @@ jobs:
 
     - name: Install dependencies with poetry
       run: poetry install --no-root --no-cache --only main,news_processing
-
-#    - name: Setup yt-dlp
-#      uses: AnimMouse/setup-yt-dlp@v1
-#      with:
-#        with-ffmpeg: true
-#        nightly: true
-
-#    - name: Setup yt-dlp-youtube-oauth2 plugin
-#      uses: AnimMouse/setup-yt-dlp/oauth@v2
-#      with:
-#        token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
 
     - name: Enable VPN connection
       run: |
