@@ -127,6 +127,9 @@ class NewsTextToSpeech:
 
     def generate_and_run_speech_command(self, speaker_reading_text: str) -> None:
         print(f"Generating speech from text...")
+
+        # dropping braces to reduce error while generating speech
+        speaker_reading_text = speaker_reading_text.replace("(", "").replace(")", "")
         os.system(f"""echo Text : {speaker_reading_text}""")
 
         # Generation

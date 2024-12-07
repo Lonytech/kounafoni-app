@@ -19,33 +19,38 @@ jobs:
     - name: Install poetry
       run: |
         sudo apt update -y
-        sudo apt install -y pipx ffmpeg jq
+        sudo apt install -y pipx ffmpeg jq openvpn
         pipx install poetry==1.7.1
         export PATH="/root/.local/bin:$PATH"
 
     - name: Install dependencies with poetry
       run: poetry install --no-root --no-cache --only main,news_processing
 
-    - name: Setup yt-dlp
-      uses: AnimMouse/setup-yt-dlp@v1
-      with:
-        with-ffmpeg: true
-        nightly: true
-
-    - name: Setup yt-dlp-youtube-oauth2 plugin
-      uses: AnimMouse/setup-yt-dlp/oauth2@v1
-      with:
-        token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
+    - name: Enable VPN connection
+      run: |
+        # Get secrets
+        echo "${{ secrets.OPENVPN_USERNAME }}" > openvpn_credentials.txt
+        echo "${{ secrets.OPENVPN_PASSWORD }}" >> openvpn_credentials.txt
+        
+        # Get config
+        echo "${{ secrets.OVPN_CONFIG }}" > nl-free-150.protonvpn.tcp.ovpn
+        
+        sudo openvpn --config nl-free-150.protonvpn.tcp.ovpn --auth-user-pass openvpn_credentials.txt --daemon
 
     # Get the last video in the playlist
     - name: Get the latest video id in the playlist
       id: get_video
       run: |
+       poetry run yt-dlp --version
+        
+       # white cookie in a file
+       echo  "${{ secrets.YT_DLP_COOKIE_EXTRACT }}" > yt_dlp_cookie_extract.txt
+        
        # playlist url
        PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
        
        # Search for the latest video inside the playlist
-       VIDEO_ID=$(yt-dlp --downloader aria2c --username oauth2 --password '' --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-1].id')
+       VIDEO_ID=$(poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-10].id')
        if [ -z "$VIDEO_ID" ]; then
          echo "No video found in the playlist."
          exit 1
@@ -53,17 +58,27 @@ jobs:
        
        # Save VIDEO_ID to environment file
        echo "VIDEO_ID=$VIDEO_ID" >> $GITHUB_ENV
+       echo $VIDEO_ID
 
     # Download the audio in MP3 format
     - name: Download audio
       run: |
        # Get relevant attributes (id, upload_date and title) of the video
        VIDEO_ID="${{ steps.get_video.outputs.video_id }}"
-       UPLOAD_DATE=$(date -d "(yt-dlp --username oauth2 --password '' --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
-       TITLE=$(yt-dlp --username oauth2 --password '' --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
+       echo $VIDEO_ID
+       echo ${{ steps.get_video.outputs.video_id }}
+       
+       UPLOAD_DATE=$(date -d "(poetry run yt-dlp --cookies yt_dlp_cookie_extract.txt --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
+       echo $UPLOAD_DATE
+       
+       TITLE=$(poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
+       echo $TITLE
         
        # Donwload video as mp3 file
-       yt-dlp --downloader aria2c --username oauth2 --password '' -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
+       poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
+
+    - name: Disable VPN connection
+      run: sudo killall openvpn
 
     - name: Build Text To Speech (TTS), summarize and Speech To Text (STT)
       env:
@@ -82,6 +97,14 @@ jobs:
       uses: 'google-github-actions/upload-cloud-storage@v2'
       with:
         path: 'data/whisper/stt_texts'
+        destination: 'kounafonia-news/data'
+        gzip: false # disable gzip compression on upload
+        process_gcloudignore: false #no .gcloudignore file in the repo
+
+    - name: Upload intro and body text splits
+      uses: 'google-github-actions/upload-cloud-storage@v2'
+      with:
+        path: 'data/piper/split_texts/'
         destination: 'kounafonia-news/data'
         gzip: false # disable gzip compression on upload
         process_gcloudignore: false #no .gcloudignore file in the repo
