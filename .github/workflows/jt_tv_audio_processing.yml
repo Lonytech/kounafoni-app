@@ -42,11 +42,16 @@ jobs:
 #      with:
 #        token-data: ${{ secrets.YOUTUBE_OAUTH2_TOKEN_DATA }}
 
-    - name: Install Chrome
-      run: sudo apt-get install -y google-chrome-stable
-
-    - name: Download video with yt-dlp
-      run: poetry run yt-dlp --cookies-from-browser chrome --flat-playlist -J "https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N" | jq -r '.entries[-10].id'
+    - name: Enable VPN connection
+      run: |
+        # Get secrets
+        echo "${{ secrets.OPENVPN_USERNAME }}" > openvpn_credentials.txt
+        echo "${{ secrets.OPENVPN_PASSWORD }}" >> openvpn_credentials.txt
+        
+        # Get config
+        echo "${{ secrets.OVPN_CONFIG }}" > nl-free-150.protonvpn.tcp.ovpn
+        
+        sudo openvpn --config nl-free-150.protonvpn.tcp.ovpn --auth-user-pass openvpn_credentials.txt --daemon
 
     # Get the last video in the playlist
     - name: Get the latest video id in the playlist
@@ -54,8 +59,6 @@ jobs:
       run: |
        poetry run yt-dlp --version
         
-      
-      
        # white cookie in a file
        echo  "${{ secrets.YT_DLP_COOKIE_EXTRACT }}" > yt_dlp_cookie_extract.txt
         
@@ -89,6 +92,9 @@ jobs:
         
        # Donwload video as mp3 file
        poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt -x --audio-format mp3 --audio-quality 192K "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}" -o "data/whisper/stt_audio/$UPLOAD_DATE/$TITLE.mp3"
+
+    - name: Disable VPN connection
+      run: sudo killall openvpn
 
     - name: Build Text To Speech (TTS), summarize and Speech To Text (STT)
       env:
