@@ -24,7 +24,7 @@ jobs:
     - name: Install poetry
       run: |
         sudo apt update -y
-        sudo apt install -y pipx ffmpeg jq
+        sudo apt install -y pipx ffmpeg jq openvpn
         pipx install poetry==1.7.1
         export PATH="/root/.local/bin:$PATH"
 
