@@ -100,7 +100,7 @@ class Summarizer:
                     prompt_template.format(
                         SummaryDuration.SHORT_DURATION.value,
                         SummaryDuration.SHORT_DURATION.value,
-                        1500,  # 1_500 words maxi
+                        1_200,  # 1_200 words maxi
                         text,
                     )
                 )
