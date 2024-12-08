@@ -100,7 +100,7 @@ class Summarizer:
                         SummaryDuration.LONG_DURATION.value,
                         SummaryDuration.LONG_DURATION.value,
                         int(
-                            1_500 / len(texts[1:])
+                            2_000 / len(texts[1:])
                         ),  # 1_500 words maxi for the whole text
                         text,
                     )
