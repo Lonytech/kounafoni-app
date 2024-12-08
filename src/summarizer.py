@@ -97,8 +97,8 @@ class Summarizer:
 
                 new_summary = self.llm.invoke(
                     prompt_template.format(
-                        SummaryDuration.SHORT_DURATION.value,
-                        SummaryDuration.SHORT_DURATION.value,
+                        SummaryDuration.LONG_DURATION.value,
+                        SummaryDuration.LONG_DURATION.value,
                         int(
                             1_500 / len(texts[1:])
                         ),  # 1_500 words maxi for the whole text
