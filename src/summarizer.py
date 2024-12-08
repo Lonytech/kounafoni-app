@@ -31,7 +31,7 @@ class Summarizer:
     def summarize(self, speech_duration: SummaryDuration) -> None:
         prompt_template = """
             Résume moi le texte donné ci bas. Le texte résumé doit être lisible en {0}. 
-            Réponds en {1} mots maximum. 
+            Réponds en exactement {1} mots. Ne dis rien de plus. 
 
             Voici le texte :
             <<<{2}>>>
@@ -98,9 +98,8 @@ class Summarizer:
                 new_summary = self.llm.invoke(
                     prompt_template.format(
                         SummaryDuration.LONG_DURATION.value,
-                        SummaryDuration.LONG_DURATION.value,
                         int(
-                            2_000 / len(texts[1:])
+                            1_500 / len(texts[1:])
                         ),  # 1_500 words maxi for the whole text
                         text,
                     )
