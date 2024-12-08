@@ -28,7 +28,7 @@ jobs:
     - name: Serve and pull ollama model
       run: |
         ollama serve &
-        ollama pull bge-m3:567m-fp16
+        ollama pull mayflowergmbh/occiglot-7b-fr-en-instruct:latest
 
     - name: Install poetry
       run: |
