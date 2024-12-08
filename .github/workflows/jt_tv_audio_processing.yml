@@ -21,6 +21,15 @@ jobs:
     - name: Checkout repository and code validity
       uses: actions/checkout@v4
 
+    - name: Install ollama
+      run: curl -fsSL https://ollama.com/install.sh | sh
+
+
+    - name: Serve and pull ollama model
+      run: |
+        ollama serve &
+        ollama pull bge-m3:567m-fp16
+
     - name: Install poetry
       run: |
         sudo apt update -y
