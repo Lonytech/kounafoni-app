@@ -74,7 +74,7 @@ jobs:
        echo ${{ steps.get_video.outputs.video_id }}
        
        EXTRACTED_DATE=$(poetry run yt-dlp --cookies yt_dlp_cookie_extract.txt --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
-       UPLOAD_DATE=${EXTRACTED_DATE:0:4}-${EXTRACTED_DATE:2:2}-${EXTRACTED_DATE:4:2}
+       UPLOAD_DATE=${EXTRACTED_DATE:0:4}-${EXTRACTED_DATE:4:2}-${EXTRACTED_DATE:6:2}
     
        echo $UPLOAD_DATE
        
