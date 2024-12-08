@@ -30,11 +30,13 @@ class Summarizer:
     @timeit
     def summarize(self, speech_duration: SummaryDuration) -> None:
         prompt_template = """
-                Résume moi ce texte dans un format spécifique. Tu joues le rôle d'un journaliste TV et tu es chargé de 
-                résumer l'actualité en {0}. Le texte résumé doit être lisible en {1}.
+            Résume moi ce texte dans un format spécifique. Tu joues le rôle d'un journaliste TV et tu es chargé de 
+            résumer l'actualité en {0}. Le texte résumé doit être lisible en {1}. 
+            Réponds en {2} mots maximum. 
 
-                "{2}"
-                """
+            Voici le texte :
+            <<<{3}>>>
+        """
 
         # final summary
         summarized_text = str()
@@ -47,6 +49,7 @@ class Summarizer:
                 prompt_template.format(
                     SummaryDuration.SHORT_DURATION.value,
                     SummaryDuration.SHORT_DURATION.value,
+                    700,  # 700 words maxi
                     self.text_to_summarize,
                 )
             )
@@ -97,6 +100,7 @@ class Summarizer:
                     prompt_template.format(
                         SummaryDuration.SHORT_DURATION.value,
                         SummaryDuration.SHORT_DURATION.value,
+                        1500,  # 1_500 words maxi
                         text,
                     )
                 )
