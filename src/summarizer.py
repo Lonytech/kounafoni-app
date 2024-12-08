@@ -30,12 +30,11 @@ class Summarizer:
     @timeit
     def summarize(self, speech_duration: SummaryDuration) -> None:
         prompt_template = """
-            Résume moi ce texte dans un format spécifique. Tu joues le rôle d'un journaliste TV et tu es chargé de 
-            résumer l'actualité en {0}. Le texte résumé doit être lisible en {1}. 
-            Réponds en {2} mots maximum. 
+            Résume moi le texte donné ci bas. Le texte résumé doit être lisible en {0}. 
+            Réponds en {1} mots maximum. 
 
             Voici le texte :
-            <<<{3}>>>
+            <<<{2}>>>
         """
 
         # final summary
@@ -47,7 +46,6 @@ class Summarizer:
         ):
             new_summary = self.llm.invoke(
                 prompt_template.format(
-                    SummaryDuration.SHORT_DURATION.value,
                     SummaryDuration.SHORT_DURATION.value,
                     700,  # 700 words maxi
                     self.text_to_summarize,
@@ -98,7 +96,6 @@ class Summarizer:
             for text in tqdm(texts[1:]):
                 print(
                     prompt_template.format(
-                        SummaryDuration.LONG_DURATION.value,
                         SummaryDuration.LONG_DURATION.value,
                         1_200,  # 1_200 words maxi
                         text,
