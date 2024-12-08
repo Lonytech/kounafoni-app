@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from langchain_community.llms.ollama import Ollama
 from langchain_groq import ChatGroq
 
 from models import LLMModelName
@@ -34,11 +35,12 @@ if __name__ == "__main__":
 
         ## 2nd step: Summarize the transcribed text ###
         summary = Summarizer(
-            llm=ChatGroq(
-                temperature=0,
-                model=LLMModelName.GROQ_LLAMA3.value,
-                stop_sequences=["[END]"],
-            )
+            # llm=ChatGroq(
+            #     temperature=0,
+            #     model=LLMModelName.GROQ_LLAMA3.value,
+            #     stop_sequences=["[END]"],
+            # )
+            # Default to Ollama model
         )
 
         # summarize the text

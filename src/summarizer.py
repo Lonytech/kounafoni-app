@@ -96,6 +96,15 @@ class Summarizer:
             )
             texts = content_text_splitter.split_text("".join(texts[1:]))
             for text in tqdm(texts[1:]):
+                print(
+                    prompt_template.format(
+                        SummaryDuration.LONG_DURATION.value,
+                        SummaryDuration.LONG_DURATION.value,
+                        1_200,  # 1_200 words maxi
+                        text,
+                    )
+                )
+
                 new_summary = self.llm.invoke(
                     prompt_template.format(
                         SummaryDuration.SHORT_DURATION.value,
