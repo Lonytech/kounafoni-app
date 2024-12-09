@@ -31,7 +31,7 @@ class Summarizer:
     def summarize(self, speech_duration: SummaryDuration) -> None:
         prompt_template = """
             Résume moi le texte donné ci bas. Le texte résumé doit être lisible en {0}. 
-            Réponds en exactement {1} mots. Ne dis rien de plus. 
+            Réponds en exactement {1} mots. Ne dis rien de plus, commence ta réponse directement avec le résumé.
 
             Voici le texte :
             <<<{2}>>>
