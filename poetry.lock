@@ -4074,6 +4074,53 @@ files = [
 ]
 
 [[package]]
+name = "piper-phonemize-cross"
+version = "1.2.1"
+description = "Phonemization library used by Piper text to speech system - includes wheels for MacOS & Linux"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "piper_phonemize_cross-1.2.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:dec53c442b1eeab561e318fcba756ca04b946bc4fe8f2f1f2c85f55dd8b7d3d8"},
+    {file = "piper_phonemize_cross-1.2.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:7fd3703eb0ac2504e856d82d30561f3cde8cb2ecb99da13b299b18e4b15e2eff"},
+    {file = "piper_phonemize_cross-1.2.1-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:abc22fbf63eb4a6030fe05fdabc80c9779854ab7f70fa99aa0b623760d0d121a"},
+    {file = "piper_phonemize_cross-1.2.1-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:8b3aafaf066a17d2495ce7bc54a972568cf9bb71cb3ffa02638b4e1aedc696a8"},
+    {file = "piper_phonemize_cross-1.2.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:f06d392e92c986aff56facbe71a11d6c6a9010b366a878b4a11834bc9deca5c5"},
+    {file = "piper_phonemize_cross-1.2.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:c2bbefadc0525e6dc2e7859ba9ee28d9e1ae95dbd99a25374b385cea4df93f4f"},
+    {file = "piper_phonemize_cross-1.2.1-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:bb1c0d0464e26a89e5cb495ec97538d85a18b15069d021f580c458a279cdcc3b"},
+    {file = "piper_phonemize_cross-1.2.1-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:c893c3cd28157e7ad10c1df1c3bbb1c4b3ee794003212bf2eedbc65dfe77168f"},
+    {file = "piper_phonemize_cross-1.2.1-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:cd4a2acc290b2b54273e5508aaf500e63ca4b6fa46db8f491fb905f694f28077"},
+    {file = "piper_phonemize_cross-1.2.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:e6c807b58212677709f1cf453fc7714d9c60c525f967f7652ff66eda308f9e20"},
+    {file = "piper_phonemize_cross-1.2.1-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:2d64cbbc8ceec7614032cd0d86eeb49a678fd430f02833d43914108a384034ea"},
+    {file = "piper_phonemize_cross-1.2.1-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:f171d5bd5a7e19871c9ef6b5a21390020587034ad140bc678d9360bc1627df1d"},
+    {file = "piper_phonemize_cross-1.2.1-cp37-cp37m-macosx_10_9_x86_64.whl", hash = "sha256:448d2132231b25ba5f88f358cef6c1c2cb42d694e6d0c47a6983787de5bdc79e"},
+    {file = "piper_phonemize_cross-1.2.1-cp37-cp37m-manylinux_2_28_aarch64.whl", hash = "sha256:0bf332b692e896112116bd7636b3fe802dac5d44b0f374f031a5cf5d942a22cf"},
+    {file = "piper_phonemize_cross-1.2.1-cp37-cp37m-manylinux_2_28_x86_64.whl", hash = "sha256:fa487b160903912fd5fbd2ca5fab5abceaa6be688b9ffae675bfa2242c5bd9d4"},
+    {file = "piper_phonemize_cross-1.2.1-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:e4827afe4024c24f7a8efd254749d984dbc5f4a37276d42f530329ae2a9f95c2"},
+    {file = "piper_phonemize_cross-1.2.1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:fd678356683ca224f605cef63d8711a86ab95ee5abcf4de2b88bf1cabb8e1413"},
+    {file = "piper_phonemize_cross-1.2.1-cp38-cp38-manylinux_2_28_aarch64.whl", hash = "sha256:2c5ee8f93d878dd34f4d5df7b275a2a92220e29531b605106afd07933e1b9b37"},
+    {file = "piper_phonemize_cross-1.2.1-cp38-cp38-manylinux_2_28_x86_64.whl", hash = "sha256:67852217b168cfbd1e5b188310aeb9d7de574a59a605fce5acb3787ffde4400e"},
+    {file = "piper_phonemize_cross-1.2.1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:5bd547dbd6b6a789594e46a78e85027339ebf9c5423e6d5c646d8259426a40b3"},
+    {file = "piper_phonemize_cross-1.2.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:75e6a0eaa15da33c1f664d0e913eabd09ec263bf46e4a558ab9d25f1c8b54951"},
+    {file = "piper_phonemize_cross-1.2.1-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:466ff0c34e60d7af912a129a0ef10e7385e4660896362ea481e3d9aa9a5bea4b"},
+    {file = "piper_phonemize_cross-1.2.1-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:214af7cef414b97b0ce1f79c545210bdd1b6e4067e171d9e98bed4570b001691"},
+    {file = "piper_phonemize_cross-1.2.1-pp310-pypy310_pp73-macosx_10_9_x86_64.whl", hash = "sha256:473659e49c65048cffcc2f728fe808b6366752b65f41ff12265ee0701847943b"},
+    {file = "piper_phonemize_cross-1.2.1-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:0178817ed015411de4c49479196ebc195263bc9138aba74fb9d27a6ff1e02ade"},
+    {file = "piper_phonemize_cross-1.2.1-pp310-pypy310_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:d195e243394975c361ac1f182b7da2caba1654e68f35adc2ebf3f77faef232af"},
+    {file = "piper_phonemize_cross-1.2.1-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:23a1d110f5b77d4831913cd668c1f68450378683b3e60b09bfd5128a11055f58"},
+    {file = "piper_phonemize_cross-1.2.1-pp37-pypy37_pp73-macosx_10_9_x86_64.whl", hash = "sha256:d5edf0db3f176a1365e56b2df391f646ab000769179e20dcb0c6d2e8ec0e7294"},
+    {file = "piper_phonemize_cross-1.2.1-pp37-pypy37_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:2c155230bea39342f5e5c48bc10e96bdb84f2c91e89b08aff27889fb2e1d8f80"},
+    {file = "piper_phonemize_cross-1.2.1-pp37-pypy37_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:b558b3572a340c5c06eefbedd8cfb19c9ba83082a0cdc8e29dc0a515deba4650"},
+    {file = "piper_phonemize_cross-1.2.1-pp38-pypy38_pp73-macosx_10_9_x86_64.whl", hash = "sha256:4545a81f18ae062520a7bf058887b14e29ee385e2b1bd10af23189d28cedcdd8"},
+    {file = "piper_phonemize_cross-1.2.1-pp38-pypy38_pp73-macosx_11_0_arm64.whl", hash = "sha256:247c5887effd3bf18caf7aba729536aece09ec141e906e93eaa561a4be25c1d9"},
+    {file = "piper_phonemize_cross-1.2.1-pp38-pypy38_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:455481f676567f67ef093acc9fbda44f37e5b34d92f2041bb168421725bd9498"},
+    {file = "piper_phonemize_cross-1.2.1-pp38-pypy38_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:b4307f90fdbc3821dad509b49a6b4685dd5307404310dab716850037bb8eacc8"},
+    {file = "piper_phonemize_cross-1.2.1-pp39-pypy39_pp73-macosx_10_9_x86_64.whl", hash = "sha256:26c6b6131a6663ac94dbe62ed107f1f7d8d4aac52c1489bedf417898ae742784"},
+    {file = "piper_phonemize_cross-1.2.1-pp39-pypy39_pp73-macosx_11_0_arm64.whl", hash = "sha256:7c6b607187daa98429a46d215b9b6c579f5a217122e58dec84a307d875fe8b20"},
+    {file = "piper_phonemize_cross-1.2.1-pp39-pypy39_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:84c65202abcff801892fb58377e0aeb5bbc1049f0162f5b0c2baa56b8752748a"},
+    {file = "piper_phonemize_cross-1.2.1-pp39-pypy39_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:51ab1bdb00722bd3da7c7c1ab0df46dbce9aed7fc78b5bcf347f904bf76a434d"},
+]
+
+[[package]]
 name = "piper-tts"
 version = "1.2.0"
 description = "A fast, local neural text to speech system that sounds great and is optimized for the Raspberry Pi 4."
@@ -6574,4 +6621,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "7974867f55474824dcf1230f01740713089ab4e668e42f2250b740d766cd11a3"
+content-hash = "3bae964ea101a42d8f7ba48b107dddc4b12453b0356f0bd0caaf4df772d4263b"
