@@ -12,7 +12,7 @@ on:
 
 jobs:
   process_audio:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -29,10 +29,7 @@ jobs:
         export PATH="/root/.local/bin:$PATH"
 
     - name: Install dependencies with poetry
-      run: |
-        poetry env list
-        poetry env use python3.11.0
-        poetry install --no-root --no-cache --only main,news_processing
+      run: poetry install --no-root --no-cache --only main,news_processing
 
     - name: Enable VPN connection
       run: |
