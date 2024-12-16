@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
+python = ">=3.10,<3.12"
 langchain = "^0.2.0"
 dateparser = "^1.2.0"
 types-dateparser = "^1.2.0.20240420"
@@ -19,9 +19,9 @@ mypy = "1.12.1"
 chromadb = "^0.5.0"
 langchain-community = "^0.2.0"
 langchain-groq = "^0.1.6"
+piper-tts = "^1.2.0"
 
 # special mypy config for strict static typings and avoid missing library stubs errors
-piper-tts = "^1.2.0"
 [tool.mypy]
 strict = true
 ignore_missing_imports = true
