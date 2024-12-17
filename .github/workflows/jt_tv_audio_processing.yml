@@ -7,7 +7,7 @@ on:
 
 jobs:
   process_audio:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -50,7 +50,7 @@ jobs:
        PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
        
        # Search for the latest video inside the playlist
-       VIDEO_ID=$(poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-10].id')
+       VIDEO_ID=$(poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-1].id')
        if [ -z "$VIDEO_ID" ]; then
          echo "No video found in the playlist."
          exit 1
@@ -68,7 +68,9 @@ jobs:
        echo $VIDEO_ID
        echo ${{ steps.get_video.outputs.video_id }}
        
-       UPLOAD_DATE=$(date -d "(poetry run yt-dlp --cookies yt_dlp_cookie_extract.txt --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")" +"%Y-%m-%d")
+       EXTRACTED_DATE=$(poetry run yt-dlp --cookies yt_dlp_cookie_extract.txt --print upload_date "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")
+       UPLOAD_DATE=${EXTRACTED_DATE:0:4}-${EXTRACTED_DATE:4:2}-${EXTRACTED_DATE:6:2}
+    
        echo $UPLOAD_DATE
        
        TITLE=$(poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt --simulate --print "%(title)s" "https://www.youtube.com/watch?v=${{ env.VIDEO_ID }}")

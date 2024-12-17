@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from langchain_community.llms.ollama import Ollama
 from langchain_groq import ChatGroq
 
 from models import LLMModelName
@@ -39,6 +40,7 @@ if __name__ == "__main__":
                 model=LLMModelName.GROQ_LLAMA3.value,
                 stop_sequences=["[END]"],
             )
+            # Default to Ollama model
         )
 
         # summarize the text
