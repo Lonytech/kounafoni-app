@@ -20,12 +20,17 @@ class MaliJetDataScraper:
 
     @staticmethod
     def get_soup_parser(url: str) -> BeautifulSoup:
-        response = requests.get(url)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/75.0.3770.80 Safari/537.36"
+        }
+        response = requests.get(url, headers=headers)
         return BeautifulSoup(response.text, "html.parser")
 
     @staticmethod
     def date_encoding_replacer(date_text: str) -> str:
-        replace_map = replace_map = {
+        replace_map = {
             "ao�t": "août",
             "f�vrier": "février",
             "d�cembre": "décembre",
@@ -52,6 +57,10 @@ class MaliJetDataScraper:
         soup = self.get_soup_parser(
             url=f"https://malijet.com/a_la_une_du_mali/?page={num_page}"
         )
+        print(f"https://malijet.com/a_la_une_du_mali/?page={num_page}")
+        print(soup)
+        print(soup.find("div"))
+        print(soup.find("div", id="v_container"))
         articles = soup.find("div", id="v_container").find_all("div", class_="card")
 
         # init necessary variables

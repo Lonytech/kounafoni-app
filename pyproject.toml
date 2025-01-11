@@ -22,6 +22,7 @@ langchain-groq = "^0.1.6"
 piper-tts = "^1.2.0"
 
 # special mypy config for strict static typings and avoid missing library stubs errors
+notebook = "^7.3.2"
 [tool.mypy]
 strict = true
 ignore_missing_imports = true
@@ -48,7 +49,7 @@ pydub = "^0.25.1"
 openai-whisper = "^20231117"
 beautifulsoup4 = "^4.12.3"
 torch = {version = "^2.3.1+cpu", source = "pytorch_cpu"}
-yt-dlp = {extras = ["default"], version = "^2024.12.6"}
+yt-dlp = {extras = ["default"], version = "^2024.12.23"}
 piper-phonemize-cross = "^1.2.1"
 piper-tts = "^1.2.0"
 
