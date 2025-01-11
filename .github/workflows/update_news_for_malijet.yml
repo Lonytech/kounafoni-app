@@ -1,9 +1,15 @@
 name: Upload CSV to GCS
 
+#on:
+#  schedule:
+#    # Set execution hour and minutes in UTC (a.k.a GMT)
+#    - cron: '30 23 * * *'
+
 on:
-  schedule:
+  push:
     # Set execution hour and minutes in UTC (a.k.a GMT)
-    - cron: '30 23 * * *'
+    branches:
+      - '**'
 
 jobs:
   upload:

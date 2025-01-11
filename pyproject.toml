@@ -22,6 +22,7 @@ langchain-groq = "^0.1.6"
 piper-tts = "^1.2.0"
 
 # special mypy config for strict static typings and avoid missing library stubs errors
+notebook = "^7.3.2"
 [tool.mypy]
 strict = true
 ignore_missing_imports = true
