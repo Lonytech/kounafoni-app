@@ -21,6 +21,7 @@ langchain-community = "^0.2.0"
 langchain-groq = "^0.1.6"
 piper-tts = "^1.2.0"
 notebook = "^7.3.2"
+pydantic = "<2.10.2"
 
 # special mypy config for strict static typings and avoid missing library stubs errors
 [tool.mypy]

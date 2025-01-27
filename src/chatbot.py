@@ -1,5 +1,6 @@
 import os
 import time
+import traceback
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -106,60 +107,73 @@ def main() -> None:
 
 @cl.on_message
 async def on_message(message: cl.Message) -> None:
-    # Retrieve the chain from the user session
-    agent = cl.user_session.get("runnable_sequence_llm_chain")
 
-    # update basic retriever if needed for time interval purpose
+    # wider try except for troubleshooting
     try:
-        ai_infer_range_date = get_range_date_from_user_prompt(
-            user_prompt=message.content
+        # Retrieve the chain from the user session
+        agent = cl.user_session.get("runnable_sequence_llm_chain")
+
+        # update basic retriever if needed for time interval purpose
+        try:
+            ai_infer_range_date = get_range_date_from_user_prompt(
+                user_prompt=message.content
+            )
+        except OutputParserException as e:
+            print(e)
+            print(traceback.format_exc())
+            ai_infer_range_date = dict()
+            ai_infer_range_date["start_date"] = ""
+            ai_infer_range_date["end_date"] = ""
+
+        start_date, end_date = (
+            ai_infer_range_date["start_date"],
+            ai_infer_range_date["end_date"],
         )
-    except OutputParserException as e:
+
+        if start_date and end_date:
+            start_date = int(start_date.replace("-", ""))
+            end_date = int(end_date.replace("-", ""))
+
+            time_interval_filter_in_metadata = {
+                "$and": [
+                    {"integer_date": {"$gte": start_date}},
+                    {"integer_date": {"$lte": end_date}},
+                ]
+            }
+            search_kwargs = {"filter": time_interval_filter_in_metadata, "k": 10}
+
+            # Rebuild the entire RAG pipeline chain
+            qa_rag.build_rag_chain_with_memory(retriever_search_kwargs=search_kwargs)
+
+            # qa_rag.build_rag_chain_with_memory()
+            agent = RunnableWithMessageHistory(
+                qa_rag.memory_retrieval_chain,  # type: ignore
+                get_session_history,
+                input_messages_key="input",
+                history_messages_key="chat_history",
+                output_messages_key="answer",
+            )
+
+        msg = cl.Message(content="")
+
+        async for chunk in agent.astream(
+            {"input": message.content},
+            config=RunnableConfig(
+                configurable={"session_id": qa_rag.current_session_id},
+                callbacks=[cl.LangchainCallbackHandler()],
+            ),
+        ):
+            if "answer" in chunk:  # check if the chunk has an answer key
+                await msg.stream_token(chunk["answer"])
+                time.sleep(0.03)  # slow down Groq inference only in production
+
+        await msg.send()
+
+    except Exception as e:
         print(e)
-        ai_infer_range_date = dict()
-        ai_infer_range_date["start_date"] = ""
-        ai_infer_range_date["end_date"] = ""
-
-    start_date, end_date = (
-        ai_infer_range_date["start_date"],
-        ai_infer_range_date["end_date"],
-    )
-
-    if start_date and end_date:
-        start_date = int(start_date.replace("-", ""))
-        end_date = int(end_date.replace("-", ""))
-
-        time_interval_filter_in_metadata = {
-            "$and": [
-                {"integer_date": {"$gte": start_date}},
-                {"integer_date": {"$lte": end_date}},
-            ]
-        }
-        search_kwargs = {"filter": time_interval_filter_in_metadata, "k": 10}
-
-        # Rebuild the entire RAG pipeline chain
-        qa_rag.build_rag_chain_with_memory(retriever_search_kwargs=search_kwargs)
-
-        # qa_rag.build_rag_chain_with_memory()
-        agent = RunnableWithMessageHistory(
-            qa_rag.memory_retrieval_chain,  # type: ignore
-            get_session_history,
-            input_messages_key="input",
-            history_messages_key="chat_history",
-            output_messages_key="answer",
+        print(traceback.print_exc())
+        msg = cl.Message(
+            content="🔴 Une erreur s'est produite. Veuillez réessayer ultérieurement."
         )
 
-    msg = cl.Message(content="")
-
-    async for chunk in agent.astream(
-        {"input": message.content},
-        config=RunnableConfig(
-            configurable={"session_id": qa_rag.current_session_id},
-            callbacks=[cl.LangchainCallbackHandler()],
-        ),
-    ):
-        if "answer" in chunk:  # check if the chunk has an answer key
-            await msg.stream_token(chunk["answer"])
-            time.sleep(0.03)  # slow down Groq inference only in production
-
-    await msg.send()
+        await msg.send()
