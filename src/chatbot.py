@@ -171,7 +171,7 @@ async def on_message(message: cl.Message) -> None:
 
     except Exception as e:
         print(e)
-        print(traceback.print_exc())
+        print(traceback.print_exc())  # type: ignore
         msg = cl.Message(
             content="🔴 Une erreur s'est produite. Veuillez réessayer ultérieurement."
         )
