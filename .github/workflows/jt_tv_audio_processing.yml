@@ -55,7 +55,7 @@ jobs:
        PLAYLIST_URL="https://youtube.com/playlist?list=PLDBQmURq6pOfBKc6WU0wXTg2vxAjxjQel&si=n9iNX7AUi-SpNN_N"
        
        # Search for the latest video inside the playlist
-       VIDEO_ID=$(poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-55].id')
+       VIDEO_ID=$(poetry run yt-dlp -Uv --cookies yt_dlp_cookie_extract.txt --flat-playlist -J "$PLAYLIST_URL" | jq -r '.entries[-54].id')
        if [ -z "$VIDEO_ID" ]; then
          echo "No video found in the playlist."
          exit 1
