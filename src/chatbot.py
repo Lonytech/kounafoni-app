@@ -36,7 +36,7 @@ qa_rag = LocalRag(data_source_path=ARTICLE_DIRECTORY_PATH)
 # get list of models from Ollama API in logs
 os.system("curl http://localhost:11434/api/tags")
 
-if os.environ.get("CHATBOT_ENV") == "production" and SECOND_API_KEY:
+if os.environ.get("CHATBOT_ENV") == "production" or SECOND_API_KEY:
     print("🔵 Using Groq for production mode (fast inference)...")
     qa_rag.llm = LLMModelName.GROQ_LLAMA3
 

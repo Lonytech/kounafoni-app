@@ -152,8 +152,8 @@ class NewsTextToSpeech:
 
         # get complete intro text
         introduction_sentence = f"""Bonjour, vous êtes sur Kounafôni et vous écoutez le résumé de l'actualité malienne \
-        du {self.publish_date.day} {MONTH_NAMES_FR[self.publish_date.month]} {self.publish_date.year} \
-        et voici le sommaire. \
+        du {self.publish_date.day} {MONTH_NAMES_FR[self.publish_date.month]} {self.publish_date.year}, \
+        voici le sommaire. \
         A la une, {self.intro_toc_text}"""
         introduction_sentence = introduction_sentence.replace("'", r"\'")
 
