@@ -58,10 +58,7 @@ class MaliJetDataScraper:
             url=f"https://malijet.com/a_la_une_du_mali/?page={num_page}"
         )
         print(f"https://malijet.com/a_la_une_du_mali/?page={num_page}")
-        print(soup)
-        print(soup.find("div"))
-        print(soup.find("div", id="v_container"))
-        articles = soup.find("div", id="v_container").find_all("div", class_="card")
+        articles = soup.find("div", id="v_container").find_all("div", class_="card")  # type: ignore
 
         # init necessary variables
         titles: list[str | None] = []
@@ -119,9 +116,9 @@ class MaliJetDataScraper:
         if content != "":
             return content
         else:
+            large_text: str = soup.find("div", class_="card-header").text  # type: ignore
             large_paragraphs = (
-                soup.find("div", class_="card-header")
-                .text.split("Date : ")[1]
+                large_text.split("Date : ")[1]
                 .split("À lire aussi \n\n\n")
             )
             if len(large_paragraphs) > 1:
