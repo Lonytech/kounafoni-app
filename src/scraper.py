@@ -117,9 +117,8 @@ class MaliJetDataScraper:
             return content
         else:
             large_text: str = soup.find("div", class_="card-header").text  # type: ignore
-            large_paragraphs = (
-                large_text.split("Date : ")[1]
-                .split("À lire aussi \n\n\n")
+            large_paragraphs = large_text.split("Date : ")[1].split(
+                "À lire aussi \n\n\n"
             )
             if len(large_paragraphs) > 1:
                 large_paragraphs[1] = large_paragraphs[1].split("\n\n\n\n")[
