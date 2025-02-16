@@ -42,6 +42,7 @@
     }
 
     .progress-container {
+        position: relative; /* Nécessaire pour positionner le handle */
         flex-grow: 1;
         height: 7px;
         background: rgba(255, 255, 255, 0.1);
@@ -55,6 +56,20 @@
         border-radius: 2px;
         width: 0;
         transition: width 0.1s linear;
+    }
+
+    /* Style du mini-cercle */
+    .progress-handle {
+        position: absolute;
+        top: 50%;
+        left: 0; /* Position initiale */
+        transform: translate(-50%, -50%);
+        width: 14px;
+        height: 14px;
+        background: #4CAF50;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #fff; /* Optionnel : pour le rendre plus visible */
     }
 
     .time-display {
@@ -84,26 +99,76 @@
         document.querySelectorAll('.audio-card').forEach(card => {
             const playBtn = card.querySelector('.play-btn');
             const audioElement = card.querySelector('audio');
+            const progressContainer = card.querySelector('.progress-container');
             const progressBar = card.querySelector('.progress-bar');
-            const currentTime = card.querySelector('.current-time');
-            const duration = card.querySelector('.duration');
+            const handle = card.querySelector('.progress-handle');
+            const currentTimeDisplay = card.querySelector('.current-time');
+            const durationDisplay = card.querySelector('.duration');
 
             playBtn.addEventListener('click', () => togglePlay(audioElement, playBtn));
 
+            // Mise à jour de la progression pendant la lecture
             audioElement.addEventListener('timeupdate', () => {
                 const progress = (audioElement.currentTime / audioElement.duration) * 100;
                 progressBar.style.width = `${progress}%`;
-                currentTime.textContent = formatTime(audioElement.currentTime);
+                handle.style.left = `${progress}%`;
+                currentTimeDisplay.textContent = formatTime(audioElement.currentTime);
             });
 
             audioElement.addEventListener('loadedmetadata', () => {
-                duration.textContent = formatTime(audioElement.duration);
+                durationDisplay.textContent = formatTime(audioElement.duration);
             });
 
-            card.querySelector('.progress-container').addEventListener('click', (e) => {
-                const rect = e.target.getBoundingClientRect();
+            // Cliquer sur le conteneur pour positionner la lecture
+            progressContainer.addEventListener('click', (e) => {
+                const rect = progressContainer.getBoundingClientRect();
                 const pos = (e.clientX - rect.left) / rect.width;
                 audioElement.currentTime = pos * audioElement.duration;
+            });
+
+            // Gestion du glisser-déposer du handle
+            let isDragging = false;
+
+            handle.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                e.stopPropagation(); // Évite de déclencher le clic sur le conteneur
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const rect = progressContainer.getBoundingClientRect();
+                let pos = (e.clientX - rect.left) / rect.width;
+                pos = Math.min(Math.max(pos, 0), 1); // Clamp entre 0 et 1
+                const percentage = pos * 100;
+                progressBar.style.width = `${percentage}%`;
+                handle.style.left = `${percentage}%`;
+                audioElement.currentTime = pos * audioElement.duration;
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) isDragging = false;
+            });
+
+            // Support pour les événements tactiles (mobile)
+            handle.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                e.stopPropagation();
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const touch = e.touches[0];
+                const rect = progressContainer.getBoundingClientRect();
+                let pos = (touch.clientX - rect.left) / rect.width;
+                pos = Math.min(Math.max(pos, 0), 1);
+                const percentage = pos * 100;
+                progressBar.style.width = `${percentage}%`;
+                handle.style.left = `${percentage}%`;
+                audioElement.currentTime = pos * audioElement.duration;
+            });
+
+            document.addEventListener('touchend', () => {
+                if (isDragging) isDragging = false;
             });
         });
 
