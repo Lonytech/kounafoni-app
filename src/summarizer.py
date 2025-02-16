@@ -35,6 +35,8 @@ class Summarizer:
 
             Voici le texte :
             <<<{2}>>>
+            
+            Ne dis rien, donne juste le résumé.
         """
 
         # final summary

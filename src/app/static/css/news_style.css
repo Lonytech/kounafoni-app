@@ -36,9 +36,9 @@ a {
 }
 
 .episode__number {
-    font-size: 2vw;
+    font-size: 2.5vw;
     font-weight: 700;
-    padding: 10px 0;
+    padding: 17px 0;
     position: sticky;
     top: 0;
     text-align: center;
@@ -55,11 +55,14 @@ a {
 }
 
 .episode__content .title {
-    font-weight: 600
+    font-weight: 200;
+    font-size: 2.5vw;
 }
 
 .episode__content .story {
     line-height: 26px;
+    font-size: 1.5vw;
+
 }
 
 @media (max-width: 600px) {
@@ -75,8 +78,9 @@ a {
 }
 
 #search-bar {
-    width: 40%;
-    padding: 10px;
+    width: 60%;
+    font-size: 2.5vw;
+    padding: 2px;
     border-radius: 50px;
     border: none;
     margin-bottom: 30px;
