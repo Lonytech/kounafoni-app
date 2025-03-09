@@ -31,12 +31,13 @@ class Summarizer:
     def summarize(self, speech_duration: SummaryDuration) -> None:
         prompt_template = """
             Résume moi le texte donné ci bas. Le texte résumé doit être lisible en {0}. 
-            Réponds en exactement {1} mots. Ne dis rien de plus, commence ta réponse directement avec le résumé.
+            Réponds en à peu près {1} mots. Ne dis rien de plus, commence ta réponse directement avec le résumé.
 
             Voici le texte :
             <<<{2}>>>
             
-            Ne dis rien, donne juste le résumé.
+            Il est interdit d'introduire le résumé ou de dire "voci le résumé en x mots, etc.".
+            Ne dis absolument rien, donne juste le résumé.
         """
 
         # final summary
